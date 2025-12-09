@@ -1,28 +1,37 @@
 """
-Junkan: The Pre-Flight Impact Analysis Engine
+Junkan - The Pre-Flight Impact Analysis Engine.
 
 Junkan prevents production outages by stitching together the hidden
 dependencies between Infrastructure (Terraform), Data Pipelines (dbt),
 and Application Code.
 
-Key Features:
-- Multi-language parsing via tree-sitter
-- Cross-domain dependency stitching (code <-> infra <-> data)
-- Incremental scanning with file hash tracking
-- Production-ready SQLite persistence with batching
-- Configurable matching strategies with confidence scoring
+Key Components:
+- parsing: Multi-language code parsing (Python, JS, Terraform, K8s, dbt)
+- core: Data types and graph structures
+- stitching: Cross-domain dependency matching
+- analysis: Impact and blast radius analysis
+
+Usage:
+    from junkan.parsing import create_default_engine
+    
+    engine = create_default_engine()
+    nodes, edges, stats = engine.scan_all()
 """
 
 __version__ = "0.4.0"
-__author__ = "Junkan Team"
 
-from .core import (
+from .core.types import (
     Node, Edge, NodeType, RelationshipType,
-    DependencyGraph, ConfidenceCalculator
+    MatchStrategy, MatchResult, ScanMetadata,
 )
 
 __all__ = [
     "__version__",
-    "Node", "Edge", "NodeType", "RelationshipType",
-    "DependencyGraph", "ConfidenceCalculator",
+    "Node",
+    "Edge",
+    "NodeType",
+    "RelationshipType",
+    "MatchStrategy",
+    "MatchResult",
+    "ScanMetadata",
 ]
