@@ -7,8 +7,9 @@ in its own module under cli/commands/.
 
 import click
 
-from .commands import scan, impact, trace, graph, lint, ingest, init
+from .commands import initialize, scan, impact, trace, graph, lint, ingest
 from .commands import blast_radius, check, diff, explain, suppress, stats
+from .commands.initialize import init
 
 
 @click.group()
