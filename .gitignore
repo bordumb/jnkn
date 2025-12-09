@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.so
+.jnkn/
+jnkn.db
+dist/
+build/
+*.egg-info/
+.venv/
+env/
+all_repos.txt
