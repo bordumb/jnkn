@@ -1,11 +1,12 @@
 __pycache__/
 *.py[cod]
 *.so
-.junkan/
-junkan.db
+.jnkn/
+jnkn.db
 dist/
 build/
 *.egg-info/
 .venv/
 env/
 all_repos.txt
+create
