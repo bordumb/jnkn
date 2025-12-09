@@ -1,9 +1,21 @@
 [project]
 name = "jnkn"
-version = "0.4.0"
-description = "CI/CD Gatekeeper for Infrastructure and Data Impact Analysis"
+version = "0.0.0-rc.2"
+description = "The Pre-Flight Impact Analysis Engine for Engineering Teams."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Bordumb", email = "bordumbb@gmail.com" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 dependencies = [
     "click>=8.1.7",
     "networkx>=3.2.1",
@@ -12,6 +24,14 @@ dependencies = [
     "pyyaml>=6.0.0",
     "rich>=13.7.0",
 ]
+
+# Essential for PyPI sidebar links
+[project.urls]
+# Homepage = "https://jnkn.ai"
+Documentation = "https://bordumb.github.io/jnkn/"
+Repository = "https://github.com/bordumb/jnkn"
+Issues = "https://github.com/bordumb/jnkn/issuess"
+# Changelog = "https://docs.jnkn.io/changelog/"
 
 [project.optional-dependencies]
 dev = [

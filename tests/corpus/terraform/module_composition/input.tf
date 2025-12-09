@@ -41,7 +41,7 @@ module "lambda" {
   
   function_name = "my-function"
   handler       = "index.handler"
-  runtime       = "python3.11"
+  runtime       = "python3.12"
   source_path   = "../src/lambda"
 }
 
