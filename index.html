@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#junkan" class="md-skip">
+        <a href="#jnkn" class="md-skip">
           Skip to content
         </a>
       
@@ -4644,34 +4644,36 @@
   
 
 
-<h1 id="junkan">Junkan<a class="headerlink" href="#junkan" title="Permanent link">&para;</a></h1>
+<h1 id="jnkn">Jnkn<a class="headerlink" href="#jnkn" title="Permanent link">&para;</a></h1>
 <p><strong>Catch cross-domain breaking changes before they reach production.</strong></p>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;"></th>
-<th style="text-align: left;"></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;"><strong>:material-clock-fast: 5-Minute Setup</strong></td>
-<td style="text-align: left;"><strong>:material-graph: Understand Impact</strong></td>
-</tr>
-<tr>
-<td style="text-align: left;">Install and scan your first project in minutes. <a href="getting-started/quickstart/">Quickstart →</a></td>
-<td style="text-align: left;">See what breaks when you change infrastructure or code. <a href="explanation/concepts/blast-radius/">Blast Radius →</a></td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>:material-github: CI/CD Ready</strong></td>
-<td style="text-align: left;"><strong>:material-cog: Highly Configurable</strong></td>
-</tr>
-<tr>
-<td style="text-align: left;">Block risky PRs automatically with GitHub Actions. <a href="getting-started/first-ci-integration/">CI Integration →</a></td>
-<td style="text-align: left;">Tune confidence thresholds and suppress false positives. <a href="reference/configuration/junkan-yaml/">Configuration →</a></td>
-</tr>
-</tbody>
-</table>
+<div class="grid cards">
+<ul>
+<li>
+<p>:material-clock-fast:{ .lg .middle } <strong>5-Minute Setup</strong></p>
+<hr />
+<p>Install and scan your first project in minutes.</p>
+<p><a href="getting-started/quickstart/">:octicons-arrow-right-24: Quickstart</a></p>
+</li>
+<li>
+<p>:material-graph:{ .lg .middle } <strong>Understand Impact</strong></p>
+<hr />
+<p>See what breaks when you change infrastructure or code.</p>
+<p><a href="explanation/concepts/blast-radius/">:octicons-arrow-right-24: Blast Radius</a></p>
+</li>
+<li>
+<p>:material-github:{ .lg .middle } <strong>CI/CD Ready</strong></p>
+<hr />
+<p>Block risky PRs automatically with GitHub Actions.</p>
+<p><a href="getting-started/first-ci-integration/">:octicons-arrow-right-24: CI Integration</a></p>
+</li>
+<li>
+<p>:material-cog:{ .lg .middle } <strong>Highly Configurable</strong></p>
+<hr />
+<p>Tune confidence thresholds and suppress false positives.</p>
+<p><a href="reference/configuration/jnkn-yaml.md">:octicons-arrow-right-24: Configuration</a></p>
+</li>
+</ul>
+</div>
 <hr />
 <h2 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link">&para;</a></h2>
 <p>Most CI/CD tools check within their domain. None check <strong>across</strong> domains:</p>
@@ -4701,7 +4703,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Junkan catches the gaps.</strong></p>
+<p><strong>Jnkn catches the gaps.</strong></p>
 <hr />
 <h2 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>graph LR
@@ -4728,13 +4730,13 @@
 <hr />
 <h2 id="quick-example">Quick Example<a class="headerlink" href="#quick-example" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Install</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>junkan
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>jnkn
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Scan your project</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>junkan<span class="w"> </span>scan<span class="w"> </span>--dir<span class="w"> </span>.
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--dir<span class="w"> </span>.
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Check what breaks if DATABASE_URL changes</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>junkan<span class="w"> </span>blast-radius<span class="w"> </span>env:DATABASE_URL
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>jnkn<span class="w"> </span>blast-radius<span class="w"> </span>env:DATABASE_URL
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;env:DATABASE_URL&quot;</span><span class="p">,</span>
@@ -4780,12 +4782,13 @@
 </table>
 <hr />
 <h2 id="get-started">Get Started<a class="headerlink" href="#get-started" title="Permanent link">&para;</a></h2>
-<p><strong>Ready to start?</strong></p>
+<div class="grid cards">
 <ul>
-<li><a href="getting-started/installation/">:material-download: <strong>Install Junkan</strong></a></li>
-<li><a href="getting-started/quickstart/">:material-rocket: <strong>5-Minute Quickstart</strong></a>  </li>
-<li><a href="tutorials/">:material-book: <strong>Read the Tutorials</strong></a></li>
+<li><a href="getting-started/installation/">:octicons-download-24: <strong>Install Jnkn</strong></a></li>
+<li><a href="getting-started/quickstart/">:octicons-rocket-24: <strong>5-Minute Quickstart</strong></a></li>
+<li><a href="tutorials/">:octicons-book-24: <strong>Read the Tutorials</strong></a></li>
 </ul>
+</div>
 
 
 
