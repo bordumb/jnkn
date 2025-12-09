@@ -32,6 +32,9 @@ uv run python -m tests.utils.score_corpus --parser python
 # Verbose output
 uv run python -m tests.utils.score_corpus --verbose
 
+# Verbose python
+uv run python -m tests.utils.score_corpus --parser python --verbose
+
 # Save detailed report
 uv run python -m tests.utils.score_corpus --report scores.json
 ```
