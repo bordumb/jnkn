@@ -1,5 +1,5 @@
 """
-Terraform Parser for Junkan.
+Terraform Parser for Jnkn.
 
 This module provides parsing for Terraform HCL files and plan JSON output.
 Supports both static analysis of .tf files and rich plan-based analysis.

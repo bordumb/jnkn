@@ -24,8 +24,8 @@ def trace(source: str, target: str, graph_file: str, max_paths: int):
     
     \b
     Examples:
-        junkan trace kafka.raw_events reporting.summary
-        junkan trace data:staging.events data:warehouse.fact_events
+        jnkn trace kafka.raw_events reporting.summary
+        jnkn trace data:staging.events data:warehouse.fact_events
     """
     graph = load_graph(graph_file)
     if graph is None:

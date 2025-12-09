@@ -30,9 +30,9 @@ def scan(directory: str, output: str, verbose: bool, no_recursive: bool):
     
     \b
     Examples:
-        junkan scan ./src
-        junkan scan ./jobs --output lineage.json
-        junkan scan . -o graph.html -v
+        jnkn scan ./src
+        jnkn scan ./jobs --output lineage.json
+        jnkn scan . -o graph.html -v
     """
     from ...graph.lineage import LineageGraph
     
@@ -43,7 +43,7 @@ def scan(directory: str, output: str, verbose: bool, no_recursive: bool):
     parsers = _load_parsers(scan_path)
     
     if not parsers:
-        echo_error("No parsers available. Install with: pip install junkan[full]")
+        echo_error("No parsers available. Install with: pip install jnkn[full]")
         return
     
     if verbose:
@@ -94,7 +94,7 @@ def scan(directory: str, output: str, verbose: bool, no_recursive: bool):
         _save_output(graph, output_path)
     else:
         # Default output
-        default_path = Path(".junkan/lineage.json")
+        default_path = Path(".jnkn/lineage.json")
         default_path.parent.mkdir(parents=True, exist_ok=True)
         default_path.write_text(graph.to_json())
         echo_info(f"Saved: {default_path}")

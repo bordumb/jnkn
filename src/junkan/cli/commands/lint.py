@@ -25,8 +25,8 @@ def lint(graph_file: str):
     
     \b
     Examples:
-        junkan lint
-        junkan lint -g custom-graph.json
+        jnkn lint
+        jnkn lint -g custom-graph.json
     """
     graph = load_graph(graph_file)
     if graph is None:

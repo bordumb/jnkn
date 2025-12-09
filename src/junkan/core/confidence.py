@@ -1,5 +1,5 @@
 """
-Confidence Calculation Engine for Junkan.
+Confidence Calculation Engine for Jnkn.
 
 This module provides a sophisticated confidence scoring system for dependency matches.
 It combines multiple signals (exact match, token overlap, suffix/prefix match, etc.)

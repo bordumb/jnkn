@@ -1,5 +1,5 @@
 """
-Parser Engine for Junkan.
+Parser Engine for Jnkn.
 
 This module provides the central orchestration for all parsing activities.
 It manages parser registration, file routing, and result aggregation.
@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 # Default directories to skip during scanning
 DEFAULT_SKIP_DIRS: Set[str] = {
-    ".git", ".junkan", "__pycache__", "node_modules",
+    ".git", ".jnkn", "__pycache__", "node_modules",
     ".venv", "venv", "env", ".env", "dist", "build",
     ".mypy_cache", ".pytest_cache", ".ruff_cache",
     ".tox", ".nox", ".coverage", "htmlcov",
@@ -265,7 +265,7 @@ class ParserRegistry:
         """Get list of all supported file extensions."""
         return list(self._extension_map.keys())
     
-    def discover_parsers(self, entry_point_group: str = "junkan.parsers") -> int:
+    def discover_parsers(self, entry_point_group: str = "jnkn.parsers") -> int:
         """
         Auto-discover parsers via entry points.
         

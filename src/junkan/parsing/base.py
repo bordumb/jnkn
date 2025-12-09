@@ -1,8 +1,8 @@
 """
-Base classes for Junkan parsers.
+Base classes for Jnkn parsers.
 
 This module defines the abstract base classes and common types used by
-all language-specific parsers in the Junkan framework.
+all language-specific parsers in the Jnkn framework.
 
 Key Components:
 - LanguageParser: Abstract base class for all parsers

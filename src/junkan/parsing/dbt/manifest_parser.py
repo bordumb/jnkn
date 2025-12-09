@@ -1,5 +1,5 @@
 """
-dbt Manifest Parser for Junkan.
+dbt Manifest Parser for Jnkn.
 
 This parser provides comprehensive extraction from dbt manifest.json files:
 - Models, sources, seeds, snapshots
@@ -75,7 +75,7 @@ class DbtNode:
     
     @property
     def node_id(self) -> str:
-        """Generate the Junkan node ID."""
+        """Generate the Jnkn node ID."""
         if self.resource_type == "source":
             return f"data:source:{self.schema_name}.{self.name}"
         elif self.resource_type == "model":
@@ -454,7 +454,7 @@ class DbtManifestParser(LanguageParser):
         manifest: Dict[str, Any],
     ) -> Optional[str]:
         """
-        Convert a dbt unique_id to a Junkan node ID.
+        Convert a dbt unique_id to a Jnkn node ID.
         
         dbt IDs are like: model.project.name or source.project.schema.table
         """

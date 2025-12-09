@@ -24,16 +24,16 @@ def blast_radius(artifacts: tuple, graph_file: str, max_depth: int, as_json: boo
     
     \b
     Examples:
-        junkan blast-radius env:DB_HOST
-        junkan blast-radius warehouse.dim_users
-        junkan blast-radius src/models.py infra:payment_db
+        jnkn blast-radius env:DB_HOST
+        jnkn blast-radius warehouse.dim_users
+        jnkn blast-radius src/models.py infra:payment_db
     """
     if not artifacts:
         echo_error("Provide at least one artifact to analyze")
         click.echo()
         click.echo("Examples:")
-        click.echo("  junkan blast-radius env:DB_HOST")
-        click.echo("  junkan blast-radius warehouse.dim_users")
+        click.echo("  jnkn blast-radius env:DB_HOST")
+        click.echo("  jnkn blast-radius warehouse.dim_users")
         return
     
     # Try to use BlastRadiusAnalyzer if available

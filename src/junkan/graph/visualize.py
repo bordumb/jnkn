@@ -87,7 +87,7 @@ def _html_template(nodes: List[Dict], edges: List[Dict],
     return f'''<!DOCTYPE html>
 <html>
 <head>
-    <title>Junkan Lineage Graph</title>
+    <title>Jnkn Lineage Graph</title>
     <meta charset="utf-8">
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style>
@@ -234,7 +234,7 @@ def _html_template(nodes: List[Dict], edges: List[Dict],
 </head>
 <body>
     <div id="header">
-        <h1>🔗 Junkan Lineage Graph</h1>
+        <h1>🔗 Jnkn Lineage Graph</h1>
         <div id="stats">
             <div class="stat">Nodes: <span class="stat-value">{node_count}</span></div>
             <div class="stat">Edges: <span class="stat-value">{edge_count}</span></div>

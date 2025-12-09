@@ -24,9 +24,9 @@ def graph(graph_file: str, output: str):
     
     \b
     Examples:
-        junkan graph
-        junkan graph -o my-pipeline.html
-        junkan graph -i custom.json -o viz.html
+        jnkn graph
+        jnkn graph -o my-pipeline.html
+        jnkn graph -i custom.json -o viz.html
     """
     g = load_graph(graph_file)
     if g is None:

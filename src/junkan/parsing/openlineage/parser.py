@@ -1,8 +1,8 @@
 """
-OpenLineage Parser for Junkan.
+OpenLineage Parser for Jnkn.
 
 This parser imports runtime lineage data from OpenLineage/Marquez,
-enriching Junkan's static analysis with observed production dependencies.
+enriching Jnkn's static analysis with observed production dependencies.
 
 OpenLineage Event Format:
     {
@@ -123,7 +123,7 @@ class OpenLineageParser:
     """
     Parser for OpenLineage events.
     
-    Converts runtime lineage events into Junkan's Node/Edge format,
+    Converts runtime lineage events into Jnkn's Node/Edge format,
     enabling correlation between static code analysis and observed
     production data flows.
     
@@ -756,5 +756,5 @@ if __name__ == "__main__":
                                                   redshift/analytics.exec_dashboard
     """)
     
-    print("\n💡 This runtime lineage can be MERGED with Junkan's static analysis")
+    print("\n💡 This runtime lineage can be MERGED with Jnkn's static analysis")
     print("   to create a complete pre-merge impact analysis system.")

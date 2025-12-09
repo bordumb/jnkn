@@ -1,5 +1,5 @@
 """
-PySpark Parser for Junkan.
+PySpark Parser for Jnkn.
 
 This parser extracts data lineage information from PySpark code:
 - Table reads (spark.read.table, spark.sql SELECT, etc.)

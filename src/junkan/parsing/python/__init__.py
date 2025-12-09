@@ -1,5 +1,5 @@
 """
-Python parsing module for Junkan.
+Python parsing module for Jnkn.
 
 Provides comprehensive Python code analysis including:
 - Import statement extraction

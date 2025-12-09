@@ -1,5 +1,5 @@
 """
-dbt parsing module for Junkan.
+dbt parsing module for Jnkn.
 
 Provides parsing for dbt manifest.json files to extract:
 - Models, sources, seeds, snapshots
@@ -8,7 +8,7 @@ Provides parsing for dbt manifest.json files to extract:
 - Exposures (downstream consumers)
 
 Usage:
-    from junkan.parsing.dbt import DbtManifestParser
+    from jnkn.parsing.dbt import DbtManifestParser
     
     parser = DbtManifestParser()
     result = parser.parse_full(Path("target/manifest.json"))

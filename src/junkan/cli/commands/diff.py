@@ -5,16 +5,16 @@ Analyzes what actually changed between two git refs, not just which files change
 
 Usage:
     # Compare against main
-    junkan diff main HEAD
+    jnkn diff main HEAD
     
     # Compare specific branches
-    junkan diff feature-branch main
+    jnkn diff feature-branch main
     
     # Output as JSON
-    junkan diff main HEAD --format json
+    jnkn diff main HEAD --format json
     
     # Only show breaking changes
-    junkan diff main HEAD --breaking-only
+    jnkn diff main HEAD --breaking-only
 """
 
 import click
@@ -25,7 +25,7 @@ from typing import Optional
 
 # Import the analyzer
 try:
-    from junkan.analysis.diff_analyzer import DiffAnalyzer, DiffReport, ChangeType
+    from jnkn.analysis.diff_analyzer import DiffAnalyzer, DiffReport, ChangeType
 except ImportError:
     # For standalone usage
     sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -63,16 +63,16 @@ def diff(
     \b
     Examples:
         # Basic usage
-        junkan diff main HEAD
+        jnkn diff main HEAD
         
         # Compare branches
-        junkan diff feature-x origin/main
+        jnkn diff feature-x origin/main
         
         # CI/CD usage - fail if breaking changes
-        junkan diff origin/main HEAD --fail-on-breaking
+        jnkn diff origin/main HEAD --fail-on-breaking
         
         # Generate markdown report
-        junkan diff main HEAD --format markdown > CHANGES.md
+        jnkn diff main HEAD --format markdown > CHANGES.md
     
     \b
     Exit Codes:

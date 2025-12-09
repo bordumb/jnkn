@@ -1,5 +1,5 @@
 """
-Token Matching Utilities for Junkan.
+Token Matching Utilities for Jnkn.
 
 This module provides utilities for token-based matching with:
 - Minimum token length filtering
@@ -424,13 +424,13 @@ def create_default_matcher(config_path: Optional[Path] = None) -> TokenMatcher:
     
     Args:
         config_path: Optional path to config file. 
-                    Defaults to .junkan/config.yaml
+                    Defaults to .jnkn/config.yaml
     
     Returns:
         Configured TokenMatcher
     """
     if config_path is None:
-        config_path = Path(".junkan/config.yaml")
+        config_path = Path(".jnkn/config.yaml")
     
     config = load_config_from_yaml(config_path)
     return TokenMatcher(config)

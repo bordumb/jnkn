@@ -1,5 +1,5 @@
 """
-Kubernetes Manifest Parser for Junkan.
+Kubernetes Manifest Parser for Jnkn.
 
 This parser provides comprehensive extraction from Kubernetes YAML manifests:
 - Deployments, StatefulSets, Jobs, CronJobs
@@ -91,7 +91,7 @@ class K8sResource:
     
     @property
     def node_id(self) -> str:
-        """Generate the Junkan node ID."""
+        """Generate the Jnkn node ID."""
         if self.namespace:
             return f"k8s:{self.namespace}/{self.kind.lower()}/{self.name}"
         return f"k8s:{self.kind.lower()}/{self.name}"

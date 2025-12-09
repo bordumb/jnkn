@@ -1,5 +1,5 @@
 """
-Language parsers for Junkan.
+Language parsers for Jnkn.
 
 Provides tree-sitter based parsing for multiple languages.
 """

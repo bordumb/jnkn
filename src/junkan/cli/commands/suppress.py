@@ -27,7 +27,7 @@ def suppress():
 @click.option("-r", "--reason", default="", help="Reason for suppression")
 @click.option("-u", "--created-by", default="cli", help="Who created this")
 @click.option("-e", "--expires-days", type=int, help="Expires after N days")
-@click.option("--config", "config_path", default=".junkan/suppressions.yaml",
+@click.option("--config", "config_path", default=".jnkn/suppressions.yaml",
               help="Path to suppressions file")
 def suppress_add(source_pattern: str, target_pattern: str, reason: str,
                  created_by: str, expires_days: Optional[int], config_path: str):
@@ -40,8 +40,8 @@ def suppress_add(source_pattern: str, target_pattern: str, reason: str,
     
     \b
     Examples:
-        junkan suppress add "env:*_ID" "infra:*" -r "ID fields are generic"
-        junkan suppress add "env:HOST" "infra:*" -r "HOST is generic" -e 30
+        jnkn suppress add "env:*_ID" "infra:*" -r "ID fields are generic"
+        jnkn suppress add "env:HOST" "infra:*" -r "HOST is generic" -e 30
     """
     try:
         from ...stitching.suppressions import SuppressionStore
@@ -77,7 +77,7 @@ def suppress_add(source_pattern: str, target_pattern: str, reason: str,
 
 @suppress.command("remove")
 @click.argument("identifier")
-@click.option("--config", "config_path", default=".junkan/suppressions.yaml",
+@click.option("--config", "config_path", default=".jnkn/suppressions.yaml",
               help="Path to suppressions file")
 def suppress_remove(identifier: str, config_path: str):
     """
@@ -85,8 +85,8 @@ def suppress_remove(identifier: str, config_path: str):
     
     \b
     Examples:
-        junkan suppress remove abc123
-        junkan suppress remove 1
+        jnkn suppress remove abc123
+        jnkn suppress remove 1
     """
     try:
         from ...stitching.suppressions import SuppressionStore
@@ -119,7 +119,7 @@ def suppress_remove(identifier: str, config_path: str):
 
 
 @suppress.command("list")
-@click.option("--config", "config_path", default=".junkan/suppressions.yaml",
+@click.option("--config", "config_path", default=".jnkn/suppressions.yaml",
               help="Path to suppressions file")
 @click.option("--include-expired", is_flag=True, help="Include expired suppressions")
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON")
@@ -129,9 +129,9 @@ def suppress_list(config_path: str, include_expired: bool, as_json: bool):
     
     \b
     Examples:
-        junkan suppress list
-        junkan suppress list --include-expired
-        junkan suppress list --json
+        jnkn suppress list
+        jnkn suppress list --include-expired
+        jnkn suppress list --json
     """
     try:
         from ...stitching.suppressions import SuppressionStore
@@ -149,7 +149,7 @@ def suppress_list(config_path: str, include_expired: bool, as_json: bool):
             click.echo("No suppressions configured.")
             click.echo()
             click.echo("Add one with:")
-            click.echo('  junkan suppress add "env:*_ID" "infra:*" -r "ID fields are generic"')
+            click.echo('  jnkn suppress add "env:*_ID" "infra:*" -r "ID fields are generic"')
             return
         
         click.echo(f"📋 Suppressions ({len(suppressions)} total)")
@@ -178,7 +178,7 @@ def suppress_list(config_path: str, include_expired: bool, as_json: bool):
 @suppress.command("test")
 @click.argument("source_id")
 @click.argument("target_id")
-@click.option("--config", "config_path", default=".junkan/suppressions.yaml",
+@click.option("--config", "config_path", default=".jnkn/suppressions.yaml",
               help="Path to suppressions file")
 def suppress_test(source_id: str, target_id: str, config_path: str):
     """
@@ -186,7 +186,7 @@ def suppress_test(source_id: str, target_id: str, config_path: str):
     
     \b
     Examples:
-        junkan suppress test env:USER_ID infra:main
+        jnkn suppress test env:USER_ID infra:main
     """
     try:
         from ...stitching.suppressions import SuppressionStore

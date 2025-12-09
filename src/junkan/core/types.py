@@ -1,5 +1,5 @@
 """
-Core type definitions for Junkan.
+Core type definitions for Jnkn.
 
 This module defines the fundamental data structures used throughout the system:
 - NodeType: Categories of nodes in the dependency graph

@@ -1,5 +1,5 @@
 """
-Match Explanation Generator for Junkan.
+Match Explanation Generator for Jnkn.
 
 This module provides detailed explanations of why matches were made,
 including all signals considered, their scores, and alternative matches

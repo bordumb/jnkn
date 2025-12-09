@@ -1,4 +1,4 @@
-# Junkan Test Corpus
+# Jnkn Test Corpus
 
 Ground-truth test cases for measuring parser accuracy.
 

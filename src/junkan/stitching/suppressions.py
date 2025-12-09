@@ -1,5 +1,5 @@
 """
-User Suppressions System for Junkan.
+User Suppressions System for Jnkn.
 
 This module provides a system for users to suppress false positive matches.
 Suppressions can be pattern-based (using glob patterns) and have optional
@@ -11,7 +11,7 @@ Features:
 - Expiration support
 - Integration with the Stitcher
 
-Storage Location: .junkan/suppressions.yaml
+Storage Location: .jnkn/suppressions.yaml
 """
 
 from typing import List, Optional, Set, Dict, Any
@@ -147,14 +147,14 @@ class SuppressionStore:
         store.save()
     """
     
-    DEFAULT_PATH = Path(".junkan/suppressions.yaml")
+    DEFAULT_PATH = Path(".jnkn/suppressions.yaml")
     
     def __init__(self, path: Optional[Path] = None):
         """
         Initialize the suppression store.
         
         Args:
-            path: Path to YAML file. Defaults to .junkan/suppressions.yaml
+            path: Path to YAML file. Defaults to .jnkn/suppressions.yaml
         """
         self.path = path or self.DEFAULT_PATH
         self._suppressions: List[Suppression] = []

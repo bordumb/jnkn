@@ -1,5 +1,5 @@
 """
-Spark YAML Parser for Junkan.
+Spark YAML Parser for Jnkn.
 
 This parser extracts job configuration and dependencies from spark.yml files:
 - Job definitions (name, schedule, entry point)

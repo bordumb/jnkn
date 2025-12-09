@@ -1,5 +1,5 @@
 """
-Core modules for Junkan.
+Core modules for Jnkn.
 
 This package contains the fundamental building blocks:
 - types: Data structures (Node, Edge, etc.)

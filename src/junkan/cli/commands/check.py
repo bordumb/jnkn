@@ -10,16 +10,16 @@ This command is designed to run in CI pipelines to:
 
 Usage:
     # Basic check
-    junkan check --diff changes.txt
+    jnkn check --diff changes.txt
     
     # With OpenLineage enrichment
-    junkan check --diff changes.txt --openlineage-url http://marquez:5000
+    jnkn check --diff changes.txt --openlineage-url http://marquez:5000
     
     # With policy enforcement
-    junkan check --diff changes.txt --policy policy.yaml --fail-if-critical
+    jnkn check --diff changes.txt --policy policy.yaml --fail-if-critical
     
     # GitHub Actions integration
-    junkan check --github-pr 123 --repo owner/repo
+    jnkn check --github-pr 123 --repo owner/repo
 """
 
 import click
@@ -167,7 +167,7 @@ class CheckReport:
     
     def to_markdown(self) -> str:
         """Generate markdown summary for PR comment."""
-        lines = ["## 🔍 Junkan Impact Analysis", ""]
+        lines = ["## 🔍 Jnkn Impact Analysis", ""]
         
         # Result banner
         if self.result == CheckResult.BLOCKED:
@@ -709,19 +709,19 @@ def check(
     \b
     Examples:
         # From git diff
-        junkan check --git-diff main HEAD
+        jnkn check --git-diff main HEAD
         
         # From file list
-        junkan check --diff changed_files.txt
+        jnkn check --diff changed_files.txt
         
         # With OpenLineage
-        junkan check --git-diff main HEAD --openlineage-url http://marquez:5000
+        jnkn check --git-diff main HEAD --openlineage-url http://marquez:5000
         
         # With policy
-        junkan check --git-diff main HEAD --policy policy.yaml --fail-if-critical
+        jnkn check --git-diff main HEAD --policy policy.yaml --fail-if-critical
         
         # GitHub Actions
-        junkan check --github-pr 123 --repo owner/repo
+        jnkn check --github-pr 123 --repo owner/repo
     
     \b
     Exit Codes:

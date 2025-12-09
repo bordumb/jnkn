@@ -1,5 +1,5 @@
 """
-JavaScript/TypeScript Parser for Junkan.
+JavaScript/TypeScript Parser for Jnkn.
 
 This parser provides comprehensive extraction from JS/TS files:
 - Environment variable usage (process.env patterns)

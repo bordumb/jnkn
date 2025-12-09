@@ -29,9 +29,9 @@ def impact(target: str, graph_file: str, upstream: bool, downstream: bool,
     
     \b
     Examples:
-        junkan impact warehouse.dim_users
-        junkan impact data:warehouse.fact_events --downstream
-        junkan impact env:DATABASE_HOST --json
+        jnkn impact warehouse.dim_users
+        jnkn impact data:warehouse.fact_events --downstream
+        jnkn impact env:DATABASE_HOST --json
     """
     graph = load_graph(graph_file)
     if graph is None:

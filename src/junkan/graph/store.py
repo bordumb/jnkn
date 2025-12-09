@@ -3,9 +3,9 @@ import json
 import networkx as nx
 from pathlib import Path
 from typing import List, Dict, Any
-from junkan.models import ImpactRelationship
+from jnkn.models import ImpactRelationship
 
-DB_PATH = Path(".junkan/junkan.db")
+DB_PATH = Path(".jnkn/jnkn.db")
 
 class GraphStore:
     def __init__(self, db_path: Path = DB_PATH):

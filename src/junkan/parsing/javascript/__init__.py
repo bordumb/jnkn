@@ -1,5 +1,5 @@
 """
-JavaScript/TypeScript parsing module for Junkan.
+JavaScript/TypeScript parsing module for Jnkn.
 
 Provides parsing for JavaScript and TypeScript files:
 - Environment variable detection (process.env, import.meta.env)
@@ -8,7 +8,7 @@ Provides parsing for JavaScript and TypeScript files:
 - Framework-specific patterns (Next.js, Vite, etc.)
 
 Usage:
-    from junkan.parsing.javascript import JavaScriptParser
+    from jnkn.parsing.javascript import JavaScriptParser
     
     parser = JavaScriptParser()
     result = parser.parse_full(Path("app.ts"))

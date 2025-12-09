@@ -10,7 +10,7 @@ from typing import Set, Optional
 
 # Directories to skip when scanning
 SKIP_DIRS: Set[str] = {
-    ".git", ".junkan", "__pycache__", "node_modules",
+    ".git", ".jnkn", "__pycache__", "node_modules",
     ".venv", "venv", "env", ".env", "dist", "build",
     ".mypy_cache", ".pytest_cache", ".ruff_cache",
     ".tox", "eggs", "*.egg-info",
@@ -49,7 +49,7 @@ def load_graph(graph_file: str) -> Optional["LineageGraph"]:
     
     if not graph_path.exists():
         echo_error(f"Graph file not found: {graph_file}")
-        click.echo("Run 'junkan scan <directory>' first to create it.")
+        click.echo("Run 'jnkn scan <directory>' first to create it.")
         return None
     
     try:

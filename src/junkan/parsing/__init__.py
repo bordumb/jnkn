@@ -1,5 +1,5 @@
 """
-Parsing module for Junkan.
+Parsing module for Jnkn.
 
 This module provides the extensible parsing framework that converts
 source files into nodes and edges for the dependency graph.
@@ -17,7 +17,7 @@ Supported Languages:
 - dbt manifest.json
 
 Usage:
-    from junkan.parsing import create_default_engine
+    from jnkn.parsing import create_default_engine
     
     engine = create_default_engine()
     

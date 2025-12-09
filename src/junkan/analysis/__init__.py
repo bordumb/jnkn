@@ -1,5 +1,5 @@
 """
-Analysis modules for Junkan.
+Analysis modules for Jnkn.
 
 This package contains analysis and explanation capabilities:
 - explain: Match explanation generator

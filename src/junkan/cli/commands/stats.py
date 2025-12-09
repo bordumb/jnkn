@@ -21,14 +21,14 @@ def stats(graph_file: str, as_json: bool):
     
     \b
     Examples:
-        junkan stats
-        junkan stats --json
+        jnkn stats
+        jnkn stats --json
     """
     graph_path = Path(graph_file)
     
     if not graph_path.exists():
         echo_error(f"Graph not found: {graph_file}")
-        click.echo("Run 'junkan scan' first to create the graph.")
+        click.echo("Run 'jnkn scan' first to create the graph.")
         return
     
     graph = load_graph(graph_file)
@@ -74,7 +74,7 @@ def stats(graph_file: str, as_json: bool):
 @click.option("-g", "--graph", "graph_file", default=".",
               help="Path to graph JSON file")
 @click.option("--all", "clear_all", is_flag=True,
-              help="Clear all .junkan data")
+              help="Clear all .jnkn data")
 @click.confirmation_option(prompt="Are you sure you want to clear the data?")
 def clear(graph_file: str, clear_all: bool):
     """
@@ -82,17 +82,17 @@ def clear(graph_file: str, clear_all: bool):
     
     \b
     Examples:
-        junkan clear
-        junkan clear --all
+        jnkn clear
+        jnkn clear --all
     """
     cleared = []
     
     if clear_all:
-        junkan_dir = Path(".junkan")
-        if junkan_dir.exists():
+        jnkn_dir = Path(".jnkn")
+        if jnkn_dir.exists():
             import shutil
-            shutil.rmtree(junkan_dir)
-            cleared.append(".junkan/")
+            shutil.rmtree(jnkn_dir)
+            cleared.append(".jnkn/")
     else:
         graph_path = Path(graph_file)
         if graph_path.exists():

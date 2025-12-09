@@ -1,7 +1,7 @@
 """
-Junkan - The Pre-Flight Impact Analysis Engine.
+Jnkn - The Pre-Flight Impact Analysis Engine.
 
-Junkan prevents production outages by stitching together the hidden
+Jnkn prevents production outages by stitching together the hidden
 dependencies between Infrastructure (Terraform), Data Pipelines (dbt),
 and Application Code.
 
@@ -12,7 +12,7 @@ Key Components:
 - analysis: Impact and blast radius analysis
 
 Usage:
-    from junkan.parsing import create_default_engine
+    from jnkn.parsing import create_default_engine
     
     engine = create_default_engine()
     nodes, edges, stats = engine.scan_all()

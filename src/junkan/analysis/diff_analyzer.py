@@ -39,7 +39,7 @@ from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Union
 
 # Import column lineage extractor
 try:
-    from junkan.parsing.pyspark.column_lineage import (
+    from jnkn.parsing.pyspark.column_lineage import (
         extract_column_lineage,
         ColumnLineageResult,
         ColumnRef,

@@ -26,9 +26,9 @@ def explain(source_id: str, target_id: str, min_confidence: float,
     
     \b
     Examples:
-        junkan explain env:PAYMENT_DB_HOST infra:payment_db_host
-        junkan explain env:HOST infra:main --why-not
-        junkan explain env:DB_URL infra:database --alternatives
+        jnkn explain env:PAYMENT_DB_HOST infra:payment_db_host
+        jnkn explain env:HOST infra:main --why-not
+        jnkn explain env:DB_URL infra:database --alternatives
     """
     try:
         from ...analysis.explain import create_explanation_generator
@@ -56,4 +56,4 @@ def explain(source_id: str, target_id: str, min_confidence: float,
         click.echo(f"Target: {target_id}")
         click.echo()
         click.echo("⚠️  Full explanation requires analysis module.")
-        click.echo("   Install with: pip install junkan[full]")
+        click.echo("   Install with: pip install jnkn[full]")

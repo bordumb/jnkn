@@ -17,7 +17,7 @@ from ..utils import echo_success, echo_error, echo_info
 # Skip these directories
 SKIP_DIRS: Set[str] = {
     ".git", "__pycache__", "node_modules", "venv", ".venv", 
-    "env", ".env", "dist", "build", ".junkan"
+    "env", ".env", "dist", "build", ".jnkn"
 }
 
 
@@ -28,7 +28,7 @@ SKIP_DIRS: Set[str] = {
               help="Path to dbt manifest.json")
 @click.option("--code-dir", type=click.Path(exists=True),
               help="Directory to scan for application code")
-@click.option("--output", "-o", default=".junkan/graph.json",
+@click.option("--output", "-o", default=".jnkn/graph.json",
               help="Output graph file")
 def ingest(tf_plan: str, dbt_manifest: str, code_dir: str, output: str):
     """
@@ -39,10 +39,10 @@ def ingest(tf_plan: str, dbt_manifest: str, code_dir: str, output: str):
     
     \b
     Examples:
-        junkan ingest --tf-plan plan.json
-        junkan ingest --dbt-manifest target/manifest.json
-        junkan ingest --code-dir ./src
-        junkan ingest --tf-plan plan.json --code-dir ./src -o deps.json
+        jnkn ingest --tf-plan plan.json
+        jnkn ingest --dbt-manifest target/manifest.json
+        jnkn ingest --code-dir ./src
+        jnkn ingest --tf-plan plan.json --code-dir ./src -o deps.json
     """
     if not any([tf_plan, dbt_manifest, code_dir]):
         echo_error("Provide at least one of: --tf-plan, --dbt-manifest, --code-dir")

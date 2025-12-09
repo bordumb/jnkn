@@ -1,5 +1,5 @@
 """
-Storage adapters for Junkan.
+Storage adapters for Jnkn.
 
 Provides pluggable persistence backends:
 - SQLiteStorage: Production-ready local persistence

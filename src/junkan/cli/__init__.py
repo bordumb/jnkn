@@ -1,5 +1,5 @@
 """
-Junkan CLI module.
+Jnkn CLI module.
 """
 
 from .main import main

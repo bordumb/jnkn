@@ -1,5 +1,5 @@
 """
-Junkan CLI - Main entry point.
+Jnkn CLI - Main entry point.
 
 This module registers all CLI commands. Each command is implemented
 in its own module under cli/commands/.
@@ -12,22 +12,22 @@ from .commands import blast_radius, check, diff, explain, suppress, stats
 
 
 @click.group()
-@click.version_option(package_name="junkan")
+@click.version_option(package_name="jnkn")
 def main():
-    """Junkan: Pre-Flight Impact Analysis Engine.
+    """Jnkn: Pre-Flight Impact Analysis Engine.
     
     Detects cross-domain breaking changes between Infrastructure,
     Data Pipelines, and Application Code.
     
     \b
     Quick Start:
-      junkan scan ./src --output lineage.json
-      junkan impact warehouse.dim_users
-      junkan graph --output lineage.html
+      jnkn scan ./src --output lineage.json
+      jnkn impact warehouse.dim_users
+      jnkn graph --output lineage.html
     
     \b
     Documentation:
-      https://github.com/your-org/junkan
+      https://github.com/your-org/jnkn
     """
     pass
 
