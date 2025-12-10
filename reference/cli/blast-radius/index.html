@@ -2664,6 +2664,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#jnkn.cli.commands.blast_radius-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Classes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#jnkn.cli.commands.blast_radius-functions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5791,6 +5802,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#jnkn.cli.commands.blast_radius-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Classes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#jnkn.cli.commands.blast_radius-functions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5915,6 +5937,8 @@
     <div class="doc doc-contents first">
 
         <p>Blast Radius Command - Calculate downstream impact.</p>
+<p>Fixed to ensure consistent semantic impact analysis regardless of storage backend.
+Prioritizes hydrating the Graph model to leverage bidirectional edge traversal.</p>
 
 
 
@@ -5933,7 +5957,7 @@
 
 
 
-
+<h2 id="jnkn.cli.commands.blast_radius-classes">Classes</h2>
 <h2 id="jnkn.cli.commands.blast_radius-functions">Functions</h2>
 
 <div class="doc doc-object doc-function">
@@ -5948,11 +5972,6 @@
     <div class="doc doc-contents ">
 
         <p>Calculate downstream impact for changed artifacts.</p>
-<p>
-Examples:
-    jnkn blast env:DB_HOST
-    jnkn blast infra:output.payment_db_host
-    jnkn blast src/models.py infra:payment_db</p>
 
 
     </div>

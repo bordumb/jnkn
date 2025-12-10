@@ -7194,7 +7194,7 @@ print(generator.format(explanation))</p>
 <a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_name_from_id</span><span class="p">(</span><span class="n">node_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <a id="__codelineno-0-464" name="__codelineno-0-464"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract node name from ID.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="c1"># Handle common ID formats</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="c1"># FIX: Check for :// first (e.g. file://path/to/file)</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="c1"># Check for :// first (e.g. file://path/to/file)</span>
 <a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="k">if</span> <span class="s2">&quot;://&quot;</span> <span class="ow">in</span> <span class="n">node_id</span><span class="p">:</span>
 <a id="__codelineno-0-468" name="__codelineno-0-468"></a>            <span class="k">return</span> <span class="n">node_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;://&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
 <a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="c1"># Then check for : (e.g. env:VAR)</span>
