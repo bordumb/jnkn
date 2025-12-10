@@ -4,9 +4,12 @@ CLI Utilities - Shared helpers for CLI commands.
 
 import json
 from pathlib import Path
-from typing import Optional, Set
+from typing import TYPE_CHECKING, Optional, Set
 
 import click
+
+if TYPE_CHECKING:
+    from ..graph.lineage import LineageGraph
 
 # Directories to skip when scanning
 SKIP_DIRS: Set[str] = {
