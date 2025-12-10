@@ -1,4 +1,4 @@
-name: Junkan Impact Analysis
+name: Jnkn Impact Analysis
 
 on:
   pull_request:
@@ -23,13 +23,13 @@ jobs:
       - name: Set up Python
         run: uv python install 3.12
 
-      - name: Install Junkan
+      - name: Install Jnkn
         run: uv sync
 
       - name: Build Dependency Graph
         # In a real setup, you might fetch a cached graph from main.
         # For now, we scan fresh.
-        run: uv run junkan ingest --code-dir .
+        run: uv run jnkn ingest --code-dir .
 
       - name: Get Changed Files
         id: changes
@@ -63,7 +63,7 @@ jobs:
             const count = impact.total_impacted_count;
             const emoji = count > 0 ? '⚠️' : '✅';
             
-            let body = `### ${emoji} Junkan Impact Analysis\n`;
+            let body = `### ${emoji} Jnkn Impact Analysis\n`;
             body += `**Source Changes:** \`${impact.source_artifacts.join(', ')}\`\n`;
             body += `**Total Downstream Impact:** ${count} artifacts\n\n`;
             
