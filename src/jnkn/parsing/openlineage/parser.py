@@ -35,7 +35,6 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Union
@@ -84,7 +83,7 @@ class Node:
     file_hash: Optional[str] = None
     tokens: Tuple[str, ...] = field(default_factory=tuple)
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,
@@ -104,7 +103,7 @@ class Edge:
     type: RelationshipType
     confidence: float = 1.0
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "source": self.source_id,
@@ -143,7 +142,7 @@ class OpenLineageParser:
         for item in parser.parse_events(events):
             graph.add(item)
     """
-    
+
     def __init__(self, namespace_filter: Optional[str] = None):
         """
         Initialize the parser.
@@ -154,19 +153,19 @@ class OpenLineageParser:
         self._namespace_filter = namespace_filter
         self._seen_nodes: Set[str] = set()
         self._seen_edges: Set[Tuple[str, str, str]] = set()
-    
+
     @property
     def name(self) -> str:
         return "openlineage"
-    
+
     @property
     def extensions(self) -> Set[str]:
         return {".json"}
-    
+
     # =========================================================================
     # Main Parse Methods
     # =========================================================================
-    
+
     def parse(
         self,
         file_path: Path,
@@ -189,7 +188,7 @@ class OpenLineageParser:
             data = json.loads(text)
         except (json.JSONDecodeError, UnicodeDecodeError) as e:
             raise ValueError(f"Invalid JSON in {file_path}: {e}")
-        
+
         # Handle single event or array
         if isinstance(data, list):
             events = data
@@ -201,9 +200,9 @@ class OpenLineageParser:
                 events = [data]
         else:
             raise ValueError(f"Unexpected data format in {file_path}")
-        
+
         yield from self.parse_events(events)
-    
+
     def parse_events(
         self,
         events: List[Dict[str, Any]],
@@ -219,37 +218,37 @@ class OpenLineageParser:
         """
         self._seen_nodes.clear()
         self._seen_edges.clear()
-        
+
         for event in events:
             yield from self._parse_event(event)
-    
+
     def _parse_event(
         self,
         event: Dict[str, Any],
     ) -> Iterator[Union[Node, Edge]]:
         """Parse a single OpenLineage event."""
-        
+
         # Skip non-COMPLETE events (we want final state)
         event_type = event.get("eventType", "")
         if event_type not in ("COMPLETE", "RUNNING"):
             return
-        
+
         # Extract job info
         job = event.get("job", {})
         job_namespace = job.get("namespace", "default")
         job_name = job.get("name", "unknown")
-        
+
         # Apply namespace filter
         if self._namespace_filter:
             if not re.match(self._namespace_filter, job_namespace):
                 return
-        
+
         # Create job node
         job_id = f"job:{job_namespace}/{job_name}"
         if job_id not in self._seen_nodes:
             self._seen_nodes.add(job_id)
             yield self._create_job_node(job_namespace, job_name, job)
-        
+
         # Process inputs (datasets the job reads)
         for input_dataset in event.get("inputs", []):
             yield from self._process_dataset(
@@ -258,7 +257,7 @@ class OpenLineageParser:
                 direction="input",
                 event=event,
             )
-        
+
         # Process outputs (datasets the job writes)
         for output_dataset in event.get("outputs", []):
             yield from self._process_dataset(
@@ -267,7 +266,7 @@ class OpenLineageParser:
                 direction="output",
                 event=event,
             )
-    
+
     def _process_dataset(
         self,
         dataset: Dict[str, Any],
@@ -276,17 +275,17 @@ class OpenLineageParser:
         event: Dict[str, Any],
     ) -> Iterator[Union[Node, Edge]]:
         """Process an input or output dataset."""
-        
+
         namespace = dataset.get("namespace", "default")
         name = dataset.get("name", "unknown")
-        
+
         # Create dataset node
         dataset_id = f"data:{namespace}/{name}"
-        
+
         if dataset_id not in self._seen_nodes:
             self._seen_nodes.add(dataset_id)
             yield self._create_dataset_node(namespace, name, dataset)
-        
+
         # Create edge (job -> dataset for writes, dataset -> job for reads)
         if direction == "input":
             # Job READS from dataset
@@ -318,10 +317,10 @@ class OpenLineageParser:
                         "event_time": event.get("eventTime"),
                     },
                 )
-        
+
         # Extract column lineage if present (InputDatasetFacet)
         facets = dataset.get("facets", {})
-        
+
         # Schema facet - extract columns
         schema_facet = facets.get("schema", {})
         if schema_facet and "fields" in schema_facet:
@@ -334,7 +333,7 @@ class OpenLineageParser:
                         yield self._create_column_node(
                             namespace, name, col_name, field_info
                         )
-        
+
         # Column lineage facet
         col_lineage = facets.get("columnLineage", {})
         if col_lineage and "fields" in col_lineage:
@@ -343,11 +342,11 @@ class OpenLineageParser:
                     src_namespace = input_field.get("namespace", namespace)
                     src_name = input_field.get("name", name)
                     src_field = input_field.get("field", "")
-                    
+
                     if src_field:
                         src_col_id = f"column:{src_namespace}/{src_name}/{src_field}"
                         tgt_col_id = f"column:{namespace}/{name}/{col_name}"
-                        
+
                         edge_key = (src_col_id, tgt_col_id, "transforms")
                         if edge_key not in self._seen_edges:
                             self._seen_edges.add(edge_key)
@@ -361,11 +360,11 @@ class OpenLineageParser:
                                     "transformation": input_field.get("transformations", []),
                                 },
                             )
-    
+
     # =========================================================================
     # Node Creation Helpers
     # =========================================================================
-    
+
     def _create_job_node(
         self,
         namespace: str,
@@ -373,10 +372,10 @@ class OpenLineageParser:
         job: Dict[str, Any],
     ) -> Node:
         """Create a Node for a job."""
-        
+
         # Tokenize for stitching with code files
         tokens = self._tokenize(name)
-        
+
         return Node(
             id=f"job:{namespace}/{name}",
             name=name,
@@ -388,7 +387,7 @@ class OpenLineageParser:
                 "facets": job.get("facets", {}),
             },
         )
-    
+
     def _create_dataset_node(
         self,
         namespace: str,
@@ -396,19 +395,19 @@ class OpenLineageParser:
         dataset: Dict[str, Any],
     ) -> Node:
         """Create a Node for a dataset (table, file, etc.)."""
-        
+
         # Tokenize for stitching
         tokens = self._tokenize(name)
-        
+
         # Extract additional info from facets
         facets = dataset.get("facets", {})
         schema_fields = []
-        
+
         if "schema" in facets:
             schema_fields = [
                 f.get("name") for f in facets["schema"].get("fields", [])
             ]
-        
+
         return Node(
             id=f"data:{namespace}/{name}",
             name=name,
@@ -421,7 +420,7 @@ class OpenLineageParser:
                 "facets": facets,
             },
         )
-    
+
     def _create_column_node(
         self,
         namespace: str,
@@ -430,7 +429,7 @@ class OpenLineageParser:
         field_info: Dict[str, Any],
     ) -> Node:
         """Create a Node for a column."""
-        
+
         return Node(
             id=f"column:{namespace}/{table_name}/{column_name}",
             name=column_name,
@@ -443,18 +442,18 @@ class OpenLineageParser:
                 "source": "openlineage",
             },
         )
-    
+
     def _tokenize(self, name: str) -> Tuple[str, ...]:
         """Tokenize a name for cross-domain stitching."""
         # Split on common separators
         parts = re.split(r'[_\-./]', name.lower())
         # Filter out empty and very short tokens
         return tuple(p for p in parts if len(p) >= 2)
-    
+
     # =========================================================================
     # Marquez API Integration
     # =========================================================================
-    
+
     def fetch_from_marquez(
         self,
         base_url: str,
@@ -474,27 +473,27 @@ class OpenLineageParser:
         """
         if not HAS_REQUESTS:
             raise ImportError("requests library required for Marquez API. pip install requests")
-        
+
         events = []
-        
+
         # Fetch jobs
         jobs_url = f"{base_url}/api/v1/namespaces"
         if namespace:
             jobs_url = f"{base_url}/api/v1/namespaces/{namespace}/jobs"
-        
+
         try:
             resp = requests.get(jobs_url, timeout=30)
             resp.raise_for_status()
             jobs_data = resp.json()
-            
+
             # Fetch runs for each job to get lineage events
             for job in jobs_data.get("jobs", [])[:limit]:
                 job_namespace = job.get("namespace", namespace or "default")
                 job_name = job.get("name")
-                
+
                 runs_url = f"{base_url}/api/v1/namespaces/{job_namespace}/jobs/{job_name}/runs"
                 runs_resp = requests.get(runs_url, timeout=30)
-                
+
                 if runs_resp.ok:
                     runs_data = runs_resp.json()
                     for run in runs_data.get("runs", [])[:10]:  # Latest 10 runs
@@ -502,22 +501,22 @@ class OpenLineageParser:
                         event = self._marquez_run_to_event(job, run)
                         if event:
                             events.append(event)
-        
+
         except requests.RequestException as e:
             raise ConnectionError(f"Failed to fetch from Marquez: {e}")
-        
+
         return events
-    
+
     def _marquez_run_to_event(
         self,
         job: Dict[str, Any],
         run: Dict[str, Any],
     ) -> Optional[Dict[str, Any]]:
         """Convert a Marquez run to OpenLineage event format."""
-        
+
         if run.get("state") != "COMPLETED":
             return None
-        
+
         return {
             "eventType": "COMPLETE",
             "eventTime": run.get("endedAt"),
@@ -553,18 +552,18 @@ def parse_openlineage_file(file_path: str) -> Tuple[List[Node], List[Edge]]:
     """
     path = Path(file_path)
     content = path.read_bytes()
-    
+
     parser = OpenLineageParser()
-    
+
     nodes = []
     edges = []
-    
+
     for item in parser.parse(path, content):
         if isinstance(item, Node):
             nodes.append(item)
         elif isinstance(item, Edge):
             edges.append(item)
-    
+
     return nodes, edges
 
 
@@ -584,16 +583,16 @@ def fetch_and_parse_marquez(
     """
     parser = OpenLineageParser()
     events = parser.fetch_from_marquez(base_url, namespace)
-    
+
     nodes = []
     edges = []
-    
+
     for item in parser.parse_events(events):
         if isinstance(item, Node):
             nodes.append(item)
         elif isinstance(item, Edge):
             edges.append(item)
-    
+
     return nodes, edges
 
 
@@ -705,36 +704,36 @@ if __name__ == "__main__":
             "run": {"runId": "run-003"}
         }
     ]
-    
+
     print("=" * 70)
     print("OPENLINEAGE PARSER DEMO")
     print("=" * 70)
-    
+
     parser = OpenLineageParser()
-    
+
     nodes = []
     edges = []
-    
+
     for item in parser.parse_events(sample_events):
         if isinstance(item, Node):
             nodes.append(item)
         elif isinstance(item, Edge):
             edges.append(item)
-    
+
     print(f"\n📊 Parsed {len(sample_events)} events")
     print(f"   Nodes: {len(nodes)}")
     print(f"   Edges: {len(edges)}")
-    
+
     print("\n🔷 NODES:")
     for node in nodes:
         print(f"   [{node.type.value:12}] {node.id}")
-    
+
     print("\n🔗 EDGES:")
     for edge in edges:
         print(f"   {edge.source_id}")
         print(f"     --[{edge.type.value}]--> {edge.target_id}")
         print()
-    
+
     # Show the lineage chain
     print("=" * 70)
     print("LINEAGE CHAIN (from runtime data)")
@@ -755,6 +754,6 @@ if __name__ == "__main__":
                                                                           ▼
                                                   redshift/analytics.exec_dashboard
     """)
-    
+
     print("\n💡 This runtime lineage can be MERGED with jnkn's static analysis")
     print("   to create a complete pre-merge impact analysis system.")

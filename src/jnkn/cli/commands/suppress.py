@@ -4,11 +4,12 @@ Suppress Commands - Manage match suppressions.
 Allows you to suppress false positive matches that the stitcher creates.
 """
 
-import click
 import json
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Optional
+
+import click
 
 
 @click.group()
@@ -45,14 +46,14 @@ def suppress_add(source_pattern: str, target_pattern: str, reason: str,
     """
     try:
         from ...stitching.suppressions import SuppressionStore
-        
+
         store = SuppressionStore(Path(config_path))
         store.load()
-        
+
         expires_at = None
         if expires_days:
             expires_at = datetime.utcnow() + timedelta(days=expires_days)
-        
+
         suppression = store.add(
             source_pattern=source_pattern,
             target_pattern=target_pattern,
@@ -60,9 +61,9 @@ def suppress_add(source_pattern: str, target_pattern: str, reason: str,
             created_by=created_by,
             expires_at=expires_at,
         )
-        
+
         store.save()
-        
+
         click.echo(f"✅ Added suppression (ID: {suppression.id})")
         click.echo(f"   Source: {source_pattern}")
         click.echo(f"   Target: {target_pattern}")
@@ -70,7 +71,7 @@ def suppress_add(source_pattern: str, target_pattern: str, reason: str,
             click.echo(f"   Reason: {reason}")
         if expires_at:
             click.echo(f"   Expires: {expires_at.isoformat()}")
-    
+
     except ImportError:
         _fallback_add(config_path, source_pattern, target_pattern, reason)
 
@@ -90,10 +91,10 @@ def suppress_remove(identifier: str, config_path: str):
     """
     try:
         from ...stitching.suppressions import SuppressionStore
-        
+
         store = SuppressionStore(Path(config_path))
         store.load()
-        
+
         # Try as index first
         try:
             index = int(identifier)
@@ -106,14 +107,14 @@ def suppress_remove(identifier: str, config_path: str):
                 return
         except ValueError:
             pass
-        
+
         # Try as ID
         if store.remove(identifier):
             store.save()
             click.echo(f"✅ Removed suppression {identifier}")
         else:
             click.echo(f"❌ Suppression not found: {identifier}")
-    
+
     except ImportError:
         click.echo("❌ Suppression management requires stitching module")
 
@@ -135,33 +136,33 @@ def suppress_list(config_path: str, include_expired: bool, as_json: bool):
     """
     try:
         from ...stitching.suppressions import SuppressionStore
-        
+
         store = SuppressionStore(Path(config_path))
         store.load()
         suppressions = store.list(include_expired=include_expired)
-        
+
         if as_json:
             data = [s.to_dict() for s in suppressions]
             click.echo(json.dumps(data, indent=2, default=str))
             return
-        
+
         if not suppressions:
             click.echo("No suppressions configured.")
             click.echo()
             click.echo("Add one with:")
             click.echo('  jnkn suppress add "env:*_ID" "infra:*" -r "ID fields are generic"')
             return
-        
+
         click.echo(f"📋 Suppressions ({len(suppressions)} total)")
         click.echo("=" * 60)
-        
+
         for i, s in enumerate(suppressions, 1):
             status = ""
             if s.is_expired():
                 status = " [EXPIRED]"
             elif not s.enabled:
                 status = " [DISABLED]"
-            
+
             click.echo()
             click.echo(f"#{i} (ID: {s.id}){status}")
             click.echo(f"   Pattern: {s.source_pattern} -> {s.target_pattern}")
@@ -170,7 +171,7 @@ def suppress_list(config_path: str, include_expired: bool, as_json: bool):
             click.echo(f"   Created: {s.created_at.strftime('%Y-%m-%d')} by {s.created_by}")
             if s.expires_at:
                 click.echo(f"   Expires: {s.expires_at.strftime('%Y-%m-%d')}")
-    
+
     except ImportError:
         _fallback_list(config_path)
 
@@ -190,11 +191,11 @@ def suppress_test(source_id: str, target_id: str, config_path: str):
     """
     try:
         from ...stitching.suppressions import SuppressionStore
-        
+
         store = SuppressionStore(Path(config_path))
         store.load()
         match = store.is_suppressed(source_id, target_id)
-        
+
         if match.suppressed:
             click.echo(f"✓ SUPPRESSED: {source_id} -> {target_id}")
             if match.suppression:
@@ -203,7 +204,7 @@ def suppress_test(source_id: str, target_id: str, config_path: str):
                 click.echo(f"  Reason: {match.reason}")
         else:
             click.echo(f"✗ NOT suppressed: {source_id} -> {target_id}")
-    
+
     except ImportError:
         click.echo("❌ Suppression testing requires stitching module")
 
@@ -215,27 +216,27 @@ def suppress_test(source_id: str, target_id: str, config_path: str):
 def _fallback_add(config_path: str, source: str, target: str, reason: str):
     """Add suppression using basic YAML."""
     import yaml
-    
+
     path = Path(config_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     suppressions = []
     if path.exists():
         with open(path) as f:
             data = yaml.safe_load(f) or {}
             suppressions = data.get("suppressions", [])
-    
+
     suppressions.append({
         "source_pattern": source,
         "target_pattern": target,
         "reason": reason,
         "created_at": datetime.utcnow().isoformat(),
     })
-    
+
     with open(path, "w") as f:
         yaml.dump({"suppressions": suppressions}, f)
-    
-    click.echo(f"✅ Added suppression")
+
+    click.echo("✅ Added suppression")
     click.echo(f"   Source: {source}")
     click.echo(f"   Target: {target}")
 
@@ -243,24 +244,24 @@ def _fallback_add(config_path: str, source: str, target: str, reason: str):
 def _fallback_list(config_path: str):
     """List suppressions using basic YAML."""
     import yaml
-    
+
     path = Path(config_path)
     if not path.exists():
         click.echo("No suppressions configured.")
         return
-    
+
     with open(path) as f:
         data = yaml.safe_load(f) or {}
-    
+
     suppressions = data.get("suppressions", [])
-    
+
     if not suppressions:
         click.echo("No suppressions configured.")
         return
-    
+
     click.echo(f"📋 Suppressions ({len(suppressions)} total)")
     click.echo("=" * 60)
-    
+
     for i, s in enumerate(suppressions, 1):
         click.echo()
         click.echo(f"#{i}")

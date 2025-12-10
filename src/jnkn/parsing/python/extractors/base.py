@@ -1,35 +1,35 @@
+import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Generator, Set, Union, Optional, Any, List
-import logging
+from typing import Any, Generator, Optional, Set, Union
 
 # Type alias for Tree-sitter tree, using Any as strict typing requires the library
-Tree = Any 
+Tree = Any
 
-from ....core.types import Node, Edge
+from ....core.types import Edge, Node
 
 logger = logging.getLogger(__name__)
 
 class BaseExtractor(ABC):
     """Base class for env var extractors."""
-    
+
     @property
     @abstractmethod
     def name(self) -> str:
         """Unique identifier for this extractor."""
         pass
-        
+
     @property
     @abstractmethod
     def priority(self) -> int:
         """Higher priority extractors run first (0-100)."""
         pass
-    
+
     @abstractmethod
     def can_extract(self, text: str) -> bool:
         """Quick check if this extractor is relevant."""
         pass
-        
+
     @abstractmethod
     def extract(
         self,

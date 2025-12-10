@@ -4,10 +4,11 @@ Graph Command - Generate interactive visualization.
 Creates an HTML file with an interactive graph using vis.js.
 """
 
-import click
 from pathlib import Path
 
-from ..utils import echo_success, echo_error, echo_info, load_graph
+import click
+
+from ..utils import echo_error, echo_info, echo_success, load_graph
 
 
 @click.command()
@@ -31,21 +32,20 @@ def graph(graph_file: str, output: str):
     g = load_graph(graph_file)
     if g is None:
         return
-    
+
     output_path = Path(output)
-    
+
     if output_path.suffix == ".html":
         g.export_html(output_path)
         echo_success(f"Generated: {output_path}")
         echo_info(f"Open: file://{output_path.absolute()}")
-    
+
     elif output_path.suffix == ".dot":
         dot_content = g.to_dot()
         output_path.write_text(dot_content)
         echo_success(f"Generated: {output_path}")
         echo_info(f"Render with: dot -Tpng {output_path} -o graph.png")
-    
+
     else:
         echo_error(f"Unsupported format: {output_path.suffix}")
         click.echo("Supported: .html, .dot")
-        

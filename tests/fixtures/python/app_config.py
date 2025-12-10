@@ -1,6 +1,6 @@
 """Application configuration with multiple env var patterns."""
 import os
-from os import getenv, environ
+from os import environ, getenv
 
 # Pattern 1: os.getenv()
 DATABASE_HOST = os.getenv("DATABASE_HOST")

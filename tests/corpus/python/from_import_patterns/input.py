@@ -1,5 +1,5 @@
 """Tests env var detection after from-imports."""
-from os import getenv, environ
+from os import environ, getenv
 
 # After 'from os import getenv'
 SECRET_KEY = getenv("SECRET_KEY")

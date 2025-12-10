@@ -21,8 +21,13 @@ Usage:
 __version__ = "0.4.0"
 
 from .core.types import (
-    Node, Edge, NodeType, RelationshipType,
-    MatchStrategy, MatchResult, ScanMetadata,
+    Edge,
+    MatchResult,
+    MatchStrategy,
+    Node,
+    NodeType,
+    RelationshipType,
+    ScanMetadata,
 )
 
 __all__ = [

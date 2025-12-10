@@ -1,8 +1,10 @@
-import sqlite3
 import json
-import networkx as nx
+import sqlite3
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+import networkx as nx
+
 from jnkn.models import ImpactRelationship
 
 DB_PATH = Path(".jnkn/jnkn.db")
@@ -17,7 +19,7 @@ class GraphStore:
     def _init_db(self):
         if not self.db_path.parent.exists():
             self.db_path.parent.mkdir(parents=True)
-        
+
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
         # Simple schema: distinct nodes and directed edges
@@ -46,19 +48,19 @@ class GraphStore:
         """Write through to DB and update in-memory graph."""
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
-        
+
         # Upsert logic (SQLite specific)
         cur.execute("""
             INSERT OR REPLACE INTO edges (upstream, downstream, type, metadata)
             VALUES (?, ?, ?, ?)
         """, (rel.upstream_artifact, rel.downstream_artifact, rel.relationship_type, json.dumps(rel.metadata)))
-        
+
         conn.commit()
         conn.close()
-        
+
         self.graph.add_edge(
-            rel.upstream_artifact, 
-            rel.downstream_artifact, 
+            rel.upstream_artifact,
+            rel.downstream_artifact,
             relationship_type=rel.relationship_type,
             metadata=rel.metadata
         )
@@ -66,7 +68,7 @@ class GraphStore:
     def calculate_blast_radius(self, changed_artifacts: List[str]) -> Dict[str, Any]:
         """Core Impact Analysis Logic."""
         unique_downstream = set()
-        
+
         for root in changed_artifacts:
             if root in self.graph:
                 descendants = nx.descendants(self.graph, root)

@@ -4,20 +4,11 @@ CLI Commands Package.
 Each command is implemented in its own module for maintainability.
 """
 
-from . import scan
-from . import impact
-from . import trace
-from . import graph
-from . import lint
-from . import ingest
-from . import blast_radius
-from . import explain
-from . import suppress
-from . import stats
+from . import blast_radius, explain, graph, impact, ingest, lint, scan, stats, suppress, trace
 
 __all__ = [
     "scan",
-    "impact", 
+    "impact",
     "trace",
     "graph",
     "lint",

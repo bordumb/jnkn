@@ -2,8 +2,8 @@
 Apache Airflow Variable patterns.
 Airflow Variables often map to environment variables or secret backends.
 """
-from airflow.models import Variable
 from airflow.hooks.base import BaseHook
+from airflow.models import Variable
 
 # Case 1: Simple Get
 api_key = Variable.get("API_KEY")

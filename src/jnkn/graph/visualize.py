@@ -5,7 +5,7 @@ Generates interactive HTML visualizations using vis.js.
 """
 
 import json
-from typing import Any, Dict, List, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List
 
 if TYPE_CHECKING:
     from .lineage import LineageGraph
@@ -22,22 +22,22 @@ def generate_html(graph: "LineageGraph") -> str:
     - Zoom and pan
     """
     data = graph.to_dict()
-    
+
     # Prepare vis.js data
     vis_nodes = []
     vis_edges = []
-    
+
     colors = {
         "data": "#4CAF50",    # Green
         "code": "#2196F3",    # Blue
         "config": "#FF9800",  # Orange
         "infra": "#9C27B0",   # Purple
     }
-    
+
     for node in data["nodes"]:
         node_id = node.get("id", "")
         name = node.get("name", node_id)
-        
+
         # Determine category from ID prefix
         if node_id.startswith("data:"):
             category = "data"
@@ -49,7 +49,7 @@ def generate_html(graph: "LineageGraph") -> str:
             category = "infra"
         else:
             category = "code"
-        
+
         # Short label for display
         if "." in name:
             label = name.split(".")[-1]
@@ -57,7 +57,7 @@ def generate_html(graph: "LineageGraph") -> str:
             label = name.split("/")[-1]
         else:
             label = name
-        
+
         vis_nodes.append({
             "id": node_id,
             "label": label,
@@ -65,7 +65,7 @@ def generate_html(graph: "LineageGraph") -> str:
             "color": colors.get(category, "#757575"),
             "group": category,
         })
-    
+
     for edge in data["edges"]:
         vis_edges.append({
             "from": edge["source"],
@@ -74,16 +74,16 @@ def generate_html(graph: "LineageGraph") -> str:
             "dashes": edge["type"] in ("reads", "READS"),
             "title": edge["type"],
         })
-    
+
     return _html_template(vis_nodes, vis_edges, data.get("stats", {}))
 
 
-def _html_template(nodes: List[Dict], edges: List[Dict], 
+def _html_template(nodes: List[Dict], edges: List[Dict],
                    stats: Dict[str, Any]) -> str:
     """Generate the HTML template."""
     node_count = len(nodes)
     edge_count = len(edges)
-    
+
     return f'''<!DOCTYPE html>
 <html>
 <head>

@@ -10,3 +10,4 @@ build/
 env/
 all_repos.txt
 create
+.cache/

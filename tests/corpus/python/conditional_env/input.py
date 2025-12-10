@@ -18,7 +18,7 @@ if os.getenv("ENABLE_FEATURE"):
 # Case 4: List Comprehension
 # Constructing a list of hosts from indexed env vars
 KAFKA_BROKERS = [
-    os.getenv(f"KAFKA_BROKER_{i}") 
+    os.getenv(f"KAFKA_BROKER_{i}")
     for i in range(3)
 ]
 

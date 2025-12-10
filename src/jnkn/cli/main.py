@@ -7,8 +7,20 @@ in its own module under cli/commands/.
 
 import click
 
-from .commands import initialize, scan, impact, trace, graph, lint, ingest
-from .commands import blast_radius, check, diff, explain, suppress, stats
+from .commands import (
+    blast_radius,
+    check,
+    diff,
+    explain,
+    graph,
+    impact,
+    ingest,
+    lint,
+    scan,
+    stats,
+    suppress,
+    trace,
+)
 from .commands.initialize import init
 
 

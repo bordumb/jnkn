@@ -1,10 +1,11 @@
-from pathlib import Path
-from typing import Generator, Set, Union, Optional, Any
 import re
+from pathlib import Path
+from typing import Generator, Optional, Set, Union
 
-from ....core.types import Node, Edge, NodeType, RelationshipType
+from ....core.types import Edge, Node, NodeType, RelationshipType
 from ..validation import is_valid_env_var_name
-from .base import BaseExtractor, Tree, logger
+from .base import BaseExtractor, Tree
+
 
 class AirflowExtractor(BaseExtractor):
     @property
@@ -26,20 +27,20 @@ class AirflowExtractor(BaseExtractor):
         text: str,
         seen_vars: Set[str],
     ) -> Generator[Union[Node, Edge], None, None]:
-        
+
         # Variable.get("VAR")
         pattern = r'Variable\.get\s*\(\s*["\']([^"\']+)["\']'
         regex = re.compile(pattern)
-        
+
         for match in regex.finditer(text):
             var_name = match.group(1)
-            
+
             if not is_valid_env_var_name(var_name):
                 continue
-                
+
             line = text[:match.start()].count('\n') + 1
             env_id = f"env:{var_name}"
-            
+
             yield Node(
                 id=env_id,
                 name=var_name,
@@ -50,7 +51,7 @@ class AirflowExtractor(BaseExtractor):
                     "line": line,
                 },
             )
-            
+
             yield Edge(
                 source_id=file_id,
                 target_id=env_id,

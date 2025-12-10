@@ -8,12 +8,12 @@ Scans directories for supported file types and extracts:
 - spark.yml job configurations
 """
 
-import click
-import json
 from pathlib import Path
-from typing import Dict, Any, List, Set
+from typing import Any, Dict, List, Set
 
-from ..utils import SKIP_DIRS, echo_success, echo_error, echo_info
+import click
+
+from ..utils import SKIP_DIRS, echo_error, echo_info, echo_success
 
 
 @click.command()
@@ -35,42 +35,42 @@ def scan(directory: str, output: str, verbose: bool, no_recursive: bool):
         jnkn scan . -o graph.html -v
     """
     from ...graph.lineage import LineageGraph
-    
+
     scan_path = Path(directory).absolute()
     click.echo(f"🔍 Scanning {scan_path}")
-    
+
     # Initialize parsers
     parsers = _load_parsers(scan_path)
-    
+
     if not parsers:
         echo_error("No parsers available. Install with: pip install jnkn[full]")
         return
-    
+
     if verbose:
         click.echo(f"   Parsers: {', '.join(parsers.keys())}")
-    
+
     # Find files
     extensions = {".py", ".tf", ".yml", ".yaml", ".json"}
     if no_recursive:
         files = [f for f in scan_path.glob("*") if f.suffix in extensions and f.is_file()]
     else:
         files = [f for f in scan_path.rglob("*") if f.suffix in extensions and f.is_file()]
-    
+
     # Filter out skip directories
     files = [f for f in files if not any(d in f.parts for d in SKIP_DIRS)]
-    
+
     click.echo(f"   Files: {len(files)}")
-    
+
     # Parse files
     graph = LineageGraph()
     all_nodes: List[Dict[str, Any]] = []
     all_edges: List[Dict[str, Any]] = []
-    
+
     for file_path in files:
         nodes, edges = _parse_file(file_path, parsers, verbose)
         all_nodes.extend(nodes)
         all_edges.extend(edges)
-    
+
     # Deduplicate nodes
     seen_ids: Set[str] = set()
     unique_nodes = []
@@ -79,15 +79,15 @@ def scan(directory: str, output: str, verbose: bool, no_recursive: bool):
         if node_id and node_id not in seen_ids:
             seen_ids.add(node_id)
             unique_nodes.append(node)
-    
+
     graph.load_from_dict({"nodes": unique_nodes, "edges": all_edges})
-    
+
     # Output results
     stats = graph.stats()
     echo_success("Scan complete")
     click.echo(f"   Nodes: {stats['total_nodes']}")
     click.echo(f"   Edges: {stats['total_edges']}")
-    
+
     # Save output
     if output:
         output_path = Path(output)
@@ -103,20 +103,20 @@ def scan(directory: str, output: str, verbose: bool, no_recursive: bool):
 def _load_parsers(root_dir: Path) -> Dict[str, Any]:
     """Load available parsers."""
     parsers = {}
-    
+
     try:
         from ...parsing.base import ParserContext
         context = ParserContext(root_dir=root_dir)
     except ImportError:
         context = None
-    
+
     parser_modules = [
         ("pyspark", "...parsing.pyspark.parser", "PySparkParser"),
         ("python", "...parsing.python.parser", "PythonParser"),
         ("spark_yaml", "...parsing.spark_yaml.parser", "SparkYamlParser"),
         ("terraform", "...parsing.terraform.parser", "TerraformParser"),
     ]
-    
+
     for name, module_path, class_name in parser_modules:
         try:
             import importlib
@@ -126,7 +126,7 @@ def _load_parsers(root_dir: Path) -> Dict[str, Any]:
             parsers[name] = parser_class(context)
         except (ImportError, AttributeError):
             pass
-    
+
     return parsers
 
 
@@ -134,20 +134,20 @@ def _parse_file(file_path: Path, parsers: Dict, verbose: bool) -> tuple:
     """Parse a single file with available parsers."""
     nodes = []
     edges = []
-    
+
     try:
         content = file_path.read_bytes()
     except Exception:
         return nodes, edges
-    
+
     for parser_name, parser in parsers.items():
         try:
             if not parser.can_parse(file_path, content):
                 continue
-            
+
             if verbose:
                 click.echo(f"   → {parser_name}: {file_path.name}")
-            
+
             for item in parser.parse(file_path, content):
                 item_dict = _to_dict(item)
                 if "source_id" in item_dict:
@@ -157,7 +157,7 @@ def _parse_file(file_path: Path, parsers: Dict, verbose: bool) -> tuple:
         except Exception as e:
             if verbose:
                 click.echo(f"   ✗ {parser_name} error: {e}", err=True)
-    
+
     return nodes, edges
 
 
@@ -172,8 +172,8 @@ def _to_dict(item: Any) -> Dict[str, Any]:
 
 def _save_output(graph, output_path: Path) -> None:
     """Save graph to output file."""
-    from ..utils import echo_success, echo_info
-    
+    from ..utils import echo_info, echo_success
+
     if output_path.suffix == ".json":
         output_path.write_text(graph.to_json())
         echo_success(f"Saved: {output_path}")

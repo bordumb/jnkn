@@ -7,7 +7,7 @@ Provides pluggable persistence backends:
 """
 
 from .base import StorageAdapter
-from .sqlite import SQLiteStorage
 from .memory import MemoryStorage
+from .sqlite import SQLiteStorage
 
 __all__ = ["StorageAdapter", "SQLiteStorage", "MemoryStorage"]

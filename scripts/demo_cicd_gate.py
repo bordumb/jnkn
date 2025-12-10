@@ -15,23 +15,21 @@ Run this demo:
 
 import json
 import sys
-from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
 from jnkn.cli.commands.check import (
+    AffectedAsset,
+    ChangedFile,
     CheckEngine,
     CheckResult,
-    ChangedFile,
     Policy,
     PolicyRule,
     Severity,
-    AffectedAsset,
 )
-
 
 # =============================================================================
 # Mock Data
@@ -140,57 +138,57 @@ class MockCheckEngine(CheckEngine):
     """
     CheckEngine with mocked OpenLineage data for demo purposes.
     """
-    
+
     def __init__(self, policy: Policy, openlineage_data: dict):
         super().__init__(policy=policy)
         self._mock_ol_data = openlineage_data
         self._build_runtime_graph()
-    
+
     def _build_runtime_graph(self):
         """Build the runtime dependency graph from mock data."""
         # Map outputs to downstream consumers
         output_to_consumers = {}
-        
+
         for job in self._mock_ol_data["jobs"]:
             job_id = f"job:spark/{job['name']}"
             self._runtime_jobs[job_id] = job
-            
+
             # Track what this job produces
             for output in job.get("outputs", []):
                 output_id = f"data:{output['namespace']}/{output['name']}"
                 output_to_consumers.setdefault(output_id, set())
-        
+
         # Find consumers for each output
         for job in self._mock_ol_data["jobs"]:
             job_id = f"job:spark/{job['name']}"
-            
+
             for inp in job.get("inputs", []):
                 input_id = f"data:{inp['namespace']}/{inp['name']}"
-                
+
                 # This job consumes this input
                 if input_id in output_to_consumers:
                     output_to_consumers[input_id].add(job_id)
-                    
+
                     # Also add this job's outputs as downstream
                     for output in job.get("outputs", []):
                         output_id = f"data:{output['namespace']}/{output['name']}"
                         output_to_consumers.setdefault(input_id, set()).add(output_id)
-        
+
         self._runtime_graph = output_to_consumers
         self._runtime_loaded = True
-    
+
     def _identify_affected_assets(self, files: List[ChangedFile]) -> List[AffectedAsset]:
         """Identify assets from changed files - enhanced for demo."""
         assets = []
-        
+
         for f in files:
             # Match file to job by name
             file_stem = Path(f.path).stem
-            
+
             for job in self._mock_ol_data["jobs"]:
                 if file_stem.lower() in job["name"].lower() or job["name"].lower() in file_stem.lower():
                     job_id = f"job:spark/{job['name']}"
-                    
+
                     assets.append(AffectedAsset(
                         id=job_id,
                         name=job["name"],
@@ -199,7 +197,7 @@ class MockCheckEngine(CheckEngine):
                         confidence=0.95,
                         path=[f.path, job_id],
                     ))
-                    
+
                     # Add outputs as directly affected
                     for output in job.get("outputs", []):
                         output_id = f"data:{output['namespace']}/{output['name']}"
@@ -211,7 +209,7 @@ class MockCheckEngine(CheckEngine):
                             confidence=0.95,
                             path=[f.path, job_id, output_id],
                         ))
-        
+
         return assets
 
 
@@ -236,20 +234,20 @@ def demo_scenario_1():
     - Changed file: src/jobs/daily_user_etl.py
     - Change: Modified event_count calculation
     """)
-    
+
     changed_files = [
         ChangedFile(path="src/jobs/daily_user_etl.py", change_type="modified"),
     ]
-    
+
     engine = MockCheckEngine(
         policy=create_mock_policy(),
         openlineage_data=create_mock_openlineage_data(),
     )
-    
+
     report = engine.run(changed_files)
-    
+
     _print_demo_report(report)
-    
+
     return report
 
 
@@ -269,20 +267,20 @@ def demo_scenario_2():
     - Changed file: src/jobs/marketing_campaign_loader.py
     - Change: Added new filter criteria
     """)
-    
+
     changed_files = [
         ChangedFile(path="src/jobs/marketing_campaign_loader.py", change_type="modified"),
     ]
-    
+
     engine = MockCheckEngine(
         policy=create_mock_policy(),
         openlineage_data=create_mock_openlineage_data(),
     )
-    
+
     report = engine.run(changed_files)
-    
+
     _print_demo_report(report)
-    
+
     return report
 
 
@@ -302,20 +300,20 @@ def demo_scenario_3():
     - Added file: src/utils/new_utility_script.py
     - Change: New helper function
     """)
-    
+
     changed_files = [
         ChangedFile(path="src/utils/new_utility_script.py", change_type="added"),
     ]
-    
+
     engine = MockCheckEngine(
         policy=create_mock_policy(),
         openlineage_data=create_mock_openlineage_data(),
     )
-    
+
     report = engine.run(changed_files)
-    
+
     _print_demo_report(report)
-    
+
     return report
 
 
@@ -336,27 +334,27 @@ def demo_scenario_4():
     - DELETED file: src/jobs/daily_user_etl.py
     - Change: Removing the entire job
     """)
-    
+
     changed_files = [
         ChangedFile(path="src/jobs/daily_user_etl.py", change_type="deleted"),
     ]
-    
+
     engine = MockCheckEngine(
         policy=create_mock_policy(),
         openlineage_data=create_mock_openlineage_data(),
     )
-    
+
     report = engine.run(changed_files)
-    
+
     _print_demo_report(report)
-    
+
     return report
 
 
 def _print_demo_report(report):
     """Print a formatted report for the demo."""
     print()
-    
+
     # Result banner
     if report.result == CheckResult.BLOCKED:
         print("\033[91m" + "╔════════════════════════════════════════╗")
@@ -370,7 +368,7 @@ def _print_demo_report(report):
         print("\033[92m" + "╔════════════════════════════════════════╗")
         print("║  ✅ PASSED - Safe to Merge             ║")
         print("╚════════════════════════════════════════╝" + "\033[0m")
-    
+
     print()
     print("Summary:")
     print(f"  Exit code:         {report.result.value}")
@@ -379,7 +377,7 @@ def _print_demo_report(report):
     print(f"  Critical systems:  {report.critical_count}")
     print(f"  High severity:     {report.high_count}")
     print(f"  OpenLineage:       {'✓ Enriched' if report.openlineage_enriched else '✗ Not available'}")
-    
+
     # Violations
     if report.violations:
         print()
@@ -389,27 +387,27 @@ def _print_demo_report(report):
             print(f"  {icon} {v.rule_name}: {v.message}")
             if v.required_approvers:
                 print(f"     Required: {', '.join(v.required_approvers)}")
-    
+
     # Affected assets
     if report.affected_assets:
         print()
         print("Affected Assets:")
-        
+
         # Group by severity
         critical = [a for a in report.affected_assets if a.severity == Severity.CRITICAL]
         high = [a for a in report.affected_assets if a.severity == Severity.HIGH]
         other = [a for a in report.affected_assets if a.severity not in (Severity.CRITICAL, Severity.HIGH)]
-        
+
         if critical:
             print("  \033[91mCRITICAL:\033[0m")
             for a in critical:
                 print(f"    • {a.name} ({a.asset_type})")
-        
+
         if high:
             print("  \033[93mHIGH:\033[0m")
             for a in high:
                 print(f"    • {a.name} ({a.asset_type})")
-        
+
         if other and len(other) <= 5:
             print("  OTHER:")
             for a in other:
@@ -427,23 +425,23 @@ def demo_github_actions_output():
     print("\n" + "=" * 70)
     print("GITHUB ACTIONS PR COMMENT PREVIEW")
     print("=" * 70)
-    
+
     # Run scenario 1
     changed_files = [
         ChangedFile(path="src/jobs/daily_user_etl.py", change_type="modified"),
     ]
-    
+
     engine = MockCheckEngine(
         policy=create_mock_policy(),
         openlineage_data=create_mock_openlineage_data(),
     )
-    
+
     report = engine.run(changed_files)
-    
+
     # Print markdown output
     print("\n--- PR Comment (Markdown) ---\n")
     print(report.to_markdown())
-    
+
     print("\n--- JSON Output (for artifacts) ---\n")
     print(json.dumps(report.to_dict(), indent=2))
 
@@ -457,7 +455,7 @@ def show_cli_usage():
     print("\n" + "=" * 70)
     print("CLI USAGE EXAMPLES")
     print("=" * 70)
-    
+
     print("""
     # Basic usage (git diff against main)
     jnkn check --git-diff main HEAD
@@ -489,7 +487,7 @@ def show_github_actions_workflow():
     print("\n" + "=" * 70)
     print("GITHUB ACTIONS WORKFLOW")
     print("=" * 70)
-    
+
     workflow = '''
 name: jnkn Impact Analysis
 
@@ -592,20 +590,20 @@ def main():
     4. Policy rules are evaluated
     5. PR is BLOCKED / WARNED / PASSED
     """)
-    
+
     # Run all scenarios
     demo_scenario_1()  # Modify ETL job - BLOCKED
     demo_scenario_2()  # Modify marketing job - WARN
     demo_scenario_3()  # Add new file - PASS
     demo_scenario_4()  # Delete ETL job - BLOCKED
-    
+
     # Show GitHub Actions output
     demo_github_actions_output()
-    
+
     # Show usage
     show_cli_usage()
     show_github_actions_workflow()
-    
+
     print("\n" + "=" * 70)
     print("DEMO COMPLETE")
     print("=" * 70)

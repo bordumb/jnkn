@@ -12,19 +12,17 @@ Features:
 - Human-readable formatted output
 """
 
-from typing import List, Dict, Any, Optional, Tuple
-from dataclasses import dataclass, field
-from pathlib import Path
 import logging
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
 
 from ..core.confidence import (
     ConfidenceCalculator,
     ConfidenceResult,
-    ConfidenceConfig,
     create_default_calculator,
 )
 from ..core.graph import DependencyGraph
-from ..core.types import Node, Edge, NodeType
+from ..core.types import NodeType
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +69,7 @@ class ExplanationGenerator:
         explanation = generator.explain("env:PAYMENT_DB_HOST", "infra:payment_db_host")
         print(generator.format(explanation))
     """
-    
+
     def __init__(
         self,
         graph: Optional[DependencyGraph] = None,
@@ -89,7 +87,7 @@ class ExplanationGenerator:
         self.graph = graph
         self.calculator = calculator or create_default_calculator()
         self.min_confidence = min_confidence
-    
+
     def explain(
         self,
         source_id: str,
@@ -110,7 +108,7 @@ class ExplanationGenerator:
         # Get source node info
         source_info = self._get_node_info(source_id)
         target_info = self._get_node_info(target_id)
-        
+
         # Calculate confidence
         confidence_result = self.calculator.calculate(
             source_name=source_info.name,
@@ -120,7 +118,7 @@ class ExplanationGenerator:
             source_node_id=source_id,
             target_node_id=target_id,
         )
-        
+
         # Check if edge exists
         edge_exists = False
         edge_metadata = {}
@@ -129,12 +127,12 @@ class ExplanationGenerator:
             if edge:
                 edge_exists = True
                 edge_metadata = edge.metadata or {}
-        
+
         # Find alternative matches
         alternatives = []
         if find_alternatives and self.graph:
             alternatives = self._find_alternatives(source_info, target_id)
-        
+
         return MatchExplanation(
             source=source_info,
             target=target_info,
@@ -143,7 +141,7 @@ class ExplanationGenerator:
             edge_exists=edge_exists,
             edge_metadata=edge_metadata,
         )
-    
+
     def explain_why_not(
         self,
         source_id: str,
@@ -162,15 +160,15 @@ class ExplanationGenerator:
             Human-readable explanation
         """
         explanation = self.explain(source_id, target_id, find_alternatives=False)
-        
+
         lines = []
         lines.append("=" * 60)
         lines.append("WHY NO MATCH?")
         lines.append("=" * 60)
         lines.append("")
-        
+
         score = explanation.confidence_result.score
-        
+
         if score < self.min_confidence:
             lines.append(f"X Score ({score:.2f}) is below threshold ({self.min_confidence:.2f})")
             lines.append("")
@@ -180,41 +178,41 @@ class ExplanationGenerator:
             lines.append(f"  Source tokens: {explanation.source.tokens}")
             lines.append(f"  Target tokens: {explanation.target.tokens}")
             lines.append("")
-            
+
             # Find common tokens
             source_set = set(explanation.source.tokens)
             target_set = set(explanation.target.tokens)
             common = source_set & target_set
-            
+
             if not common:
                 lines.append("  ! No overlapping tokens found")
             else:
                 lines.append(f"  Common tokens: {list(common)}")
-            
+
             # Show what would need to change
             needed = self.min_confidence - score
             lines.append("")
             lines.append(f"  To reach threshold, need +{needed:.2f} confidence")
-            
+
             if explanation.confidence_result.penalties:
                 lines.append("")
                 lines.append("  Penalties applied:")
                 for p in explanation.confidence_result.penalties:
                     lines.append(f"    - {p.get('penalty_type')}: x{p.get('multiplier', 1.0):.2f}")
-        
+
         elif explanation.edge_exists:
             lines.append("V Match DOES exist!")
             lines.append(f"  Score: {score:.2f}")
-        
+
         else:
             lines.append(f"? Score ({score:.2f}) is above threshold, but no edge found")
             lines.append("  This might indicate the stitcher hasn't run yet")
-        
+
         lines.append("")
         lines.append("=" * 60)
-        
+
         return "\n".join(lines)
-    
+
     def format(self, explanation: MatchExplanation) -> str:
         """
         Format an explanation for CLI output.
@@ -226,13 +224,13 @@ class ExplanationGenerator:
             Formatted string for display
         """
         lines = []
-        
+
         # Header
         lines.append("=" * 60)
         lines.append("MATCH EXPLANATION")
         lines.append("=" * 60)
         lines.append("")
-        
+
         # Source info
         lines.append(f"Source: {explanation.source.id}")
         lines.append(f"  Type: {explanation.source.type}")
@@ -243,7 +241,7 @@ class ExplanationGenerator:
                 loc += f":{explanation.source.line_number}"
             lines.append(f"  Found in: {loc}")
         lines.append("")
-        
+
         # Target info
         lines.append(f"Target: {explanation.target.id}")
         lines.append(f"  Type: {explanation.target.type}")
@@ -254,13 +252,13 @@ class ExplanationGenerator:
                 loc += f":{explanation.target.line_number}"
             lines.append(f"  Found in: {loc}")
         lines.append("")
-        
+
         # Confidence calculation
         lines.append("-" * 60)
         lines.append("CONFIDENCE CALCULATION")
         lines.append("-" * 60)
         lines.append("")
-        
+
         lines.append("Base signals:")
         if explanation.confidence_result.signals:
             for signal in explanation.confidence_result.signals:
@@ -268,7 +266,7 @@ class ExplanationGenerator:
                 name = signal.get("signal", "unknown")
                 details = signal.get("details", "")
                 matched_tokens = signal.get("matched_tokens", [])
-                
+
                 if matched_tokens:
                     lines.append(f"  [+{weight:.2f}] {name}: {matched_tokens}")
                 elif details:
@@ -278,7 +276,7 @@ class ExplanationGenerator:
                     lines.append(f"  [+{weight:.2f}] {name}")
         else:
             lines.append("  (none matched)")
-        
+
         lines.append("")
         lines.append("Penalties:")
         if explanation.confidence_result.penalties:
@@ -291,14 +289,14 @@ class ExplanationGenerator:
                     lines.append(f"         {reason}")
         else:
             lines.append("  None applied")
-        
+
         lines.append("")
-        
+
         # Final score
         score = explanation.confidence_result.score
         level = self._get_confidence_level(score)
         lines.append(f"Final confidence: {score:.2f} ({level})")
-        
+
         # Edge status
         if explanation.edge_exists:
             lines.append("")
@@ -313,7 +311,7 @@ class ExplanationGenerator:
                 lines.append("Edge Status: Would be created (above threshold)")
             else:
                 lines.append("Edge Status: Would be REJECTED (below threshold)")
-        
+
         # Alternatives
         if explanation.alternatives:
             lines.append("")
@@ -321,17 +319,17 @@ class ExplanationGenerator:
             lines.append("ALTERNATIVE MATCHES CONSIDERED")
             lines.append("-" * 60)
             lines.append("")
-            
+
             for alt in sorted(explanation.alternatives, key=lambda x: -x.score):
                 lines.append(f"{alt.node_id} -- Score: {alt.score:.2f} ({alt.rejection_reason})")
                 if alt.matched_tokens:
                     lines.append(f"  Tokens: {alt.matched_tokens}")
-        
+
         lines.append("")
         lines.append("=" * 60)
-        
+
         return "\n".join(lines)
-    
+
     def format_brief(self, explanation: MatchExplanation) -> str:
         """
         Format a brief, single-line explanation.
@@ -345,9 +343,9 @@ class ExplanationGenerator:
         score = explanation.confidence_result.score
         level = self._get_confidence_level(score)
         status = "EXISTS" if explanation.edge_exists else "would be created" if score >= self.min_confidence else "rejected"
-        
+
         return f"{explanation.source.id} -> {explanation.target.id}: {score:.2f} ({level}, {status})"
-    
+
     def _get_node_info(self, node_id: str) -> NodeInfo:
         """
         Get node information from graph or infer from ID.
@@ -371,19 +369,19 @@ class ExplanationGenerator:
                     line_number=node.metadata.get("line") if node.metadata else None,
                     metadata=dict(node.metadata) if node.metadata else {},
                 )
-        
+
         # Infer from ID
         name = self._extract_name_from_id(node_id)
         node_type = self._infer_type_from_id(node_id)
         tokens = self._tokenize(name)
-        
+
         return NodeInfo(
             id=node_id,
             name=name,
             type=node_type,
             tokens=tokens,
         )
-    
+
     def _find_alternatives(
         self,
         source_info: NodeInfo,
@@ -403,9 +401,9 @@ class ExplanationGenerator:
         """
         if not self.graph:
             return []
-        
+
         alternatives = []
-        
+
         # Determine what type of nodes to look at based on source type
         if source_info.id.startswith("env:"):
             candidate_types = [NodeType.INFRA_RESOURCE]
@@ -413,31 +411,31 @@ class ExplanationGenerator:
             candidate_types = [NodeType.INFRA_RESOURCE, NodeType.ENV_VAR]
         else:
             candidate_types = [NodeType.INFRA_RESOURCE, NodeType.ENV_VAR, NodeType.DATA_ASSET]
-        
+
         # Get candidate nodes
         candidates = []
         for node_type in candidate_types:
             candidates.extend(self.graph.get_nodes_by_type(node_type))
-        
+
         # Score each candidate
         for candidate in candidates:
             if candidate.id == actual_target_id:
                 continue
-            
+
             result = self.calculator.calculate(
                 source_name=source_info.name,
                 target_name=candidate.name,
                 source_tokens=source_info.tokens,
                 target_tokens=list(candidate.tokens),
             )
-            
+
             # Only include if there's some signal
             if result.score > 0:
                 if result.score < self.min_confidence:
                     reason = f"rejected: below threshold ({self.min_confidence})"
                 else:
                     reason = "not selected: lower score than match"
-                
+
                 alternatives.append(AlternativeMatch(
                     node_id=candidate.id,
                     node_name=candidate.name,
@@ -445,11 +443,11 @@ class ExplanationGenerator:
                     rejection_reason=reason,
                     matched_tokens=result.matched_tokens,
                 ))
-        
+
         # Sort by score and limit
         alternatives.sort(key=lambda x: -x.score)
         return alternatives[:max_alternatives]
-    
+
     def _get_confidence_level(self, score: float) -> str:
         """Get human-readable confidence level."""
         if score >= 0.8:
@@ -460,7 +458,7 @@ class ExplanationGenerator:
             return "LOW"
         else:
             return "VERY LOW"
-    
+
     @staticmethod
     def _extract_name_from_id(node_id: str) -> str:
         """Extract node name from ID."""
@@ -470,7 +468,7 @@ class ExplanationGenerator:
         if "://" in node_id:
             return node_id.split("://", 1)[1]
         return node_id
-    
+
     @staticmethod
     def _infer_type_from_id(node_id: str) -> str:
         """Infer node type from ID prefix."""
@@ -486,7 +484,7 @@ class ExplanationGenerator:
             return "data_asset"
         else:
             return "unknown"
-    
+
     @staticmethod
     def _tokenize(name: str) -> List[str]:
         """Split name into tokens."""

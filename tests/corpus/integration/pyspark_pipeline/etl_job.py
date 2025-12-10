@@ -1,5 +1,6 @@
 """ETL job that matches the spark.yml configuration."""
 import os
+
 from pyspark.sql import SparkSession
 
 DATABASE_HOST = os.getenv("DATABASE_HOST")

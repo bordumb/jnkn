@@ -19,10 +19,10 @@ Usage:
 """
 
 from .manifest_parser import (
-    DbtManifestParser,
-    DbtNode,
     DbtColumn,
     DbtExposure,
+    DbtManifestParser,
+    DbtNode,
     create_dbt_manifest_parser,
 )
 

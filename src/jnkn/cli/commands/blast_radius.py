@@ -4,11 +4,12 @@ Blast Radius Command - Calculate downstream impact.
 Wraps the BlastRadiusAnalyzer for CLI access.
 """
 
-import click
 import json
 from pathlib import Path
 
-from ..utils import echo_error, echo_info, load_graph
+import click
+
+from ..utils import echo_error, load_graph
 
 
 @click.command("blast-radius")
@@ -35,7 +36,7 @@ def blast_radius(artifacts: tuple, graph_file: str, max_depth: int, as_json: boo
         click.echo("  jnkn blast-radius env:DB_HOST")
         click.echo("  jnkn blast-radius warehouse.dim_users")
         return
-    
+
     # Resolve graph path (Fix for IsADirectoryError)
     graph_path = Path(graph_file)
     if graph_path.is_dir():
@@ -52,18 +53,18 @@ def blast_radius(artifacts: tuple, graph_file: str, max_depth: int, as_json: boo
     try:
         from ...analysis.blast_radius import BlastRadiusAnalyzer
         from ...core.graph import DependencyGraph
-        
+
         if graph_path.exists():
             # Use the resolved graph_path here
             data = json.loads(graph_path.read_text())
             graph = DependencyGraph()
             # In a real implementation, you would hydrate the graph object from 'data' here
             # For this snippet, we assume the graph loads or exists
-            
+
             # If the analyzer logic is fully implemented:
             # analyzer = BlastRadiusAnalyzer(graph=graph)
             # result = analyzer.calculate(list(artifacts), max_depth=max_depth)
-            
+
             # if as_json:
             #     click.echo(json.dumps(result, indent=2))
             # else:
@@ -74,16 +75,16 @@ def blast_radius(artifacts: tuple, graph_file: str, max_depth: int, as_json: boo
     except Exception:
         # Fallthrough to basic implementation if advanced analyzer fails/isn't ready
         pass
-    
+
     # Fallback: use LineageGraph logic with the resolved path
     # Convert path back to string for compatibility if load_graph expects str
     graph = load_graph(str(graph_path))
     if graph is None:
         return
-    
+
     all_downstream = set()
     resolved_artifacts = []
-    
+
     for artifact in artifacts:
         # Resolve partial names
         if not artifact.startswith(("data:", "file:", "job:", "env:", "infra:")):
@@ -93,18 +94,18 @@ def blast_radius(artifacts: tuple, graph_file: str, max_depth: int, as_json: boo
             else:
                 echo_error(f"No match found for: {artifact}")
                 continue
-        
+
         resolved_artifacts.append(artifact)
         downstream = graph.downstream(artifact, max_depth)
         all_downstream.update(downstream)
-    
+
     result = {
         "source_artifacts": resolved_artifacts,
         "total_impacted_count": len(all_downstream),
         "impacted_artifacts": sorted(all_downstream),
         "breakdown": _categorize(all_downstream),
     }
-    
+
     if as_json:
         click.echo(json.dumps(result, indent=2))
     else:
@@ -120,7 +121,7 @@ def _categorize(artifacts: set) -> dict:
         "infra": [],
         "other": [],
     }
-    
+
     for art in artifacts:
         if art.startswith("data:"):
             breakdown["data"].append(art)
@@ -132,7 +133,7 @@ def _categorize(artifacts: set) -> dict:
             breakdown["infra"].append(art)
         else:
             breakdown["other"].append(art)
-    
+
     return breakdown
 
 
@@ -141,16 +142,16 @@ def _print_result(result: dict):
     click.echo()
     click.echo(f"{click.style('Blast Radius Analysis', bold=True)}")
     click.echo("=" * 60)
-    
+
     click.echo()
     click.echo(click.style("Source artifacts:", bold=True))
     for art in result.get("source_artifacts", []):
         click.echo(f"  - {art}")
-    
+
     click.echo()
     total = result.get("total_impacted_count", 0)
     click.echo(f"{click.style('Total impacted:', bold=True)} {total} artifacts")
-    
+
     breakdown = result.get("breakdown", {})
     if breakdown:
         click.echo()
@@ -158,13 +159,13 @@ def _print_result(result: dict):
         for category, items in breakdown.items():
             if items:
                 click.echo(f"  {category}: {len(items)}")
-    
+
     click.echo()
     click.echo(click.style("Impacted artifacts:", bold=True))
     for art in result.get("impacted_artifacts", [])[:20]:
         click.echo(f"  - {art}")
-    
+
     if total > 20:
         click.echo(f"  ... and {total - 20} more")
-    
+
     click.echo()

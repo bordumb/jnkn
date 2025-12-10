@@ -7,15 +7,16 @@ This package contains the fundamental building blocks:
 - confidence: Confidence calculation engine
 """
 
-from .types import (
-    Node, Edge, NodeType, RelationshipType,
-    MatchStrategy, MatchResult, ScanMetadata
+from .confidence import (
+    ConfidenceCalculator,
+    ConfidenceConfig,
+    ConfidenceResult,
+    ConfidenceSignal,
+    PenaltyType,
+    create_default_calculator,
 )
 from .graph import DependencyGraph, TokenIndex
-from .confidence import (
-    ConfidenceCalculator, ConfidenceConfig, ConfidenceResult,
-    ConfidenceSignal, PenaltyType, create_default_calculator
-)
+from .types import Edge, MatchResult, MatchStrategy, Node, NodeType, RelationshipType, ScanMetadata
 
 __all__ = [
     # Types

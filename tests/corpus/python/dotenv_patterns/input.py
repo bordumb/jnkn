@@ -3,7 +3,8 @@ python-dotenv patterns.
 Specifically targets dictionary usage via dotenv_values().
 """
 import os
-from dotenv import load_dotenv, dotenv_values
+
+from dotenv import dotenv_values, load_dotenv
 
 # Standard load (already covered by stdlib tests, but good for regression)
 load_dotenv()

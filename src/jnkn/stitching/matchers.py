@@ -11,10 +11,11 @@ The TokenMatcher class is the central component for all token-based
 operations in the stitching system.
 """
 
-from typing import List, Set, Dict, Tuple, Optional, FrozenSet
+import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-import logging
+from typing import Dict, FrozenSet, List, Optional, Tuple
+
 import yaml
 
 logger = logging.getLogger(__name__)
@@ -30,10 +31,10 @@ class TokenConfig:
     """
     # Minimum length for a token to be considered
     min_token_length: int = 3
-    
+
     # Minimum significant tokens required for a match
     min_significant_tokens: int = 2
-    
+
     # Tokens that provide no signal and should be ignored
     blocked_tokens: FrozenSet[str] = field(default_factory=lambda: frozenset({
         # Generic identifiers
@@ -49,7 +50,7 @@ class TokenConfig:
         # Very short common words
         "the", "and", "for", "not", "get", "set", "new", "old",
     }))
-    
+
     # Tokens that provide weak signal (0.5x weight)
     low_value_tokens: FrozenSet[str] = field(default_factory=lambda: frozenset({
         # Cloud providers
@@ -64,25 +65,25 @@ class TokenConfig:
         # Common resource types that don't differentiate
         "instance", "cluster", "group", "pool", "bucket",
     }))
-    
+
     # Weight multiplier for low-value tokens
     low_value_weight: float = 0.5
-    
+
     # Weight multiplier for short tokens (< min_token_length)
     short_token_weight: float = 0.3
-    
+
     def is_blocked(self, token: str) -> bool:
         """Check if a token is blocked."""
         return token.lower() in self.blocked_tokens
-    
+
     def is_low_value(self, token: str) -> bool:
         """Check if a token is low-value."""
         return token.lower() in self.low_value_tokens
-    
+
     def is_short(self, token: str) -> bool:
         """Check if a token is too short."""
         return len(token) < self.min_token_length
-    
+
     def get_token_weight(self, token: str) -> float:
         """
         Get the weight multiplier for a token.
@@ -96,15 +97,15 @@ class TokenConfig:
         """
         if self.is_blocked(token):
             return 0.0
-        
+
         weight = 1.0
-        
+
         if self.is_low_value(token):
             weight *= self.low_value_weight
-        
+
         if self.is_short(token):
             weight *= self.short_token_weight
-        
+
         return weight
 
 
@@ -126,7 +127,7 @@ class TokenMatcher:
         # Calculate overlap
         overlap, score = matcher.calculate_overlap(sig1, sig2)
     """
-    
+
     def __init__(self, config: Optional[TokenConfig] = None):
         """
         Initialize the token matcher.
@@ -135,7 +136,7 @@ class TokenMatcher:
             config: Optional TokenConfig. Uses defaults if not provided.
         """
         self.config = config or TokenConfig()
-    
+
     @staticmethod
     def normalize(name: str) -> str:
         """
@@ -151,7 +152,7 @@ class TokenMatcher:
         for sep in ["_", ".", "-", "/", ":", " "]:
             result = result.replace(sep, "")
         return result
-    
+
     @staticmethod
     def tokenize(name: str) -> List[str]:
         """
@@ -167,7 +168,7 @@ class TokenMatcher:
         for sep in ["_", ".", "-", "/", ":", " "]:
             normalized = normalized.replace(sep, " ")
         return [t.strip() for t in normalized.split() if t.strip()]
-    
+
     def get_significant_tokens(self, tokens: List[str]) -> List[str]:
         """
         Filter tokens to only significant ones.
@@ -183,19 +184,19 @@ class TokenMatcher:
         significant = []
         for token in tokens:
             token_lower = token.lower()
-            
+
             # Skip blocked tokens
             if self.config.is_blocked(token_lower):
                 continue
-            
+
             # Skip tokens that are too short
             if len(token_lower) < self.config.min_token_length:
                 continue
-            
+
             significant.append(token_lower)
-        
+
         return significant
-    
+
     def get_weighted_tokens(self, tokens: List[str]) -> List[Tuple[str, float]]:
         """
         Get tokens with their weight multipliers.
@@ -210,12 +211,12 @@ class TokenMatcher:
         for token in tokens:
             token_lower = token.lower()
             weight = self.config.get_token_weight(token_lower)
-            
+
             if weight > 0:
                 weighted.append((token_lower, weight))
-        
+
         return weighted
-    
+
     def calculate_overlap(
         self,
         tokens1: List[str],
@@ -233,16 +234,16 @@ class TokenMatcher:
         """
         set1 = set(t.lower() for t in tokens1)
         set2 = set(t.lower() for t in tokens2)
-        
+
         overlap = set1 & set2
         union = set1 | set2
-        
+
         if not union:
             return [], 0.0
-        
+
         jaccard = len(overlap) / len(union)
         return list(overlap), jaccard
-    
+
     def calculate_significant_overlap(
         self,
         tokens1: List[str],
@@ -260,9 +261,9 @@ class TokenMatcher:
         """
         sig1 = self.get_significant_tokens(tokens1)
         sig2 = self.get_significant_tokens(tokens2)
-        
+
         return self.calculate_overlap(sig1, sig2)
-    
+
     def calculate_weighted_overlap(
         self,
         tokens1: List[str],
@@ -282,27 +283,27 @@ class TokenMatcher:
         """
         weighted1 = dict(self.get_weighted_tokens(tokens1))
         weighted2 = dict(self.get_weighted_tokens(tokens2))
-        
+
         # Find overlapping tokens
         overlap_tokens = set(weighted1.keys()) & set(weighted2.keys())
-        
+
         if not overlap_tokens:
             return [], 0.0
-        
+
         # Calculate weighted overlap score
         overlap_weight = sum(
             min(weighted1[t], weighted2[t])
             for t in overlap_tokens
         )
-        
+
         total_weight = sum(weighted1.values()) + sum(weighted2.values()) - overlap_weight
-        
+
         if total_weight == 0:
             return list(overlap_tokens), 0.0
-        
+
         score = overlap_weight / total_weight
         return list(overlap_tokens), score
-    
+
     def has_sufficient_overlap(
         self,
         tokens1: List[str],
@@ -322,7 +323,7 @@ class TokenMatcher:
         """
         overlap, _ = self.calculate_significant_overlap(tokens1, tokens2)
         return len(overlap) >= self.config.min_significant_tokens
-    
+
     def get_match_quality(
         self,
         source_tokens: List[str],
@@ -341,18 +342,18 @@ class TokenMatcher:
         # Get significant tokens
         sig_source = self.get_significant_tokens(source_tokens)
         sig_target = self.get_significant_tokens(target_tokens)
-        
+
         # Calculate overlaps
         overlap, jaccard = self.calculate_overlap(sig_source, sig_target)
         _, weighted_score = self.calculate_weighted_overlap(source_tokens, target_tokens)
-        
+
         # Find blocked and low-value tokens
         blocked_source = [t for t in source_tokens if self.config.is_blocked(t.lower())]
         blocked_target = [t for t in target_tokens if self.config.is_blocked(t.lower())]
-        
+
         low_value_source = [t for t in source_tokens if self.config.is_low_value(t.lower())]
         low_value_target = [t for t in target_tokens if self.config.is_low_value(t.lower())]
-        
+
         return {
             "source_tokens": source_tokens,
             "target_tokens": target_tokens,
@@ -394,16 +395,16 @@ def load_config_from_yaml(path: Path) -> Optional[TokenConfig]:
     """
     if not path.exists():
         return None
-    
+
     try:
         with open(path) as f:
             data = yaml.safe_load(f)
-        
+
         if not data or "matching" not in data:
             return None
-        
+
         matching = data["matching"]
-        
+
         return TokenConfig(
             min_token_length=matching.get("min_token_length", 3),
             min_significant_tokens=matching.get("min_significant_tokens", 2),
@@ -412,7 +413,7 @@ def load_config_from_yaml(path: Path) -> Optional[TokenConfig]:
             low_value_weight=matching.get("low_value_weight", 0.5),
             short_token_weight=matching.get("short_token_weight", 0.3),
         )
-    
+
     except Exception as e:
         logger.warning(f"Failed to load token config from {path}: {e}")
         return None
@@ -431,7 +432,7 @@ def create_default_matcher(config_path: Optional[Path] = None) -> TokenMatcher:
     """
     if config_path is None:
         config_path = Path(".jnkn/config.yaml")
-    
+
     config = load_config_from_yaml(config_path)
     return TokenMatcher(config)
 

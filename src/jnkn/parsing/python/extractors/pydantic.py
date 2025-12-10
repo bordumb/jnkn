@@ -1,10 +1,11 @@
-from pathlib import Path
-from typing import Generator, Set, Union, Optional, Any
 import re
+from pathlib import Path
+from typing import Generator, Optional, Set, Union
 
-from ....core.types import Node, Edge, NodeType, RelationshipType
+from ....core.types import Edge, Node, NodeType, RelationshipType
 from ..validation import is_valid_env_var_name
-from .base import BaseExtractor, Tree, logger
+from .base import BaseExtractor, Tree
+
 
 class PydanticExtractor(BaseExtractor):
     @property
@@ -26,20 +27,20 @@ class PydanticExtractor(BaseExtractor):
         text: str,
         seen_vars: Set[str],
     ) -> Generator[Union[Node, Edge], None, None]:
-        
+
         # 1. Field(env="VAR") pattern
         field_env_pattern = r'Field\s*\([^)]*env\s*=\s*["\']([^"\']+)["\']'
         regex = re.compile(field_env_pattern)
-        
+
         for match in regex.finditer(text):
             var_name = match.group(1)
-            
+
             if not is_valid_env_var_name(var_name):
                 continue
-                
+
             line = text[:match.start()].count('\n') + 1
             env_id = f"env:{var_name}"
-            
+
             yield Node(
                 id=env_id,
                 name=var_name,
@@ -50,7 +51,7 @@ class PydanticExtractor(BaseExtractor):
                     "line": line,
                 },
             )
-            
+
             yield Edge(
                 source_id=file_id,
                 target_id=env_id,
@@ -63,12 +64,12 @@ class PydanticExtractor(BaseExtractor):
             r'class\s+(\w+)\s*\([^)]*BaseSettings[^)]*\)\s*:\s*\n(.*?)(?=\nclass\s+\w+\s*[\(:]|\Z)',
             re.DOTALL
         )
-        
+
         for class_match in class_pattern.finditer(text):
             class_name = class_match.group(1)
             class_body = class_match.group(2)
             class_start_line = text[:class_match.start()].count('\n') + 1
-            
+
             # Extract env_prefix from Config class
             prefix = ""
             prefix_match = re.search(
@@ -78,21 +79,21 @@ class PydanticExtractor(BaseExtractor):
             )
             if prefix_match:
                 prefix = prefix_match.group(1)
-            
+
             # Find all typed field definitions (field_name: type)
             field_pattern = re.compile(
                 r'^([ \t]{4}(\w+)\s*:\s*\w+.*?)$',
                 re.MULTILINE
             )
-            
+
             for field_match in field_pattern.finditer(class_body):
                 field_line_content = field_match.group(1)
                 field_name = field_match.group(2)
-                
+
                 # Skip private fields, Config class, and model internals
                 if field_name.startswith('_') or field_name in ('Config', 'model_config', 'model_fields'):
                     continue
-                
+
                 # Check explicit env= override
                 explicit_env_match = re.search(
                     r'Field\s*\([^)]*\benv\s*=\s*["\']([^"\']+)["\']',
@@ -100,12 +101,12 @@ class PydanticExtractor(BaseExtractor):
                 )
                 if explicit_env_match:
                     continue
-                
+
                 env_var_name = prefix + field_name.upper()
-                
+
                 field_line = class_start_line + class_body[:field_match.start()].count('\n')
                 env_id = f"env:{env_var_name}"
-                
+
                 yield Node(
                     id=env_id,
                     name=env_var_name,
@@ -120,7 +121,7 @@ class PydanticExtractor(BaseExtractor):
                         "inferred": True,
                     },
                 )
-                
+
                 yield Edge(
                     source_id=file_id,
                     target_id=env_id,

@@ -16,10 +16,9 @@ Then open lineage.html in your browser!
 
 import json
 import tempfile
-import shutil
-from pathlib import Path
 from collections import defaultdict
-from typing import Dict, List, Any, Set, Tuple
+from pathlib import Path
+from typing import Any, Dict, List, Set, Tuple
 
 # =============================================================================
 # Sample Data Pipeline Files
@@ -185,29 +184,29 @@ st.dataframe(churn_predictions.toPandas())
 
 class LineageGraph:
     """Lightweight lineage graph for demo."""
-    
+
     def __init__(self):
         self._nodes: Dict[str, Dict[str, Any]] = {}
         self._outgoing: Dict[str, Set[str]] = defaultdict(set)
         self._incoming: Dict[str, Set[str]] = defaultdict(set)
         self._edge_types: Dict[Tuple[str, str], str] = {}
-    
+
     def add_node(self, node_id: str, **attrs) -> None:
         self._nodes[node_id] = attrs
-    
+
     def add_edge(self, source: str, target: str, edge_type: str = "unknown") -> None:
         self._outgoing[source].add(target)
         self._incoming[target].add(source)
         self._edge_types[(source, target)] = edge_type
-    
+
     def get_node(self, node_id: str) -> Dict:
         return self._nodes.get(node_id, {})
-    
+
     def downstream(self, node_id: str, max_depth: int = -1) -> Set[str]:
         """Find all affected nodes downstream."""
         visited = set()
         to_visit = [(node_id, 0)]
-        
+
         while to_visit:
             current, depth = to_visit.pop(0)
             if current in visited:
@@ -215,27 +214,27 @@ class LineageGraph:
             if max_depth >= 0 and depth > max_depth:
                 continue
             visited.add(current)
-            
+
             # Things that read from us
             for source in self._incoming.get(current, set()):
                 et = self._edge_types.get((source, current), "").lower()
                 if et == "reads":
                     to_visit.append((source, depth + 1))
-            
+
             # Things we write to
             for target in self._outgoing.get(current, set()):
                 et = self._edge_types.get((current, target), "").lower()
                 if et in ("writes", "depends_on"):
                     to_visit.append((target, depth + 1))
-        
+
         visited.discard(node_id)
         return visited
-    
+
     def upstream(self, node_id: str, max_depth: int = -1) -> Set[str]:
         """Find all source nodes upstream."""
         visited = set()
         to_visit = [(node_id, 0)]
-        
+
         while to_visit:
             current, depth = to_visit.pop(0)
             if current in visited:
@@ -243,30 +242,30 @@ class LineageGraph:
             if max_depth >= 0 and depth > max_depth:
                 continue
             visited.add(current)
-            
+
             # Things we read from
             for target in self._outgoing.get(current, set()):
                 et = self._edge_types.get((current, target), "").lower()
                 if et == "reads":
                     to_visit.append((target, depth + 1))
-            
+
             # Things that write to us
             for source in self._incoming.get(current, set()):
                 et = self._edge_types.get((source, current), "").lower()
                 if et == "writes":
                     to_visit.append((source, depth + 1))
-        
+
         visited.discard(node_id)
         return visited
-    
+
     def trace(self, source: str, target: str) -> List[List[str]]:
         """Find paths between two nodes."""
         if source not in self._nodes or target not in self._nodes:
             return []
-        
+
         paths = []
         queue = [(source, [source])]
-        
+
         while queue:
             current, path = queue.pop(0)
             if current == target:
@@ -274,18 +273,18 @@ class LineageGraph:
                 continue
             if len(path) > 15:
                 continue
-            
+
             for neighbor in self._outgoing.get(current, set()) | self._incoming.get(current, set()):
                 if neighbor not in path:
                     queue.append((neighbor, path + [neighbor]))
-        
+
         return paths
-    
+
     def find_orphans(self) -> List[str]:
         """Find nodes with no connections."""
-        return [n for n in self._nodes 
+        return [n for n in self._nodes
                 if not self._outgoing.get(n) and not self._incoming.get(n)]
-    
+
     def stats(self) -> Dict[str, Any]:
         """Get graph statistics."""
         by_type = defaultdict(int)
@@ -296,22 +295,22 @@ class LineageGraph:
                 by_type["code"] += 1
             else:
                 by_type["other"] += 1
-        
+
         edge_types = defaultdict(int)
         for (_, _), et in self._edge_types.items():
             edge_types[et] += 1
-        
+
         return {
             "total_nodes": len(self._nodes),
             "total_edges": len(self._edge_types),
             "nodes_by_type": dict(by_type),
             "edges_by_type": dict(edge_types),
         }
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "nodes": [{"id": k, **v} for k, v in self._nodes.items()],
-            "edges": [{"source": s, "target": t, "type": et} 
+            "edges": [{"source": s, "target": t, "type": et}
                      for (s, t), et in self._edge_types.items()],
             "stats": self.stats(),
         }
@@ -323,18 +322,19 @@ class LineageGraph:
 
 import re
 
+
 def parse_pyspark(content: str, file_path: str) -> Tuple[List[Dict], List[Dict]]:
     """Extract tables read/written from PySpark code."""
     nodes = []
     edges = []
-    
+
     # Normalize backslash continuations
     text = content.replace('\\\n', ' ')
-    
+
     file_id = f"file:{file_path}"
     file_name = Path(file_path).stem
     nodes.append({"id": file_id, "name": file_name, "type": "code_file"})
-    
+
     # Patterns for reading tables
     read_patterns = [
         r'spark\.read\.table\(["\']([^"\']+)["\']\)',
@@ -342,7 +342,7 @@ def parse_pyspark(content: str, file_path: str) -> Tuple[List[Dict], List[Dict]]
         r'\.load\(["\']([^"\']+)["\']\)',
         r'\.parquet\(["\']([^"\']+)["\']\)',
     ]
-    
+
     # Patterns for writing tables
     write_patterns = [
         r'\.saveAsTable\(["\']([^"\']+)["\']\)',
@@ -350,7 +350,7 @@ def parse_pyspark(content: str, file_path: str) -> Tuple[List[Dict], List[Dict]]
         r'\.save\(["\']([^"\']+)["\']\)',
         r'\.parquet\(["\']([^"\']+)["\']\)',  # Context determines read vs write
     ]
-    
+
     # Find reads
     for pattern in read_patterns:
         for match in re.finditer(pattern, text):
@@ -358,7 +358,7 @@ def parse_pyspark(content: str, file_path: str) -> Tuple[List[Dict], List[Dict]]
             table_id = f"data:{table.replace('://', ':')}"
             nodes.append({"id": table_id, "name": table, "type": "data_asset"})
             edges.append({"source": file_id, "target": table_id, "type": "reads"})
-    
+
     # Find writes (look for .write before .save/.saveAsTable)
     write_block_pattern = r'\.write\s*(?:\.[a-zA-Z_]+\s*\([^)]*\)\s*)*\.(saveAsTable|save|parquet)\(["\']([^"\']+)["\']\)'
     for match in re.finditer(write_block_pattern, text):
@@ -366,7 +366,7 @@ def parse_pyspark(content: str, file_path: str) -> Tuple[List[Dict], List[Dict]]
         table_id = f"data:{table.replace('://', ':')}"
         nodes.append({"id": table_id, "name": table, "type": "data_asset"})
         edges.append({"source": file_id, "target": table_id, "type": "writes"})
-    
+
     return nodes, edges
 
 
@@ -377,22 +377,22 @@ def parse_pyspark(content: str, file_path: str) -> Tuple[List[Dict], List[Dict]]
 def generate_html(graph: LineageGraph) -> str:
     """Generate interactive HTML visualization."""
     data = graph.to_dict()
-    
+
     # Prepare vis.js data
     vis_nodes = []
     vis_edges = []
-    
+
     colors = {
         "data": "#4CAF50",    # Green
-        "code": "#2196F3",    # Blue  
+        "code": "#2196F3",    # Blue
         "config": "#FF9800",  # Orange
         "infra": "#9C27B0",   # Purple
     }
-    
+
     for node in data["nodes"]:
         node_id = node.get("id", "")
         name = node.get("name", node_id)
-        
+
         # Determine category
         if node_id.startswith("data:"):
             category = "data"
@@ -402,7 +402,7 @@ def generate_html(graph: LineageGraph) -> str:
             category = "config"
         else:
             category = "code"
-        
+
         # Short label
         if "." in name:
             label = name.split(".")[-1]
@@ -410,7 +410,7 @@ def generate_html(graph: LineageGraph) -> str:
             label = name.split("/")[-1]
         else:
             label = name
-        
+
         vis_nodes.append({
             "id": node_id,
             "label": label,
@@ -418,7 +418,7 @@ def generate_html(graph: LineageGraph) -> str:
             "color": colors.get(category, "#757575"),
             "group": category,
         })
-    
+
     for edge in data["edges"]:
         vis_edges.append({
             "from": edge["source"],
@@ -427,7 +427,7 @@ def generate_html(graph: LineageGraph) -> str:
             "dashes": edge["type"] == "reads",
             "title": edge["type"],
         })
-    
+
     return f'''<!DOCTYPE html>
 <html>
 <head>
@@ -758,35 +758,35 @@ def main():
     ║                                                           ║
     ╚═══════════════════════════════════════════════════════════╝
     """)
-    
+
     # Create temp directory with sample files
     tmp_dir = Path(tempfile.mkdtemp(prefix="jnkn_demo_"))
     print(f"📁 Creating sample pipeline in: {tmp_dir}\n")
-    
+
     for rel_path, content in SAMPLE_FILES.items():
         file_path = tmp_dir / rel_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_text(content)
         print(f"   ✓ {rel_path}")
-    
+
     # Parse files and build graph
-    print(f"\n🔍 Scanning files...\n")
-    
+    print("\n🔍 Scanning files...\n")
+
     graph = LineageGraph()
-    
+
     for rel_path in SAMPLE_FILES.keys():
         file_path = tmp_dir / rel_path
         content = file_path.read_text()
-        
+
         nodes, edges = parse_pyspark(content, rel_path)
-        
+
         for node in nodes:
             graph.add_node(node["id"], **node)
         for edge in edges:
             graph.add_edge(edge["source"], edge["target"], edge["type"])
-        
+
         print(f"   → {rel_path}: {len(nodes)} nodes, {len(edges)} edges")
-    
+
     # Show stats
     stats = graph.stats()
     print(f"""
@@ -803,17 +803,17 @@ def main():
       Reads:  {stats['edges_by_type'].get('reads', 0)}
       Writes: {stats['edges_by_type'].get('writes', 0)}
 """)
-    
+
     # Demo: Impact Analysis
     print("💥 Impact Analysis Demo")
     print("═" * 55)
-    
+
     target = "data:warehouse.dim_users"
-    print(f"\n   Question: What breaks if we change 'warehouse.dim_users'?\n")
-    
+    print("\n   Question: What breaks if we change 'warehouse.dim_users'?\n")
+
     downstream = graph.downstream(target)
     upstream = graph.upstream(target)
-    
+
     print(f"   ⬆️  Upstream (sources): {len(upstream)}")
     if upstream:
         for node_id in sorted(upstream)[:5]:
@@ -821,23 +821,23 @@ def main():
             print(f"      • {name}")
     else:
         print("      (none - this is a source table)")
-    
+
     print(f"\n   ⬇️  Downstream (affected): {len(downstream)}")
     for node_id in sorted(downstream)[:10]:
         name = node_id.replace("data:", "").replace("file:", "")
         print(f"      • {name}")
-    
+
     print(f"\n   Total affected: {len(upstream) + len(downstream)} nodes")
-    
+
     # Generate HTML
     output_path = Path("lineage.html")
     html = generate_html(graph)
     output_path.write_text(html)
-    
+
     # Also save JSON
     json_path = Path("lineage.json")
     json_path.write_text(json.dumps(graph.to_dict(), indent=2))
-    
+
     print(f"""
 🎨 Generated Visualization
 ═══════════════════════════════════════
@@ -866,7 +866,7 @@ def main():
 🚀 This is what 'jnkn scan' + 'jnkn graph' does!
 
 """)
-    
+
     # Cleanup
     # shutil.rmtree(tmp_dir)  # Uncomment to cleanup temp files
 
