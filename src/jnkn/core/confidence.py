@@ -22,22 +22,16 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Dict, List, Optional, Set
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 logger = logging.getLogger(__name__)
 
 
 class ConfidenceSignal(StrEnum):
-    """
-    Signals that contribute to match confidence.
-    
-    Each signal represents a type of evidence that two items are related.
-    Higher weights indicate stronger evidence.
-    """
     EXACT_MATCH = "exact_match"
     NORMALIZED_MATCH = "normalized_match"
-    TOKEN_OVERLAP_HIGH = "token_overlap_high"  # 3+ tokens
-    TOKEN_OVERLAP_MEDIUM = "token_overlap_medium"  # 2 tokens
+    TOKEN_OVERLAP_HIGH = "token_overlap_high"
+    TOKEN_OVERLAP_MEDIUM = "token_overlap_medium"
     SUFFIX_MATCH = "suffix_match"
     PREFIX_MATCH = "prefix_match"
     CONTAINS = "contains"
@@ -45,12 +39,6 @@ class ConfidenceSignal(StrEnum):
 
 
 class PenaltyType(StrEnum):
-    """
-    Penalty types that reduce match confidence.
-    
-    Penalties are applied multiplicatively to reduce confidence
-    for potentially unreliable matches.
-    """
     SHORT_TOKEN = "short_token"
     COMMON_TOKEN = "common_token"
     AMBIGUITY = "ambiguity"
@@ -59,7 +47,6 @@ class PenaltyType(StrEnum):
 
 @dataclass
 class SignalResult:
-    """Result of evaluating a single confidence signal."""
     signal: ConfidenceSignal
     weight: float
     matched: bool
@@ -69,9 +56,8 @@ class SignalResult:
 
 @dataclass
 class PenaltyResult:
-    """Result of evaluating a single penalty."""
     penalty_type: PenaltyType
-    multiplier: float  # 0.0 to 1.0, applied multiplicatively
+    multiplier: float
     reason: str = ""
     affected_tokens: List[str] = field(default_factory=list)
 
@@ -79,29 +65,22 @@ class PenaltyResult:
 class ConfidenceResult(BaseModel):
     """
     Complete result of confidence calculation.
-    
-    Contains the final score, all contributing signals, applied penalties,
-    and a human-readable explanation.
     """
     score: float = Field(ge=0.0, le=1.0)
-    signals: List[Dict] = Field(default_factory=list)  # SignalResult as dicts
-    penalties: List[Dict] = Field(default_factory=list)  # PenaltyResult as dicts
+    signals: List[Dict] = Field(default_factory=list)
+    penalties: List[Dict] = Field(default_factory=list)
     explanation: str = ""
     matched_tokens: List[str] = Field(default_factory=list)
     source_node_id: str = ""
     target_node_id: str = ""
 
-    class Config:
-        frozen = False
+    model_config = ConfigDict(frozen=False)
 
 
 class ConfidenceConfig(BaseModel):
     """
     Configuration for confidence calculation.
-    
-    Allows customization of signal weights, penalty factors, and thresholds.
     """
-    # Signal weights (0.0 to 1.0)
     signal_weights: Dict[str, float] = Field(default_factory=lambda: {
         ConfidenceSignal.EXACT_MATCH: 1.0,
         ConfidenceSignal.NORMALIZED_MATCH: 0.9,
@@ -113,7 +92,6 @@ class ConfidenceConfig(BaseModel):
         ConfidenceSignal.SINGLE_TOKEN: 0.2,
     })
 
-    # Penalty multipliers (0.0 to 1.0, lower = stronger penalty)
     penalty_multipliers: Dict[str, float] = Field(default_factory=lambda: {
         PenaltyType.SHORT_TOKEN: 0.5,
         PenaltyType.COMMON_TOKEN: 0.7,
@@ -121,12 +99,10 @@ class ConfidenceConfig(BaseModel):
         PenaltyType.LOW_VALUE_TOKEN: 0.6,
     })
 
-    # Thresholds
-    short_token_length: int = 4  # Tokens shorter than this get penalty
-    min_token_overlap_high: int = 3  # Minimum for "high" overlap
-    min_token_overlap_medium: int = 2  # Minimum for "medium" overlap
+    short_token_length: int = 4
+    min_token_overlap_high: int = 3
+    min_token_overlap_medium: int = 2
 
-    # Common tokens that provide weak signal
     common_tokens: Set[str] = Field(default_factory=lambda: {
         "id", "db", "host", "url", "key", "name", "type", "data",
         "info", "temp", "test", "api", "app", "env", "var", "val",
@@ -135,7 +111,6 @@ class ConfidenceConfig(BaseModel):
         "dst", "in", "out", "err", "msg", "str", "int", "num",
     })
 
-    # Low-value tokens (provide some signal but reduced)
     low_value_tokens: Set[str] = Field(default_factory=lambda: {
         "aws", "gcp", "azure", "main", "default", "primary",
         "production", "prod", "staging", "dev", "development",
@@ -143,30 +118,15 @@ class ConfidenceConfig(BaseModel):
         "remote", "master", "slave", "read", "write",
     })
 
-    class Config:
-        frozen = False
+    model_config = ConfigDict(frozen=False)
 
 
 class ConfidenceCalculator:
     """
     Calculate confidence scores for dependency matches.
-    
-    Combines multiple signals with configurable weights and penalty factors
-    to produce explainable confidence scores.
-    
-    Usage:
-        calculator = ConfidenceCalculator()
-        result = calculator.calculate(source_node, target_node, matched_tokens)
-        print(calculator.explain(result))
     """
 
     def __init__(self, config: Optional[ConfidenceConfig] = None):
-        """
-        Initialize the confidence calculator.
-        
-        Args:
-            config: Optional configuration. Uses defaults if not provided.
-        """
         self.config = config or ConfidenceConfig()
 
     def calculate(
@@ -182,19 +142,6 @@ class ConfidenceCalculator:
     ) -> ConfidenceResult:
         """
         Calculate confidence score for a match between source and target.
-        
-        Args:
-            source_name: Name of the source node (e.g., "PAYMENT_DB_HOST")
-            target_name: Name of the target node (e.g., "payment_db_host")
-            source_tokens: Tokenized source name
-            target_tokens: Tokenized target name
-            matched_tokens: Pre-computed matched tokens (optional)
-            alternative_match_count: Number of other potential matches for source
-            source_node_id: ID of source node for reference
-            target_node_id: ID of target node for reference
-        
-        Returns:
-            ConfidenceResult with score, signals, penalties, and explanation
         """
         # Calculate matched tokens if not provided
         if matched_tokens is None:
@@ -405,8 +352,8 @@ class ConfidenceCalculator:
         # Penalty 4: Low-value tokens
         low_value_found = [t for t in matched_tokens if t in self.config.low_value_tokens]
         high_value_found = [t for t in matched_tokens
-                          if t not in self.config.low_value_tokens
-                          and t not in self.config.common_tokens]
+                           if t not in self.config.low_value_tokens
+                           and t not in self.config.common_tokens]
 
         # Only apply if majority of tokens are low-value
         if low_value_found and len(low_value_found) > len(high_value_found):
@@ -500,7 +447,6 @@ class ConfidenceCalculator:
     def explain(self, result: ConfidenceResult) -> str:
         """
         Generate a detailed, formatted explanation of a confidence result.
-        
         This is a richer version of the explanation included in the result,
         suitable for CLI output.
         """

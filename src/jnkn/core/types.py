@@ -11,7 +11,7 @@ This module defines the fundamental data structures used throughout the system:
 """
 
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import StrEnum
 from typing import Any, Dict, List, Optional
 
@@ -72,7 +72,7 @@ class Node(BaseModel):
     file_hash: Optional[str] = None
     tokens: List[str] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     def model_post_init(self, __context) -> None:
         """Generate tokens from name if not provided."""
@@ -109,8 +109,7 @@ class Edge(BaseModel):
     confidence: float = 1.0
     match_strategy: Optional[MatchStrategy] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class MatchResult(BaseModel):
     """
@@ -132,7 +131,7 @@ class ScanMetadata(BaseModel):
     """
     file_path: str
     file_hash: str
-    last_scanned: datetime = Field(default_factory=datetime.utcnow)
+    last_scanned: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))    
     node_count: int = 0
     edge_count: int = 0
 
@@ -153,5 +152,5 @@ class ScanMetadata(BaseModel):
 class SchemaVersion(BaseModel):
     """Database schema version for migrations."""
     version: int
-    applied_at: datetime = Field(default_factory=datetime.utcnow)
+    applied_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     description: str = ""

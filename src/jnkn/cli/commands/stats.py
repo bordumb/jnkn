@@ -17,7 +17,6 @@ from ..utils import echo_error, echo_success, load_graph
 def stats(graph_file: str, as_json: bool):
     """
     Show graph statistics.
-    
     Displays node counts, edge counts, and breakdowns by type.
     
     \b
@@ -36,7 +35,7 @@ def stats(graph_file: str, as_json: bool):
     if graph is None:
         return
 
-    s = graph.stats()
+    s = graph.stats() if hasattr(graph, "stats") else graph.get_stats()
 
     if as_json:
         click.echo(json.dumps(s, indent=2))
@@ -46,11 +45,21 @@ def stats(graph_file: str, as_json: bool):
     click.echo(f"📊 {click.style('Graph Statistics', bold=True)}")
     click.echo("═" * 40)
     click.echo()
+    
+    # NEW: Display Backend (This proves we are on rustworkx)
+    backend = s.get("backend", "unknown")
+    backend_color = "green" if backend == "rustworkx" else "yellow"
+    click.echo(f"Backend: {click.style(backend, fg=backend_color, bold=True)}")
+    
     click.echo(f"Source: {graph_file}")
     click.echo(f"Size: {graph_path.stat().st_size / 1024:.1f} KB")
     click.echo()
     click.echo(f"Nodes: {s['total_nodes']}")
     click.echo(f"Edges: {s['total_edges']}")
+
+    # NEW: Show token index stats if available
+    if "indexed_tokens" in s:
+        click.echo(f"Indexed Tokens: {s['indexed_tokens']}")
 
     if s.get("nodes_by_type"):
         click.echo()
@@ -80,7 +89,6 @@ def stats(graph_file: str, as_json: bool):
 def clear(graph_file: str, clear_all: bool):
     """
     Clear graph data.
-    
     \b
     Examples:
         jnkn clear

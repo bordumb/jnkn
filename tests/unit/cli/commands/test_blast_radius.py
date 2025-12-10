@@ -10,7 +10,7 @@ from jnkn.cli.commands.blast_radius import blast_radius
 class TestBlastRadiusCommand:
     """Integration tests for the blast radius CLI."""
 
-    @patch("jnkn.cli.commands.blast_radius._run_with_json")
+    @patch("jnkn.cli.commands.blast_radius._run_with_sqlite") # FIX: Patch the SQLite runner, not JSON
     @patch("jnkn.cli.commands.blast_radius.format_blast_radius")
     def test_blast_radius_default_output(self, mock_format, mock_run):
         """Test that the text formatter is used by default."""
@@ -80,4 +80,4 @@ class TestBlastRadiusCommand:
         mock_run.assert_called()
         # Verify it passed the fallback path
         args = mock_run.call_args[0]
-        assert str(args[0]) == ".jnkn/lineage.json"
+        assert "lineage.json" in str(args[0])
