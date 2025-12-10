@@ -6,12 +6,14 @@ in its own module under cli/commands/.
 """
 
 import click
+from .utils_telemetry import TelemetryGroup
 
 from .commands import (
     blast_radius,
     check,
     diff,
     explain,
+    feedback,
     graph,
     impact,
     ingest,
@@ -24,23 +26,14 @@ from .commands import (
 from .commands.initialize import init
 
 
-@click.group()
+# Use cls=TelemetryGroup to enable automatic tracking
+@click.group(cls=TelemetryGroup)
 @click.version_option(package_name="jnkn")
 def main():
-    """jnkn: Pre-Flight Impact Analysis Engine.
+    """jnkn: The Pre-Flight Impact Analysis Engine.
     
     Detects cross-domain breaking changes between Infrastructure,
     Data Pipelines, and Application Code.
-    
-    \b
-    Quick Start:
-      jnkn scan ./src --output lineage.json
-      jnkn impact warehouse.dim_users
-      jnkn graph --output lineage.html
-    
-    \b
-    Documentation:
-      https://github.com/your-org/jnkn
     """
     pass
 
@@ -59,6 +52,7 @@ main.add_command(stats.stats)
 main.add_command(stats.clear)
 main.add_command(check.check)
 main.add_command(diff.diff)
+main.add_command(feedback.feedback)
 main.add_command(init)
 
 if __name__ == "__main__":
