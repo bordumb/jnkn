@@ -6111,9 +6111,9 @@
   
 
 
-<h1 id="why-tree-sitter">Why Tree-Sitter<a class="headerlink" href="#why-tree-sitter" title="Permanent link">&para;</a></h1>
+<h1 id="why-tree-sitter">Why Tree-Sitter</h1>
 <p>Rationale for our parsing technology choice.</p>
-<h2 id="the-alternatives">The Alternatives<a class="headerlink" href="#the-alternatives" title="Permanent link">&para;</a></h2>
+<h2 id="the-alternatives">The Alternatives</h2>
 <table>
 <thead>
 <tr>
@@ -6140,7 +6140,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="why-not-regex">Why Not Regex?<a class="headerlink" href="#why-not-regex" title="Permanent link">&para;</a></h2>
+<h2 id="why-not-regex">Why Not Regex?</h2>
 <p>Regex works for simple cases:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Matches</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">)</span>
@@ -6162,7 +6162,7 @@
 <a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="p">)</span>
 </code></pre></div>
 <p>Regex can't understand <strong>context</strong>.</p>
-<h2 id="why-not-ast-libraries">Why Not AST Libraries?<a class="headerlink" href="#why-not-ast-libraries" title="Permanent link">&para;</a></h2>
+<h2 id="why-not-ast-libraries">Why Not AST Libraries?</h2>
 <p>Python's <code>ast</code> module is accurate:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
@@ -6178,9 +6178,9 @@
 <li><strong>Slow for large files</strong> — Full parse required</li>
 <li><strong>Fragile</strong> — Syntax errors break entire parse</li>
 </ol>
-<h2 id="why-tree-sitter_1">Why Tree-Sitter<a class="headerlink" href="#why-tree-sitter_1" title="Permanent link">&para;</a></h2>
+<h2 id="why-tree-sitter_1">Why Tree-Sitter</h2>
 <p>Tree-sitter provides:</p>
-<h3 id="1-universal-query-language">1. Universal Query Language<a class="headerlink" href="#1-universal-query-language" title="Permanent link">&para;</a></h3>
+<h3 id="1-universal-query-language">1. Universal Query Language</h3>
 <p>One query syntax works across languages:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">; Python</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="p">(</span><span class="nf">call</span>
@@ -6192,20 +6192,20 @@
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="nv">function:</span><span class="w"> </span><span class="p">(</span><span class="nf">member_expression</span><span class="w"> </span><span class="nv">object:</span><span class="w"> </span><span class="p">(</span><span class="nf">identifier</span><span class="p">)</span><span class="w"> </span><span class="nv">@obj</span><span class="p">)</span>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="p">(</span><span class="o">#</span><span class="nb">eq?</span><span class="w"> </span><span class="nv">@obj</span><span class="w"> </span><span class="s">&quot;process&quot;</span><span class="p">))</span>
 </code></pre></div>
-<h3 id="2-error-tolerance">2. Error Tolerance<a class="headerlink" href="#2-error-tolerance" title="Permanent link">&para;</a></h3>
+<h3 id="2-error-tolerance">2. Error Tolerance</h3>
 <p>Tree-sitter produces partial ASTs even with syntax errors:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">broken</span><span class="p">(</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="c1"># Missing closing paren - tree-sitter still parses the rest</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;STILL_DETECTED&quot;</span><span class="p">)</span>  <span class="c1"># ✅ Found</span>
 </code></pre></div>
-<h3 id="3-incremental-parsing">3. Incremental Parsing<a class="headerlink" href="#3-incremental-parsing" title="Permanent link">&para;</a></h3>
+<h3 id="3-incremental-parsing">3. Incremental Parsing</h3>
 <p>Only re-parse changed regions:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Change line 50 of a 1000-line file</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1"># Tree-sitter: ~1ms</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="c1"># Full re-parse: ~50ms</span>
 </code></pre></div>
-<h3 id="4-performance">4. Performance<a class="headerlink" href="#4-performance" title="Permanent link">&para;</a></h3>
+<h3 id="4-performance">4. Performance</h3>
 <p>Tree-sitter is written in C with efficient memory usage:</p>
 <table>
 <thead>
@@ -6233,8 +6233,8 @@
 </tr>
 </tbody>
 </table>
-<h2 id="trade-offs">Trade-offs<a class="headerlink" href="#trade-offs" title="Permanent link">&para;</a></h2>
-<h3 id="learning-curve">Learning Curve<a class="headerlink" href="#learning-curve" title="Permanent link">&para;</a></h3>
+<h2 id="trade-offs">Trade-offs</h2>
+<h3 id="learning-curve">Learning Curve</h3>
 <p>Tree-sitter queries have unusual syntax:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">(</span><span class="nf">call</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nv">function:</span><span class="w"> </span><span class="p">(</span><span class="nf">attribute</span>
@@ -6248,12 +6248,12 @@
 - Pre-built queries for common patterns
 - Regex fallback when tree-sitter isn't available
 - Documentation and examples</p>
-<h3 id="dependency">Dependency<a class="headerlink" href="#dependency" title="Permanent link">&para;</a></h3>
+<h3 id="dependency">Dependency</h3>
 <p>Tree-sitter requires native binaries. We handle this by:
 - Making it optional (<code>jnkn[full]</code>)
 - Falling back to regex when unavailable
 - Providing pre-built Docker images</p>
-<h2 id="the-result">The Result<a class="headerlink" href="#the-result" title="Permanent link">&para;</a></h2>
+<h2 id="the-result">The Result</h2>
 <p>Tree-sitter enables Jnkn to:</p>
 <ol>
 <li><strong>Parse accurately</strong> — Context-aware pattern detection</li>
@@ -6320,6 +6320,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

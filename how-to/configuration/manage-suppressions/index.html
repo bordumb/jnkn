@@ -6102,14 +6102,14 @@
   
 
 
-<h1 id="manage-suppressions">Manage Suppressions<a class="headerlink" href="#manage-suppressions" title="Permanent link">&para;</a></h1>
+<h1 id="manage-suppressions">Manage Suppressions</h1>
 <p>Handle false positives by suppressing incorrect matches.</p>
-<h2 id="add-a-suppression">Add a Suppression<a class="headerlink" href="#add-a-suppression" title="Permanent link">&para;</a></h2>
-<h3 id="specific-match">Specific Match<a class="headerlink" href="#specific-match" title="Permanent link">&para;</a></h3>
+<h2 id="add-a-suppression">Add a Suppression</h2>
+<h3 id="specific-match">Specific Match</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;env:HOST&quot;</span><span class="w"> </span><span class="s2">&quot;infra:ghost_writer&quot;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span>--reason<span class="w"> </span><span class="s2">&quot;Unrelated - ghost_writer is a logging service&quot;</span>
 </code></pre></div>
-<h3 id="pattern-match">Pattern Match<a class="headerlink" href="#pattern-match" title="Permanent link">&para;</a></h3>
+<h3 id="pattern-match">Pattern Match</h3>
 <p>Use globs for broader suppression:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># All *_ID env vars</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;env:*_ID&quot;</span><span class="w"> </span><span class="s2">&quot;infra:*&quot;</span><span class="w"> </span><span class="se">\</span>
@@ -6123,7 +6123,7 @@
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;env:LEGACY_*&quot;</span><span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span>--reason<span class="w"> </span><span class="s2">&quot;Legacy vars being deprecated&quot;</span>
 </code></pre></div>
-<h2 id="list-suppressions">List Suppressions<a class="headerlink" href="#list-suppressions" title="Permanent link">&para;</a></h2>
+<h2 id="list-suppressions">List Suppressions</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>list
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>ID  Source        Target         Reason                  Enabled  Expires
@@ -6131,34 +6131,34 @@
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>2   env:*_ID      infra:*        ID fields too generic   yes      never
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>3   *             infra:test_*   Test infrastructure     yes      2024-06-01
 </code></pre></div>
-<h2 id="remove-a-suppression">Remove a Suppression<a class="headerlink" href="#remove-a-suppression" title="Permanent link">&para;</a></h2>
+<h2 id="remove-a-suppression">Remove a Suppression</h2>
 <p>By ID:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>remove<span class="w"> </span><span class="m">1</span>
 </code></pre></div>
 <p>By pattern:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>remove<span class="w"> </span>--source<span class="w"> </span><span class="s2">&quot;env:*_ID&quot;</span><span class="w"> </span>--target<span class="w"> </span><span class="s2">&quot;infra:*&quot;</span>
 </code></pre></div>
-<h2 id="test-a-suppression">Test a Suppression<a class="headerlink" href="#test-a-suppression" title="Permanent link">&para;</a></h2>
+<h2 id="test-a-suppression">Test a Suppression</h2>
 <p>Check if a match would be suppressed:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span><span class="nb">test</span><span class="w"> </span>env:USER_ID<span class="w"> </span>infra:user_service
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>✓ Would be SUPPRESSED by rule 2: &quot;env:*_ID&quot; → &quot;infra:*&quot;
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>  Reason: ID fields too generic
 </code></pre></div>
-<h2 id="temporary-suppressions">Temporary Suppressions<a class="headerlink" href="#temporary-suppressions" title="Permanent link">&para;</a></h2>
+<h2 id="temporary-suppressions">Temporary Suppressions</h2>
 <p>Add an expiration date:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;env:X&quot;</span><span class="w"> </span><span class="s2">&quot;infra:Y&quot;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>--reason<span class="w"> </span><span class="s2">&quot;Temporary during migration&quot;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span>--expires<span class="w"> </span><span class="m">2024</span>-06-01
 </code></pre></div>
-<h2 id="enabledisable">Enable/Disable<a class="headerlink" href="#enabledisable" title="Permanent link">&para;</a></h2>
+<h2 id="enabledisable">Enable/Disable</h2>
 <p>Disable without removing:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>disable<span class="w"> </span><span class="m">2</span>
 </code></pre></div>
 <p>Re-enable:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span><span class="nb">enable</span><span class="w"> </span><span class="m">2</span>
 </code></pre></div>
-<h2 id="suppressions-file">Suppressions File<a class="headerlink" href="#suppressions-file" title="Permanent link">&para;</a></h2>
+<h2 id="suppressions-file">Suppressions File</h2>
 <p>Stored in <code>.jnkn/suppressions.yaml</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">suppressions</span><span class="p">:</span>
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
@@ -6181,7 +6181,7 @@
 <p class="admonition-title">Version Control</p>
 <p>Commit <code>.jnkn/suppressions.yaml</code> to git so the team shares suppressions.</p>
 </div>
-<h2 id="glob-patterns">Glob Patterns<a class="headerlink" href="#glob-patterns" title="Permanent link">&para;</a></h2>
+<h2 id="glob-patterns">Glob Patterns</h2>
 <table>
 <thead>
 <tr>
@@ -6213,7 +6213,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="bulk-import">Bulk Import<a class="headerlink" href="#bulk-import" title="Permanent link">&para;</a></h2>
+<h2 id="bulk-import">Bulk Import</h2>
 <p>Import from JSON:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>cat<span class="w"> </span>suppressions.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jnkn<span class="w"> </span>suppress<span class="w"> </span>import
 </code></pre></div>
@@ -6222,7 +6222,7 @@
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="p">{</span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;env:HOST&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;infra:ghost_*&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Unrelated&quot;</span><span class="p">}</span>
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="p">]</span>
 </code></pre></div>
-<h2 id="export">Export<a class="headerlink" href="#export" title="Permanent link">&para;</a></h2>
+<h2 id="export">Export</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>&gt;<span class="w"> </span>suppressions-backup.json
 </code></pre></div>
 
@@ -6284,6 +6284,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

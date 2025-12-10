@@ -6104,13 +6104,13 @@
   
 
 
-<h1 id="no-matches-found">No Matches Found<a class="headerlink" href="#no-matches-found" title="Permanent link">&para;</a></h1>
+<h1 id="no-matches-found">No Matches Found</h1>
 <p>Debug why Jnkn isn't detecting dependencies.</p>
-<h2 id="check-what-was-scanned">Check What Was Scanned<a class="headerlink" href="#check-what-was-scanned" title="Permanent link">&para;</a></h2>
+<h2 id="check-what-was-scanned">Check What Was Scanned</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>jnkn<span class="w"> </span>stats
 </code></pre></div>
 <p>If <code>Nodes: 0</code>, no files were parsed.</p>
-<h2 id="verify-file-discovery">Verify File Discovery<a class="headerlink" href="#verify-file-discovery" title="Permanent link">&para;</a></h2>
+<h2 id="verify-file-discovery">Verify File Discovery</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--verbose
 </code></pre></div>
 <p>Look for:</p>
@@ -6118,7 +6118,7 @@
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  Found 0 Python files
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  Found 0 Terraform files
 </code></pre></div>
-<h3 id="common-causes">Common Causes<a class="headerlink" href="#common-causes" title="Permanent link">&para;</a></h3>
+<h3 id="common-causes">Common Causes</h3>
 <p><strong>Wrong directory:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Make sure you&#39;re in the right place</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--dir<span class="w"> </span>./src
@@ -6130,7 +6130,7 @@
 </code></pre></div>
 <p><strong>Unsupported extension:</strong></p>
 <p>Jnkn only scans <code>.py</code>, <code>.tf</code>, <code>.yaml</code>, <code>.yml</code> by default.</p>
-<h2 id="verify-pattern-detection">Verify Pattern Detection<a class="headerlink" href="#verify-pattern-detection" title="Permanent link">&para;</a></h2>
+<h2 id="verify-pattern-detection">Verify Pattern Detection</h2>
 <p>For a specific file:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--verbose<span class="w"> </span>--files<span class="w"> </span>src/config.py
 </code></pre></div>
@@ -6139,7 +6139,7 @@
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>  Detected: env:DATABASE_URL (os.getenv)
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  Detected: env:API_KEY (pydantic_settings)
 </code></pre></div>
-<h3 id="common-causes_1">Common Causes<a class="headerlink" href="#common-causes_1" title="Permanent link">&para;</a></h3>
+<h3 id="common-causes_1">Common Causes</h3>
 <p><strong>Pattern not supported:</strong></p>
 <p>Check <a href="../../../reference/patterns/">Supported Patterns</a>. Your pattern may not be implemented yet.</p>
 <p><strong>Syntax variation:</strong></p>
@@ -6157,7 +6157,7 @@
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># This is NOT detected (it&#39;s a string)</span>
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">example</span> <span class="o">=</span> <span class="s1">&#39;os.getenv(&quot;DATABASE_URL&quot;)&#39;</span>
 </code></pre></div>
-<h2 id="check-stitching">Check Stitching<a class="headerlink" href="#check-stitching" title="Permanent link">&para;</a></h2>
+<h2 id="check-stitching">Check Stitching</h2>
 <p>If nodes exist but no cross-domain edges:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>jnkn<span class="w"> </span>stats
 </code></pre></div>
@@ -6165,7 +6165,7 @@
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Edges: 45
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>Cross-domain edges: 0  # Problem!
 </code></pre></div>
-<h3 id="verify-tokens">Verify Tokens<a class="headerlink" href="#verify-tokens" title="Permanent link">&para;</a></h3>
+<h3 id="verify-tokens">Verify Tokens</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>jnkn<span class="w"> </span>explain<span class="w"> </span>env:DATABASE_URL<span class="w"> </span>infra:db_instance
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Source tokens: [database, url]
@@ -6178,7 +6178,7 @@
 <li>Creating a custom stitching rule</li>
 <li>Lowering confidence threshold</li>
 </ul>
-<h3 id="check-confidence">Check Confidence<a class="headerlink" href="#check-confidence" title="Permanent link">&para;</a></h3>
+<h3 id="check-confidence">Check Confidence</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>jnkn<span class="w"> </span>explain<span class="w"> </span>env:DB_HOST<span class="w"> </span>infra:db_host
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Confidence: 0.45 (REJECTED)
@@ -6188,7 +6188,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">stitching</span><span class="p">:</span>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.4</span>
 </code></pre></div>
-<h2 id="check-for-suppressions">Check for Suppressions<a class="headerlink" href="#check-for-suppressions" title="Permanent link">&para;</a></h2>
+<h2 id="check-for-suppressions">Check for Suppressions</h2>
 <p>A suppression might be hiding the match:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span><span class="nb">test</span><span class="w"> </span>env:DATABASE_URL<span class="w"> </span>infra:db_instance
 </code></pre></div>
@@ -6197,11 +6197,11 @@
 <p><strong>Solution:</strong> Remove or disable the suppression:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>remove<span class="w"> </span><span class="m">2</span>
 </code></pre></div>
-<h2 id="enable-debug-logging">Enable Debug Logging<a class="headerlink" href="#enable-debug-logging" title="Permanent link">&para;</a></h2>
+<h2 id="enable-debug-logging">Enable Debug Logging</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nv">JUNKAN_LOG_LEVEL</span><span class="o">=</span>DEBUG<span class="w"> </span>jnkn<span class="w"> </span>scan
 </code></pre></div>
 <p>This shows detailed parsing and matching information.</p>
-<h2 id="still-stuck">Still Stuck?<a class="headerlink" href="#still-stuck" title="Permanent link">&para;</a></h2>
+<h2 id="still-stuck">Still Stuck?</h2>
 <ol>
 <li>Check GitHub Issues for similar problems</li>
 <li>Run <code>jnkn feedback</code> to report a bug</li>
@@ -6266,6 +6266,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

@@ -6189,23 +6189,23 @@
   
 
 
-<h1 id="threat-model">Threat Model<a class="headerlink" href="#threat-model" title="Permanent link">&para;</a></h1>
+<h1 id="threat-model">Threat Model</h1>
 <p>Security considerations for Jnkn.</p>
-<h2 id="what-jnkn-does">What Jnkn Does<a class="headerlink" href="#what-jnkn-does" title="Permanent link">&para;</a></h2>
+<h2 id="what-jnkn-does">What Jnkn Does</h2>
 <ul>
 <li>Reads source files from disk</li>
 <li>Parses file contents into an AST</li>
 <li>Stores graph data in SQLite</li>
 <li>Outputs analysis results</li>
 </ul>
-<h2 id="what-jnkn-does-not-do">What Jnkn Does NOT Do<a class="headerlink" href="#what-jnkn-does-not-do" title="Permanent link">&para;</a></h2>
+<h2 id="what-jnkn-does-not-do">What Jnkn Does NOT Do</h2>
 <ul>
 <li>Execute code</li>
 <li>Make network requests</li>
 <li>Access credentials or secrets</li>
 <li>Modify source files</li>
 </ul>
-<h2 id="trust-boundaries">Trust Boundaries<a class="headerlink" href="#trust-boundaries" title="Permanent link">&para;</a></h2>
+<h2 id="trust-boundaries">Trust Boundaries</h2>
 <pre class="mermaid"><code>graph TD
     subgraph Trusted
         FS[File System]
@@ -6222,66 +6222,66 @@
     CF --&gt; |read| FS
     FS --&gt; |parse| DB
     DB --&gt; |query| CLI</code></pre>
-<h3 id="trusted">Trusted<a class="headerlink" href="#trusted" title="Permanent link">&para;</a></h3>
+<h3 id="trusted">Trusted</h3>
 <ul>
 <li><strong>File system</strong> — Jnkn assumes it can read files you point it at</li>
 <li><strong>SQLite database</strong> — Jnkn controls this file</li>
 <li><strong>CLI output</strong> — Results are displayed to the user</li>
 </ul>
-<h3 id="untrusted">Untrusted<a class="headerlink" href="#untrusted" title="Permanent link">&para;</a></h3>
+<h3 id="untrusted">Untrusted</h3>
 <ul>
 <li><strong>Source files</strong> — May contain malicious patterns</li>
 <li><strong>Config files</strong> — User-controlled</li>
 </ul>
-<h2 id="threat-analysis">Threat Analysis<a class="headerlink" href="#threat-analysis" title="Permanent link">&para;</a></h2>
-<h3 id="threat-1-malicious-source-files">Threat 1: Malicious Source Files<a class="headerlink" href="#threat-1-malicious-source-files" title="Permanent link">&para;</a></h3>
+<h2 id="threat-analysis">Threat Analysis</h2>
+<h3 id="threat-1-malicious-source-files">Threat 1: Malicious Source Files</h3>
 <p><strong>Scenario:</strong> Attacker includes crafted code that exploits parser.</p>
 <p><strong>Mitigation:</strong>
 - Tree-sitter is memory-safe (written in C with fuzzing)
 - Jnkn doesn't execute code, only parses
 - Regex patterns are bounded</p>
 <p><strong>Residual risk:</strong> Low</p>
-<h3 id="threat-2-config-injection">Threat 2: Config Injection<a class="headerlink" href="#threat-2-config-injection" title="Permanent link">&para;</a></h3>
+<h3 id="threat-2-config-injection">Threat 2: Config Injection</h3>
 <p><strong>Scenario:</strong> Attacker modifies <code>.jnkn/config.yaml</code> to load malicious code.</p>
 <p><strong>Mitigation:</strong>
 - Extra extractors/rules must be importable Python modules
 - Requires write access to config file
 - Requires code execution environment</p>
 <p><strong>Residual risk:</strong> Medium (if attacker has write access, they have larger problems)</p>
-<h3 id="threat-3-information-disclosure">Threat 3: Information Disclosure<a class="headerlink" href="#threat-3-information-disclosure" title="Permanent link">&para;</a></h3>
+<h3 id="threat-3-information-disclosure">Threat 3: Information Disclosure</h3>
 <p><strong>Scenario:</strong> Jnkn output reveals sensitive information.</p>
 <p><strong>Mitigation:</strong>
 - Jnkn only reports artifact names, not contents
 - No secret values are extracted
 - Environment variable names (not values) are detected</p>
 <p><strong>Residual risk:</strong> Low (env var names are not typically secret)</p>
-<h3 id="threat-4-denial-of-service">Threat 4: Denial of Service<a class="headerlink" href="#threat-4-denial-of-service" title="Permanent link">&para;</a></h3>
+<h3 id="threat-4-denial-of-service">Threat 4: Denial of Service</h3>
 <p><strong>Scenario:</strong> Large or malformed file causes excessive resource usage.</p>
 <p><strong>Mitigation:</strong>
 - File size limits in parsing
 - Timeout on tree-sitter operations
 - Bounded regex execution</p>
 <p><strong>Residual risk:</strong> Low</p>
-<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
-<h3 id="cicd-usage">CI/CD Usage<a class="headerlink" href="#cicd-usage" title="Permanent link">&para;</a></h3>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="cicd-usage">CI/CD Usage</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Run in isolated container</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Jnkn</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker://ghcr.io/jnkn-io/jnkn:latest</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">with</span><span class="p">:</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scan --dir /github/workspace</span>
 </code></pre></div>
-<h3 id="secret-handling">Secret Handling<a class="headerlink" href="#secret-handling" title="Permanent link">&para;</a></h3>
+<h3 id="secret-handling">Secret Handling</h3>
 <p>Jnkn detects env var <strong>names</strong>, not values. However:</p>
 <ul>
 <li>Don't commit <code>.jnkn/jnkn.db</code> if it might contain sensitive paths</li>
 <li>Use <code>.jnknignore</code> to skip sensitive directories</li>
 </ul>
-<h3 id="dependency-security">Dependency Security<a class="headerlink" href="#dependency-security" title="Permanent link">&para;</a></h3>
+<h3 id="dependency-security">Dependency Security</h3>
 <p>Jnkn's dependencies are:
 - Scanned with Dependabot
 - Pinned to specific versions
 - Audited for known vulnerabilities</p>
-<h2 id="reporting-security-issues">Reporting Security Issues<a class="headerlink" href="#reporting-security-issues" title="Permanent link">&para;</a></h2>
+<h2 id="reporting-security-issues">Reporting Security Issues</h2>
 <p>Report vulnerabilities to: security@jnkn.io</p>
 <p>We follow responsible disclosure with a 90-day window.</p>
 
@@ -6343,6 +6343,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

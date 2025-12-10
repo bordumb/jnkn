@@ -6118,27 +6118,27 @@
   
 
 
-<h1 id="fixing-false-positives">Fixing False Positives<a class="headerlink" href="#fixing-false-positives" title="Permanent link">&para;</a></h1>
+<h1 id="fixing-false-positives">Fixing False Positives</h1>
 <p>Learn to tune Jnkn when it makes incorrect matches.</p>
 <p><strong>Time:</strong> 10 minutes</p>
-<h2 id="when-to-suppress">When to Suppress<a class="headerlink" href="#when-to-suppress" title="Permanent link">&para;</a></h2>
+<h2 id="when-to-suppress">When to Suppress</h2>
 <p>False positives happen when Jnkn links unrelated artifacts due to similar names:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>env:HOST  ←→  infra:ghost_writer    # Wrong! Just share &quot;host&quot; substring
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>env:ID    ←→  infra:user_id         # Wrong! &quot;ID&quot; is too generic
 </code></pre></div>
-<h2 id="strategy-1-raise-confidence-threshold">Strategy 1: Raise Confidence Threshold<a class="headerlink" href="#strategy-1-raise-confidence-threshold" title="Permanent link">&para;</a></h2>
+<h2 id="strategy-1-raise-confidence-threshold">Strategy 1: Raise Confidence Threshold</h2>
 <p>Edit <code>.jnkn/config.yaml</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">stitching</span><span class="p">:</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.6</span><span class="w">  </span><span class="c1"># Default is 0.5</span>
 </code></pre></div>
 <p>Higher threshold = fewer matches = fewer false positives (but may miss real links).</p>
-<h2 id="strategy-2-add-suppressions">Strategy 2: Add Suppressions<a class="headerlink" href="#strategy-2-add-suppressions" title="Permanent link">&para;</a></h2>
+<h2 id="strategy-2-add-suppressions">Strategy 2: Add Suppressions</h2>
 <p>Suppress specific patterns that you know are wrong.</p>
-<h3 id="suppress-a-single-match">Suppress a Single Match<a class="headerlink" href="#suppress-a-single-match" title="Permanent link">&para;</a></h3>
+<h3 id="suppress-a-single-match">Suppress a Single Match</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;env:HOST&quot;</span><span class="w"> </span><span class="s2">&quot;infra:ghost_writer&quot;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span>--reason<span class="w"> </span><span class="s2">&quot;Unrelated - ghost_writer is a logging service&quot;</span>
 </code></pre></div>
-<h3 id="suppress-a-pattern">Suppress a Pattern<a class="headerlink" href="#suppress-a-pattern" title="Permanent link">&para;</a></h3>
+<h3 id="suppress-a-pattern">Suppress a Pattern</h3>
 <p>Use globs to suppress categories:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># All *_ID env vars are too generic</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;env:*_ID&quot;</span><span class="w"> </span><span class="s2">&quot;infra:*&quot;</span><span class="w"> </span><span class="se">\</span>
@@ -6148,7 +6148,7 @@
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="w"> </span><span class="s2">&quot;infra:test_*&quot;</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span>--reason<span class="w"> </span><span class="s2">&quot;Test infrastructure, not production&quot;</span>
 </code></pre></div>
-<h3 id="list-suppressions">List Suppressions<a class="headerlink" href="#list-suppressions" title="Permanent link">&para;</a></h3>
+<h3 id="list-suppressions">List Suppressions</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>list
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ID  Source        Target         Reason                    Expires
@@ -6156,16 +6156,16 @@
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>2   env:*_ID      infra:*        ID fields too generic     never
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>3   *             infra:test_*   Test infrastructure       2024-03-01
 </code></pre></div>
-<h3 id="remove-a-suppression">Remove a Suppression<a class="headerlink" href="#remove-a-suppression" title="Permanent link">&para;</a></h3>
+<h3 id="remove-a-suppression">Remove a Suppression</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>remove<span class="w"> </span><span class="m">1</span>
 </code></pre></div>
-<h3 id="test-a-suppression">Test a Suppression<a class="headerlink" href="#test-a-suppression" title="Permanent link">&para;</a></h3>
+<h3 id="test-a-suppression">Test a Suppression</h3>
 <p>Check if a match would be suppressed:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span><span class="nb">test</span><span class="w"> </span>env:USER_ID<span class="w"> </span>infra:user_service
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>✓ Would be SUPPRESSED by rule 2: &quot;env:*_ID&quot; → &quot;infra:*&quot;
 </code></pre></div>
-<h2 id="strategy-3-configure-token-filtering">Strategy 3: Configure Token Filtering<a class="headerlink" href="#strategy-3-configure-token-filtering" title="Permanent link">&para;</a></h2>
+<h2 id="strategy-3-configure-token-filtering">Strategy 3: Configure Token Filtering</h2>
 <p>Some tokens are too common to be meaningful. Edit <code>.jnkn/config.yaml</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">stitching</span><span class="p">:</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">blocked_tokens</span><span class="p">:</span>
@@ -6178,7 +6178,7 @@
 <a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
 <a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="nt">min_token_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">  </span><span class="c1"># Ignore tokens shorter than this</span>
 </code></pre></div>
-<h2 id="suppressions-file">Suppressions File<a class="headerlink" href="#suppressions-file" title="Permanent link">&para;</a></h2>
+<h2 id="suppressions-file">Suppressions File</h2>
 <p>Suppressions are stored in <code>.jnkn/suppressions.yaml</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">suppressions</span><span class="p">:</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;env:*_ID&quot;</span>
@@ -6199,22 +6199,22 @@
 <p class="admonition-title">Commit suppressions to git</p>
 <p>Suppressions should be version-controlled so the whole team benefits.</p>
 </div>
-<h2 id="verifying-your-fixes">Verifying Your Fixes<a class="headerlink" href="#verifying-your-fixes" title="Permanent link">&para;</a></h2>
+<h2 id="verifying-your-fixes">Verifying Your Fixes</h2>
 <p>After adding suppressions, re-scan:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--full
 </code></pre></div>
 <p>Check that false positives are gone:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:HOST
 </code></pre></div>
-<h2 id="when-to-not-suppress">When to NOT Suppress<a class="headerlink" href="#when-to-not-suppress" title="Permanent link">&para;</a></h2>
+<h2 id="when-to-not-suppress">When to NOT Suppress</h2>
 <p>Don't suppress just because a match is unexpected. Investigate first:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>jnkn<span class="w"> </span>explain<span class="w"> </span>env:PAYMENT_DB_HOST<span class="w"> </span>infra:payment_database
 </code></pre></div>
 <p>If the confidence is high and the tokens genuinely overlap, the match might be <strong>correct</strong> — you may have discovered a real dependency you didn't know about.</p>
-<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<h2 id="next-steps">Next Steps</h2>
 <ul>
-<li><a href="../../../how-to/configuration/configure-confidence/">:octicons-arrow-right-24: Configure confidence in detail</a></li>
-<li><a href="../../../explanation/concepts/cross-domain-deps/">:octicons-arrow-right-24: Understand how matching works</a></li>
+<li><a href="../../../how-to/configuration/configure-confidence/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Configure confidence in detail</a></li>
+<li><a href="../../../explanation/concepts/cross-domain-deps/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Understand how matching works</a></li>
 </ul>
 
 
@@ -6275,6 +6275,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

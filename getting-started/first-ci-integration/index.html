@@ -5925,9 +5925,9 @@
   
 
 
-<h1 id="ci-integration">CI Integration<a class="headerlink" href="#ci-integration" title="Permanent link">&para;</a></h1>
+<h1 id="ci-integration">CI Integration</h1>
 <p>Add Jnkn to your CI pipeline to catch breaking changes on every PR.</p>
-<h2 id="github-actions">GitHub Actions<a class="headerlink" href="#github-actions" title="Permanent link">&para;</a></h2>
+<h2 id="github-actions">GitHub Actions</h2>
 <p>Create <code>.github/workflows/jnkn.yml</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Jnkn Impact Analysis</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -5970,14 +5970,14 @@
 <a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="w">            </span><span class="no">done</span>
 <a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a><span class="w">          </span><span class="no">fi</span>
 </code></pre></div>
-<h2 id="what-this-does">What This Does<a class="headerlink" href="#what-this-does" title="Permanent link">&para;</a></h2>
+<h2 id="what-this-does">What This Does</h2>
 <ol>
 <li><strong>Triggers</strong> on PRs that modify Python or Terraform files</li>
 <li><strong>Scans</strong> your codebase to build the dependency graph</li>
 <li><strong>Analyzes</strong> each changed file's blast radius</li>
 <li><strong>Reports</strong> results in the GitHub Actions summary</li>
 </ol>
-<h2 id="example-output">Example Output<a class="headerlink" href="#example-output" title="Permanent link">&para;</a></h2>
+<h2 id="example-output">Example Output</h2>
 <p>When a PR modifies <code>terraform/rds.tf</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gu">## 🔍 Impact Analysis</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
@@ -5991,7 +5991,7 @@
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>| code_file | src/db/connection.py | 0.88 |
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>| code_file | src/api/users.py | 0.85 |
 </code></pre></div>
-<h2 id="block-on-high-risk-changes">Block on High-Risk Changes<a class="headerlink" href="#block-on-high-risk-changes" title="Permanent link">&para;</a></h2>
+<h2 id="block-on-high-risk-changes">Block on High-Risk Changes</h2>
 <p>Add a failure condition for high-impact changes:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check impact threshold</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
@@ -6001,12 +6001,12 @@
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="no">exit 1</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="no">fi</span>
 </code></pre></div>
-<h2 id="gitlab-ci">GitLab CI<a class="headerlink" href="#gitlab-ci" title="Permanent link">&para;</a></h2>
+<h2 id="gitlab-ci">GitLab CI</h2>
 <p>See <a href="../../how-to/integration/gitlab-ci/">GitLab CI Integration</a> for GitLab-specific setup.</p>
-<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<h2 id="next-steps">Next Steps</h2>
 <ul>
-<li><a href="../../how-to/configuration/configure-confidence/">:octicons-arrow-right-24: Configure confidence thresholds</a></li>
-<li><a href="../../how-to/configuration/manage-suppressions/">:octicons-arrow-right-24: Manage suppressions</a></li>
+<li><a href="../../how-to/configuration/configure-confidence/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Configure confidence thresholds</a></li>
+<li><a href="../../how-to/configuration/manage-suppressions/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Manage suppressions</a></li>
 </ul>
 
 
@@ -6067,6 +6067,8 @@
     
     
       <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

@@ -6002,15 +6002,15 @@
   
 
 
-<h1 id="export-results">Export Results<a class="headerlink" href="#export-results" title="Permanent link">&para;</a></h1>
+<h1 id="export-results">Export Results</h1>
 <p>Export Jnkn results in various formats for integration with other tools.</p>
-<h2 id="json-export">JSON Export<a class="headerlink" href="#json-export" title="Permanent link">&para;</a></h2>
+<h2 id="json-export">JSON Export</h2>
 <p>Default format, suitable for scripting:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>&gt;<span class="w"> </span>results.json
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>jnkn<span class="w"> </span>stats<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>&gt;<span class="w"> </span>stats.json
 </code></pre></div>
-<h2 id="sarif-export">SARIF Export<a class="headerlink" href="#sarif-export" title="Permanent link">&para;</a></h2>
+<h2 id="sarif-export">SARIF Export</h2>
 <p>For IDE integration and GitHub Advanced Security:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--format<span class="w"> </span>sarif<span class="w"> </span>&gt;<span class="w"> </span>jnkn.sarif
 </code></pre></div>
@@ -6020,21 +6020,21 @@
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">with</span><span class="p">:</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nt">sarif_file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jnkn.sarif</span>
 </code></pre></div>
-<h2 id="csv-export">CSV Export<a class="headerlink" href="#csv-export" title="Permanent link">&para;</a></h2>
+<h2 id="csv-export">CSV Export</h2>
 <p>For spreadsheet analysis:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>jnkn<span class="w"> </span>stats<span class="w"> </span>--nodes<span class="w"> </span>--format<span class="w"> </span>csv<span class="w"> </span>&gt;<span class="w"> </span>nodes.csv
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>jnkn<span class="w"> </span>stats<span class="w"> </span>--edges<span class="w"> </span>--format<span class="w"> </span>csv<span class="w"> </span>&gt;<span class="w"> </span>edges.csv
 </code></pre></div>
-<h2 id="graphml-export">GraphML Export<a class="headerlink" href="#graphml-export" title="Permanent link">&para;</a></h2>
+<h2 id="graphml-export">GraphML Export</h2>
 <p>For visualization in tools like Gephi or yEd:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>jnkn<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--format<span class="w"> </span>graphml<span class="w"> </span>&gt;<span class="w"> </span>graph.graphml
 </code></pre></div>
-<h2 id="dot-export">DOT Export<a class="headerlink" href="#dot-export" title="Permanent link">&para;</a></h2>
+<h2 id="dot-export">DOT Export</h2>
 <p>For Graphviz visualization:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>jnkn<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--format<span class="w"> </span>dot<span class="w"> </span>&gt;<span class="w"> </span>graph.dot
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>dot<span class="w"> </span>-Tpng<span class="w"> </span>graph.dot<span class="w"> </span>-o<span class="w"> </span>graph.png
 </code></pre></div>
-<h2 id="export-full-graph">Export Full Graph<a class="headerlink" href="#export-full-graph" title="Permanent link">&para;</a></h2>
+<h2 id="export-full-graph">Export Full Graph</h2>
 <p>Export all nodes and edges:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>jnkn<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>&gt;<span class="w"> </span>full-graph.json
 </code></pre></div>
@@ -6050,12 +6050,12 @@
 <a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="p">]</span>
 <a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="p">}</span>
 </code></pre></div>
-<h2 id="filter-exports">Filter Exports<a class="headerlink" href="#filter-exports" title="Permanent link">&para;</a></h2>
+<h2 id="filter-exports">Filter Exports</h2>
 <p>Export only certain types:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>jnkn<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--type<span class="w"> </span>env_var<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>&gt;<span class="w"> </span>env-vars.json
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>jnkn<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--type<span class="w"> </span>infra<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>&gt;<span class="w"> </span>infrastructure.json
 </code></pre></div>
-<h2 id="pipe-to-other-tools">Pipe to Other Tools<a class="headerlink" href="#pipe-to-other-tools" title="Permanent link">&para;</a></h2>
+<h2 id="pipe-to-other-tools">Pipe to Other Tools</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Pretty print</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>.
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
@@ -6124,6 +6124,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

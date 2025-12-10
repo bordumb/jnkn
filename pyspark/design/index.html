@@ -5902,16 +5902,16 @@
   
 
 
-<h1 id="column-level-lineage-design">Column-Level Lineage Design<a class="headerlink" href="#column-level-lineage-design" title="Permanent link">&para;</a></h1>
-<h2 id="problem-statement">Problem Statement<a class="headerlink" href="#problem-statement" title="Permanent link">&para;</a></h2>
+<h1 id="column-level-lineage-design">Column-Level Lineage Design</h1>
+<h2 id="problem-statement">Problem Statement</h2>
 <p>Current parser extracts table-level lineage:
 - <code>process_events.py</code> READS <code>warehouse.dim_users</code>
 - <code>process_events.py</code> WRITES <code>warehouse.fact_events</code></p>
 <p>But engineers need column-level lineage:
 - <code>warehouse.fact_events.user_segment</code> comes from <code>warehouse.dim_users.segment</code>
 - <code>warehouse.fact_events.total_revenue</code> is computed from <code>staging.events.revenue</code></p>
-<h2 id="extraction-patterns">Extraction Patterns<a class="headerlink" href="#extraction-patterns" title="Permanent link">&para;</a></h2>
-<h3 id="pattern-1-sql-strings-easiest">Pattern 1: SQL Strings (Easiest)<a class="headerlink" href="#pattern-1-sql-strings-easiest" title="Permanent link">&para;</a></h3>
+<h2 id="extraction-patterns">Extraction Patterns</h2>
+<h3 id="pattern-1-sql-strings-easiest">Pattern 1: SQL Strings (Easiest)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT column_a, column_b FROM database.table WHERE column_a = &#39;xyz&#39;&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s2">    SELECT </span>
@@ -5927,7 +5927,7 @@
 - FROM/JOIN tables → source tables
 - WHERE/ON columns → filter columns
 - Column aliases → transformations</p>
-<h3 id="pattern-2-dataframe-method-chains-medium">Pattern 2: DataFrame Method Chains (Medium)<a class="headerlink" href="#pattern-2-dataframe-method-chains-medium" title="Permanent link">&para;</a></h3>
+<h3 id="pattern-2-dataframe-method-chains-medium">Pattern 2: DataFrame Method Chains (Medium)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">read_df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">parquet</span><span class="p">(</span><span class="s2">&quot;hdfs://path/to/table&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">filtered_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;column_a&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;xyz&#39;</span><span class="p">)</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">selected_df</span> <span class="o">=</span> <span class="n">filtered_df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;column_a&quot;</span><span class="p">,</span> <span class="s2">&quot;column_b&quot;</span><span class="p">)</span>
@@ -5940,7 +5940,7 @@
 - <code>.groupBy()</code> → grouping columns
 - <code>.agg()</code> → aggregation columns
 - <code>.join()</code> → join keys + source columns</p>
-<h3 id="pattern-3-dynamicvariable-references-hard">Pattern 3: Dynamic/Variable References (Hard)<a class="headerlink" href="#pattern-3-dynamicvariable-references-hard" title="Permanent link">&para;</a></h3>
+<h3 id="pattern-3-dynamicvariable-references-hard">Pattern 3: Dynamic/Variable References (Hard)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">grouping_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;column_a&quot;</span><span class="p">,</span> <span class="s2">&quot;column_b&quot;</span><span class="p">]</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">filter_value</span> <span class="o">=</span> <span class="s1">&#39;xyz&#39;</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
@@ -5953,7 +5953,7 @@
 - Resolve list literals to column names
 - Handle <code>*args</code> unpacking
 - Mark as "dynamic" when truly unresolvable</p>
-<h3 id="pattern-4-f-expressions-and-col-medium">Pattern 4: F-expressions and col() (Medium)<a class="headerlink" href="#pattern-4-f-expressions-and-col-medium" title="Permanent link">&para;</a></h3>
+<h3 id="pattern-4-f-expressions-and-col-medium">Pattern 4: F-expressions and col() (Medium)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">functions</span> <span class="k">as</span> <span class="n">F</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">col</span><span class="p">,</span> <span class="nb">sum</span><span class="p">,</span> <span class="n">avg</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
@@ -5966,7 +5966,7 @@
 - <code>F.sum("name")</code>, <code>F.avg("name")</code>, etc.
 - <code>df["column"]</code> bracket notation
 - <code>.alias("new_name")</code> for output naming</p>
-<h2 id="data-model">Data Model<a class="headerlink" href="#data-model" title="Permanent link">&para;</a></h2>
+<h2 id="data-model">Data Model</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@dataclass</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">ColumnReference</span><span class="p">:</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A reference to a column in the code.&quot;&quot;&quot;</span>
@@ -5993,27 +5993,27 @@
 <a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>    <span class="n">columns_written</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ColumnReference</span><span class="p">]</span>
 <a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>    <span class="n">lineage</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ColumnLineage</span><span class="p">]</span>  <span class="c1"># Output → Source mappings</span>
 </code></pre></div>
-<h2 id="implementation-strategy">Implementation Strategy<a class="headerlink" href="#implementation-strategy" title="Permanent link">&para;</a></h2>
-<h3 id="phase-1-sql-string-extraction-this-pr">Phase 1: SQL String Extraction (This PR)<a class="headerlink" href="#phase-1-sql-string-extraction-this-pr" title="Permanent link">&para;</a></h3>
+<h2 id="implementation-strategy">Implementation Strategy</h2>
+<h3 id="phase-1-sql-string-extraction-this-pr">Phase 1: SQL String Extraction (This PR)</h3>
 <ul>
 <li>Parse SQL strings with sqlglot</li>
 <li>Extract SELECT columns, FROM tables, WHERE columns</li>
 <li>Handle JOINs and subqueries</li>
 <li>High accuracy, well-defined grammar</li>
 </ul>
-<h3 id="phase-2-dataframe-method-tracking-next-pr">Phase 2: DataFrame Method Tracking (Next PR)<a class="headerlink" href="#phase-2-dataframe-method-tracking-next-pr" title="Permanent link">&para;</a></h3>
+<h3 id="phase-2-dataframe-method-tracking-next-pr">Phase 2: DataFrame Method Tracking (Next PR)</h3>
 <ul>
 <li>Regex-based extraction of .select(), .filter(), etc.</li>
 <li>Extract column names from method arguments</li>
 <li>Track method chains to infer flow</li>
 </ul>
-<h3 id="phase-3-variable-resolution-future">Phase 3: Variable Resolution (Future)<a class="headerlink" href="#phase-3-variable-resolution-future" title="Permanent link">&para;</a></h3>
+<h3 id="phase-3-variable-resolution-future">Phase 3: Variable Resolution (Future)</h3>
 <ul>
 <li>AST-based analysis for variable tracking</li>
 <li>Resolve list literals and f-strings</li>
 <li>Mark unresolvable as "dynamic"</li>
 </ul>
-<h2 id="confidence-levels">Confidence Levels<a class="headerlink" href="#confidence-levels" title="Permanent link">&para;</a></h2>
+<h2 id="confidence-levels">Confidence Levels</h2>
 <table>
 <thead>
 <tr>
@@ -6055,7 +6055,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="output-format">Output Format<a class="headerlink" href="#output-format" title="Permanent link">&para;</a></h2>
+<h2 id="output-format">Output Format</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jobs/process_events.py&quot;</span><span class="p">,</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&quot;table_lineage&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -6094,8 +6094,8 @@
 <a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a><span class="w">  </span><span class="p">]</span>
 <a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a><span class="p">}</span>
 </code></pre></div>
-<h2 id="test-cases">Test Cases<a class="headerlink" href="#test-cases" title="Permanent link">&para;</a></h2>
-<h3 id="sql-extraction">SQL Extraction<a class="headerlink" href="#sql-extraction" title="Permanent link">&para;</a></h3>
+<h2 id="test-cases">Test Cases</h2>
+<h3 id="sql-extraction">SQL Extraction</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Simple SELECT</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;SELECT user_id, name FROM users&quot;</span><span class="p">)</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># → reads: users.user_id, users.name</span>
@@ -6113,7 +6113,7 @@
 <a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="c1"># → reads: sales.category, sales.amount</span>
 <a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="c1"># → output: total (from SUM(amount))</span>
 </code></pre></div>
-<h3 id="dataframe-method-extraction">DataFrame Method Extraction<a class="headerlink" href="#dataframe-method-extraction" title="Permanent link">&para;</a></h3>
+<h3 id="dataframe-method-extraction">DataFrame Method Extraction</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Select</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">)</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="c1"># → columns: a, b, c</span>
@@ -6133,7 +6133,7 @@
 <a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="c1"># → grouping: category</span>
 <a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="c1"># → aggregation: amount → total (sum)</span>
 </code></pre></div>
-<h3 id="variable-resolution">Variable Resolution<a class="headerlink" href="#variable-resolution" title="Permanent link">&para;</a></h3>
+<h3 id="variable-resolution">Variable Resolution</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Resolvable</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">]</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
@@ -6207,6 +6207,8 @@
     
     
       <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

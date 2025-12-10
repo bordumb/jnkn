@@ -5813,11 +5813,11 @@
   
 
 
-<h1 id="jnknignore-reference">.jnknignore Reference<a class="headerlink" href="#jnknignore-reference" title="Permanent link">&para;</a></h1>
+<h1 id="jnknignore-reference">.jnknignore Reference</h1>
 <p>Exclude files and directories from scanning.</p>
-<h2 id="location">Location<a class="headerlink" href="#location" title="Permanent link">&para;</a></h2>
+<h2 id="location">Location</h2>
 <p>Place <code>.jnknignore</code> in your project root (same level as <code>.jnkn/</code>).</p>
-<h2 id="syntax">Syntax<a class="headerlink" href="#syntax" title="Permanent link">&para;</a></h2>
+<h2 id="syntax">Syntax</h2>
 <p>Uses gitignore-style patterns.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a># Comments start with #
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -5848,7 +5848,7 @@
 <a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a># Double star (any depth)
 <a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>**/generated/**
 </code></pre></div>
-<h2 id="pattern-reference">Pattern Reference<a class="headerlink" href="#pattern-reference" title="Permanent link">&para;</a></h2>
+<h2 id="pattern-reference">Pattern Reference</h2>
 <table>
 <thead>
 <tr>
@@ -5885,7 +5885,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="default-ignores">Default Ignores<a class="headerlink" href="#default-ignores" title="Permanent link">&para;</a></h2>
+<h2 id="default-ignores">Default Ignores</h2>
 <p>Even without <code>.jnknignore</code>, Jnkn skips:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>.git/
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>.hg/
@@ -5896,8 +5896,8 @@
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>node_modules/
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>.terraform/
 </code></pre></div>
-<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
-<h3 id="python-project">Python Project<a class="headerlink" href="#python-project" title="Permanent link">&para;</a></h3>
+<h2 id="examples">Examples</h2>
+<h3 id="python-project">Python Project</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a># Virtual environments
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>venv/
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>.venv/
@@ -5919,7 +5919,7 @@
 <a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>dist/
 <a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>build/
 </code></pre></div>
-<h3 id="terraform-project">Terraform Project<a class="headerlink" href="#terraform-project" title="Permanent link">&para;</a></h3>
+<h3 id="terraform-project">Terraform Project</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a># State files
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>*.tfstate
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>*.tfstate.backup
@@ -5932,7 +5932,7 @@
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>environments/dev/
 <a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>environments/staging/
 </code></pre></div>
-<h3 id="monorepo">Monorepo<a class="headerlink" href="#monorepo" title="Permanent link">&para;</a></h3>
+<h3 id="monorepo">Monorepo</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a># Third-party
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>vendor/
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>node_modules/
@@ -5947,13 +5947,13 @@
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a># Specific services to skip
 <a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>services/deprecated-*/
 </code></pre></div>
-<h2 id="precedence">Precedence<a class="headerlink" href="#precedence" title="Permanent link">&para;</a></h2>
+<h2 id="precedence">Precedence</h2>
 <ol>
 <li>Built-in defaults (lowest)</li>
 <li><code>.jnknignore</code> in project root</li>
 <li><code>--exclude</code> CLI flag (highest)</li>
 </ol>
-<h2 id="debugging">Debugging<a class="headerlink" href="#debugging" title="Permanent link">&para;</a></h2>
+<h2 id="debugging">Debugging</h2>
 <p>See what's being ignored:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--verbose
 </code></pre></div>
@@ -6021,6 +6021,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

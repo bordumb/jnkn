@@ -6348,10 +6348,10 @@
   
 
 
-<h1 id="python-environment-variable-patterns">Python Environment Variable Patterns<a class="headerlink" href="#python-environment-variable-patterns" title="Permanent link">&para;</a></h1>
+<h1 id="python-environment-variable-patterns">Python Environment Variable Patterns</h1>
 <p>All Python patterns Jnkn detects.</p>
-<h2 id="standard-library">Standard Library<a class="headerlink" href="#standard-library" title="Permanent link">&para;</a></h2>
-<h3 id="osgetenv"><code>os.getenv()</code><a class="headerlink" href="#osgetenv" title="Permanent link">&para;</a></h3>
+<h2 id="standard-library">Standard Library</h2>
+<h3 id="osgetenv"><code>os.getenv()</code></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># ✅ Detected</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
@@ -6361,7 +6361,7 @@
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;DATABASE_URL&quot;</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="osenvironget"><code>os.environ.get()</code><a class="headerlink" href="#osenvironget" title="Permanent link">&para;</a></h3>
+<h3 id="osenvironget"><code>os.environ.get()</code></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># ✅ Detected</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">)</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
@@ -6369,14 +6369,14 @@
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># ❌ Not detected</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="osenviron"><code>os.environ[]</code><a class="headerlink" href="#osenviron" title="Permanent link">&para;</a></h3>
+<h3 id="osenviron"><code>os.environ[]</code></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># ✅ Detected</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">]</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># ❌ Not detected</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 </code></pre></div>
-<h3 id="from-imports">From-imports<a class="headerlink" href="#from-imports" title="Permanent link">&para;</a></h3>
+<h3 id="from-imports">From-imports</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">os</span><span class="w"> </span><span class="kn">import</span> <span class="n">getenv</span><span class="p">,</span> <span class="n">environ</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># ✅ Detected</span>
@@ -6384,8 +6384,8 @@
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">)</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">]</span>
 </code></pre></div>
-<h2 id="pydantic-settings">Pydantic Settings<a class="headerlink" href="#pydantic-settings" title="Permanent link">&para;</a></h2>
-<h3 id="basesettings-fields">BaseSettings Fields<a class="headerlink" href="#basesettings-fields" title="Permanent link">&para;</a></h3>
+<h2 id="pydantic-settings">Pydantic Settings</h2>
+<h3 id="basesettings-fields">BaseSettings Fields</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseSettings</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">Settings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
@@ -6398,7 +6398,7 @@
 <a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="c1"># ✅ Detected as env:DEBUG</span>
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 </code></pre></div>
-<h3 id="field-with-env">Field with <code>env=</code><a class="headerlink" href="#field-with-env" title="Permanent link">&para;</a></h3>
+<h3 id="field-with-env">Field with <code>env=</code></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseSettings</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
@@ -6409,7 +6409,7 @@
 <a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="c1"># ✅ Detected as env:MY_API_KEY</span>
 <a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="s2">&quot;MY_API_KEY&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="env_prefix"><code>env_prefix</code><a class="headerlink" href="#env_prefix" title="Permanent link">&para;</a></h3>
+<h3 id="env_prefix"><code>env_prefix</code></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Settings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="c1"># ✅ Detected as env:APP_DATABASE_URL</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">database_url</span><span class="p">:</span> <span class="nb">str</span>
@@ -6420,14 +6420,14 @@
 <a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
 <a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>        <span class="n">env_prefix</span> <span class="o">=</span> <span class="s2">&quot;APP_&quot;</span>
 </code></pre></div>
-<h3 id="model_config"><code>model_config</code><a class="headerlink" href="#model_config" title="Permanent link">&para;</a></h3>
+<h3 id="model_config"><code>model_config</code></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Settings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">database_url</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># ✅ env:MYAPP_DATABASE_URL</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
 <a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;MYAPP_&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="click-typer">Click / Typer<a class="headerlink" href="#click-typer" title="Permanent link">&para;</a></h2>
-<h3 id="click-envvar">Click <code>envvar=</code><a class="headerlink" href="#click-envvar" title="Permanent link">&para;</a></h3>
+<h2 id="click-typer">Click / Typer</h2>
+<h3 id="click-envvar">Click <code>envvar=</code></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">click</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
@@ -6437,7 +6437,7 @@
 <a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
 <a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="k">pass</span>
 </code></pre></div>
-<h3 id="typer-envvar">Typer <code>envvar=</code><a class="headerlink" href="#typer-envvar" title="Permanent link">&para;</a></h3>
+<h3 id="typer-envvar">Typer <code>envvar=</code></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">typer</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">app</span> <span class="o">=</span> <span class="n">typer</span><span class="o">.</span><span class="n">Typer</span><span class="p">()</span>
@@ -6449,8 +6449,8 @@
 <a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="p">):</span>
 <a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="k">pass</span>
 </code></pre></div>
-<h2 id="django-environ">django-environ<a class="headerlink" href="#django-environ" title="Permanent link">&para;</a></h2>
-<h3 id="environenv"><code>environ.Env()</code><a class="headerlink" href="#environenv" title="Permanent link">&para;</a></h3>
+<h2 id="django-environ">django-environ</h2>
+<h3 id="environenv"><code>environ.Env()</code></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">environ</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">env</span> <span class="o">=</span> <span class="n">environ</span><span class="o">.</span><span class="n">Env</span><span class="p">()</span>
@@ -6462,7 +6462,7 @@
 <a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="s2">&quot;ALLOWED_HOSTS&quot;</span><span class="p">)</span>
 <a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="n">CACHE_URL</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">cache</span><span class="p">(</span><span class="s2">&quot;CACHE_URL&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="type-methods">Type Methods<a class="headerlink" href="#type-methods" title="Permanent link">&para;</a></h3>
+<h3 id="type-methods">Type Methods</h3>
 <table>
 <thead>
 <tr>
@@ -6524,8 +6524,8 @@
 </tr>
 </tbody>
 </table>
-<h2 id="python-dotenv">python-dotenv<a class="headerlink" href="#python-dotenv" title="Permanent link">&para;</a></h2>
-<h3 id="dotenv_values"><code>dotenv_values()</code><a class="headerlink" href="#dotenv_values" title="Permanent link">&para;</a></h3>
+<h2 id="python-dotenv">python-dotenv</h2>
+<h3 id="dotenv_values"><code>dotenv_values()</code></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">dotenv_values</span>
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">config</span> <span class="o">=</span> <span class="n">dotenv_values</span><span class="p">(</span><span class="s2">&quot;.env&quot;</span><span class="p">)</span>
@@ -6534,7 +6534,7 @@
 <a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">DATABASE_URL</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">]</span>
 <a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">API_KEY</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;API_KEY&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="environs">environs<a class="headerlink" href="#environs" title="Permanent link">&para;</a></h2>
+<h2 id="environs">environs</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">environs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Env</span>
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">env</span> <span class="o">=</span> <span class="n">Env</span><span class="p">()</span>
@@ -6545,7 +6545,7 @@
 <a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="n">DATABASE_URL</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">str</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">)</span>
 <a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="n">PORT</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">int</span><span class="p">(</span><span class="s2">&quot;PORT&quot;</span><span class="p">,</span> <span class="mi">8080</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="heuristic-detection">Heuristic Detection<a class="headerlink" href="#heuristic-detection" title="Permanent link">&para;</a></h2>
+<h2 id="heuristic-detection">Heuristic Detection</h2>
 <p>Jnkn uses heuristics for patterns that look like env vars:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># ✅ Detected (heuristic, lower confidence)</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">DATABASE_URL</span> <span class="o">=</span> <span class="n">some_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">)</span>
@@ -6554,7 +6554,7 @@
 <a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="c1"># These variable names suggest env vars:</span>
 <a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="c1"># *_URL, *_HOST, *_PORT, *_KEY, *_SECRET, *_TOKEN, *_PASSWORD</span>
 </code></pre></div>
-<h2 id="not-detected">Not Detected<a class="headerlink" href="#not-detected" title="Permanent link">&para;</a></h2>
+<h2 id="not-detected">Not Detected</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># ❌ Dynamic keys</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;DATABASE_URL&quot;</span>
 <a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -6631,6 +6631,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

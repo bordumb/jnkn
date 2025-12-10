@@ -6158,21 +6158,21 @@
   
 
 
-<h1 id="too-many-false-positives">Too Many False Positives<a class="headerlink" href="#too-many-false-positives" title="Permanent link">&para;</a></h1>
+<h1 id="too-many-false-positives">Too Many False Positives</h1>
 <p>Reduce incorrect matches when Jnkn links unrelated artifacts.</p>
-<h2 id="quick-fixes">Quick Fixes<a class="headerlink" href="#quick-fixes" title="Permanent link">&para;</a></h2>
-<h3 id="1-raise-confidence-threshold">1. Raise Confidence Threshold<a class="headerlink" href="#1-raise-confidence-threshold" title="Permanent link">&para;</a></h3>
+<h2 id="quick-fixes">Quick Fixes</h2>
+<h3 id="1-raise-confidence-threshold">1. Raise Confidence Threshold</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># .jnkn/config.yaml</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">stitching</span><span class="p">:</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span><span class="w">  </span><span class="c1"># Up from 0.5</span>
 </code></pre></div>
-<h3 id="2-suppress-known-bad-patterns">2. Suppress Known Bad Patterns<a class="headerlink" href="#2-suppress-known-bad-patterns" title="Permanent link">&para;</a></h3>
+<h3 id="2-suppress-known-bad-patterns">2. Suppress Known Bad Patterns</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Generic patterns that match too much</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;env:*_ID&quot;</span><span class="w"> </span><span class="s2">&quot;infra:*&quot;</span><span class="w"> </span>--reason<span class="w"> </span><span class="s2">&quot;ID fields too generic&quot;</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;env:*_KEY&quot;</span><span class="w"> </span><span class="s2">&quot;infra:*&quot;</span><span class="w"> </span>--reason<span class="w"> </span><span class="s2">&quot;KEY fields too generic&quot;</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;env:HOST&quot;</span><span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="w"> </span>--reason<span class="w"> </span><span class="s2">&quot;HOST alone is too generic&quot;</span>
 </code></pre></div>
-<h3 id="3-block-common-tokens">3. Block Common Tokens<a class="headerlink" href="#3-block-common-tokens" title="Permanent link">&para;</a></h3>
+<h3 id="3-block-common-tokens">3. Block Common Tokens</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># .jnkn/config.yaml</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">stitching</span><span class="p">:</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">blocked_tokens</span><span class="p">:</span>
@@ -6187,17 +6187,17 @@
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type</span>
 </code></pre></div>
-<h2 id="systematic-approach">Systematic Approach<a class="headerlink" href="#systematic-approach" title="Permanent link">&para;</a></h2>
-<h3 id="step-1-identify-the-problem">Step 1: Identify the Problem<a class="headerlink" href="#step-1-identify-the-problem" title="Permanent link">&para;</a></h3>
+<h2 id="systematic-approach">Systematic Approach</h2>
+<h3 id="step-1-identify-the-problem">Step 1: Identify the Problem</h3>
 <p>List all current matches:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>jnkn<span class="w"> </span>stats<span class="w"> </span>--edges<span class="w"> </span>--type<span class="w"> </span>cross_domain
 </code></pre></div>
-<h3 id="step-2-sample-and-review">Step 2: Sample and Review<a class="headerlink" href="#step-2-sample-and-review" title="Permanent link">&para;</a></h3>
+<h3 id="step-2-sample-and-review">Step 2: Sample and Review</h3>
 <p>Pick 10 random matches and verify:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>jnkn<span class="w"> </span>stats<span class="w"> </span>--edges<span class="w"> </span>--type<span class="w"> </span>cross_domain<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.[0:10]&#39;</span>
 </code></pre></div>
 <p>For each, ask: "Is this a real dependency?"</p>
-<h3 id="step-3-categorize-false-positives">Step 3: Categorize False Positives<a class="headerlink" href="#step-3-categorize-false-positives" title="Permanent link">&para;</a></h3>
+<h3 id="step-3-categorize-false-positives">Step 3: Categorize False Positives</h3>
 <p>Common categories:</p>
 <table>
 <thead>
@@ -6230,7 +6230,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="step-4-apply-fixes">Step 4: Apply Fixes<a class="headerlink" href="#step-4-apply-fixes" title="Permanent link">&para;</a></h3>
+<h3 id="step-4-apply-fixes">Step 4: Apply Fixes</h3>
 <p><strong>For generic tokens:</strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">stitching</span><span class="p">:</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">blocked_tokens</span><span class="p">:</span>
@@ -6248,12 +6248,12 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="w"> </span><span class="s2">&quot;infra:test_*&quot;</span><span class="w"> </span>--reason<span class="w"> </span><span class="s2">&quot;Test infra&quot;</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span><span class="s2">&quot;*&quot;</span><span class="w"> </span><span class="s2">&quot;infra:*_dev&quot;</span><span class="w"> </span>--reason<span class="w"> </span><span class="s2">&quot;Dev infra&quot;</span>
 </code></pre></div>
-<h3 id="step-5-verify">Step 5: Verify<a class="headerlink" href="#step-5-verify" title="Permanent link">&para;</a></h3>
+<h3 id="step-5-verify">Step 5: Verify</h3>
 <p>Rescan and check:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--full
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>jnkn<span class="w"> </span>stats<span class="w"> </span>--edges<span class="w"> </span>--type<span class="w"> </span>cross_domain
 </code></pre></div>
-<h2 id="advanced-custom-penalties">Advanced: Custom Penalties<a class="headerlink" href="#advanced-custom-penalties" title="Permanent link">&para;</a></h2>
+<h2 id="advanced-custom-penalties">Advanced: Custom Penalties</h2>
 <p>Add penalties for tokens that reduce confidence:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">stitching</span><span class="p">:</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">confidence</span><span class="p">:</span>
@@ -6270,7 +6270,7 @@
 <a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
 <a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
 </code></pre></div>
-<h2 id="advanced-rule-specific-tuning">Advanced: Rule-Specific Tuning<a class="headerlink" href="#advanced-rule-specific-tuning" title="Permanent link">&para;</a></h2>
+<h2 id="advanced-rule-specific-tuning">Advanced: Rule-Specific Tuning</h2>
 <p>Different rules can have different thresholds:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">stitching</span><span class="p">:</span>
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">rule_overrides</span><span class="p">:</span>
@@ -6283,7 +6283,7 @@
 <a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="nt">K8sToSecretRule</span><span class="p">:</span>
 <a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">      </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span><span class="w">     </span><span class="c1"># Default</span>
 </code></pre></div>
-<h2 id="measuring-improvement">Measuring Improvement<a class="headerlink" href="#measuring-improvement" title="Permanent link">&para;</a></h2>
+<h2 id="measuring-improvement">Measuring Improvement</h2>
 <p>Track precision over time:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Before changes</span>
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>jnkn<span class="w"> </span>stats<span class="w"> </span>--edges<span class="w"> </span>--type<span class="w"> </span>cross_domain<span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
@@ -6294,7 +6294,7 @@
 <a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="c1"># 45 matches (70% reduction)</span>
 </code></pre></div>
 <p>Review the remaining matches to ensure you didn't lose real dependencies.</p>
-<h2 id="when-to-accept-some-false-positives">When to Accept Some False Positives<a class="headerlink" href="#when-to-accept-some-false-positives" title="Permanent link">&para;</a></h2>
+<h2 id="when-to-accept-some-false-positives">When to Accept Some False Positives</h2>
 <p>Consider keeping false positives if:</p>
 <ul>
 <li>Manual review is fast (&lt; 5 matches per PR)</li>
@@ -6361,6 +6361,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

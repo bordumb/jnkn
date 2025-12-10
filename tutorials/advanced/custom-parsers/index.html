@@ -6052,16 +6052,16 @@
   
 
 
-<h1 id="custom-parsers">Custom Parsers<a class="headerlink" href="#custom-parsers" title="Permanent link">&para;</a></h1>
+<h1 id="custom-parsers">Custom Parsers</h1>
 <p>Extend Jnkn to detect patterns in new languages or frameworks.</p>
 <p><strong>Time:</strong> 30 minutes</p>
-<h2 id="when-to-write-a-custom-parser">When to Write a Custom Parser<a class="headerlink" href="#when-to-write-a-custom-parser" title="Permanent link">&para;</a></h2>
+<h2 id="when-to-write-a-custom-parser">When to Write a Custom Parser</h2>
 <ul>
 <li>Your framework has unique configuration patterns</li>
 <li>You use an unsupported language</li>
 <li>You have internal conventions Jnkn doesn't recognize</li>
 </ul>
-<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<h2 id="architecture">Architecture</h2>
 <pre class="mermaid"><code>graph TD
     F[File] --&gt; E{Extractor&lt;br/&gt;Registry}
     E --&gt; E1[StdlibExtractor]
@@ -6071,8 +6071,8 @@
     E2 --&gt; N
     E3 --&gt; N</code></pre>
 <p>Parsers are composed of <strong>Extractors</strong> — small, focused classes that detect specific patterns.</p>
-<h2 id="creating-an-extractor">Creating an Extractor<a class="headerlink" href="#creating-an-extractor" title="Permanent link">&para;</a></h2>
-<h3 id="step-1-define-the-extractor">Step 1: Define the Extractor<a class="headerlink" href="#step-1-define-the-extractor" title="Permanent link">&para;</a></h3>
+<h2 id="creating-an-extractor">Creating an Extractor</h2>
+<h3 id="step-1-define-the-extractor">Step 1: Define the Extractor</h3>
 <p>Create <code>my_extractors/internal_config.py</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="sd">&quot;&quot;&quot;Extractor for internal @config decorator pattern.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -6154,13 +6154,13 @@
 <a id="__codelineno-0-78" name="__codelineno-0-78" href="#__codelineno-0-78"></a>                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;pattern&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">},</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79" href="#__codelineno-0-79"></a>            <span class="p">)</span>
 </code></pre></div>
-<h3 id="step-2-register-the-extractor">Step 2: Register the Extractor<a class="headerlink" href="#step-2-register-the-extractor" title="Permanent link">&para;</a></h3>
+<h3 id="step-2-register-the-extractor">Step 2: Register the Extractor</h3>
 <p>Create <code>my_extractors/__init__.py</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">.internal_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">InternalConfigExtractor</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">CUSTOM_EXTRACTORS</span> <span class="o">=</span> <span class="p">[</span><span class="n">InternalConfigExtractor</span><span class="p">]</span>
 </code></pre></div>
-<h3 id="step-3-configure-jnkn">Step 3: Configure Jnkn<a class="headerlink" href="#step-3-configure-jnkn" title="Permanent link">&para;</a></h3>
+<h3 id="step-3-configure-jnkn">Step 3: Configure Jnkn</h3>
 <p>In <code>.jnkn/config.yaml</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">parsing</span><span class="p">:</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">python</span><span class="p">:</span>
@@ -6174,7 +6174,7 @@
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">parser</span> <span class="o">=</span> <span class="n">PythonParser</span><span class="p">()</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">parser</span><span class="o">.</span><span class="n">register_extractor</span><span class="p">(</span><span class="n">InternalConfigExtractor</span><span class="p">())</span>
 </code></pre></div>
-<h2 id="using-tree-sitter-recommended">Using Tree-Sitter (Recommended)<a class="headerlink" href="#using-tree-sitter-recommended" title="Permanent link">&para;</a></h2>
+<h2 id="using-tree-sitter-recommended">Using Tree-Sitter (Recommended)</h2>
 <p>For complex patterns, use tree-sitter instead of regex:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">jnkn.parsing.python.extractors.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExtractor</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
@@ -6228,7 +6228,7 @@
 <a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a>                <span class="nb">type</span><span class="o">=</span><span class="n">RelationshipType</span><span class="o">.</span><span class="n">READS</span><span class="p">,</span>
 <a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a>            <span class="p">)</span>
 </code></pre></div>
-<h2 id="testing-your-extractor">Testing Your Extractor<a class="headerlink" href="#testing-your-extractor" title="Permanent link">&para;</a></h2>
+<h2 id="testing-your-extractor">Testing Your Extractor</h2>
 <p>Create <code>tests/test_internal_config.py</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -6281,7 +6281,7 @@
 <p>Run tests:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>pytest<span class="w"> </span>tests/test_internal_config.py<span class="w"> </span>-v
 </code></pre></div>
-<h2 id="complete-example-go-parser">Complete Example: Go Parser<a class="headerlink" href="#complete-example-go-parser" title="Permanent link">&para;</a></h2>
+<h2 id="complete-example-go-parser">Complete Example: Go Parser</h2>
 <p>For a new language, create a full parser:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># jnkn_go/parser.py</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">jnkn.parsing.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">LanguageParser</span>
@@ -6300,10 +6300,10 @@
 <a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>        <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;os\.Getenv\s*\(\s*&quot;([^&quot;]+)&quot;\s*\)&#39;</span>
 <a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>        <span class="o">...</span>
 </code></pre></div>
-<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<h2 id="next-steps">Next Steps</h2>
 <ul>
-<li><a href="../custom-stitching-rules/">:octicons-arrow-right-24: Custom stitching rules</a></li>
-<li><a href="../../../reference/patterns/python-env-vars/">:octicons-arrow-right-24: Python patterns reference</a></li>
+<li><a href="../custom-stitching-rules/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Custom stitching rules</a></li>
+<li><a href="../../../reference/patterns/python-env-vars/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Python patterns reference</a></li>
 </ul>
 
 
@@ -6364,6 +6364,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

@@ -6306,9 +6306,9 @@
   
 
 
-<h1 id="terraform-resource-patterns">Terraform Resource Patterns<a class="headerlink" href="#terraform-resource-patterns" title="Permanent link">&para;</a></h1>
+<h1 id="terraform-resource-patterns">Terraform Resource Patterns</h1>
 <p>All Terraform patterns Jnkn detects.</p>
-<h2 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">&para;</a></h2>
+<h2 id="resources">Resources</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># ✅ Detected as infra:aws_db_instance.main</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_db_instance&quot;</span><span class="w"> </span><span class="nv">&quot;main&quot;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="na">identifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-database&quot;</span>
@@ -6320,14 +6320,14 @@
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="na">bucket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my-data-bucket&quot;</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="node-id-format">Node ID Format<a class="headerlink" href="#node-id-format" title="Permanent link">&para;</a></h3>
+<h3 id="node-id-format">Node ID Format</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>infra:{resource_type}.{resource_name}
 </code></pre></div>
 <p>Examples:
 - <code>infra:aws_db_instance.main</code>
 - <code>infra:aws_s3_bucket.logs</code>
 - <code>infra:google_compute_instance.web</code></p>
-<h2 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h2>
+<h2 id="variables">Variables</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># ✅ Detected as infra:var.database_url</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kr">variable</span><span class="w"> </span><span class="nv">&quot;database_url&quot;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="na">type</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="kt">string</span>
@@ -6340,10 +6340,10 @@
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="na">sensitive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
 <a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="node-id-format_1">Node ID Format<a class="headerlink" href="#node-id-format_1" title="Permanent link">&para;</a></h3>
+<h3 id="node-id-format_1">Node ID Format</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>infra:var.{variable_name}
 </code></pre></div>
-<h2 id="outputs">Outputs<a class="headerlink" href="#outputs" title="Permanent link">&para;</a></h2>
+<h2 id="outputs">Outputs</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># ✅ Detected as infra:output.database_endpoint</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kr">output</span><span class="w"> </span><span class="nv">&quot;database_endpoint&quot;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="na">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_db_instance.main.endpoint</span>
@@ -6354,30 +6354,30 @@
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="na">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_s3_bucket.data.arn</span>
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="node-id-format_2">Node ID Format<a class="headerlink" href="#node-id-format_2" title="Permanent link">&para;</a></h3>
+<h3 id="node-id-format_2">Node ID Format</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>infra:output.{output_name}
 </code></pre></div>
-<h2 id="data-sources">Data Sources<a class="headerlink" href="#data-sources" title="Permanent link">&para;</a></h2>
+<h2 id="data-sources">Data Sources</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># ✅ Detected as infra:data.aws_ami.ubuntu</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kr">data</span><span class="w"> </span><span class="nc">&quot;aws_ami&quot;</span><span class="w"> </span><span class="nv">&quot;ubuntu&quot;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="na">most_recent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="na">owners</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;099720109477&quot;</span><span class="p">]</span>
 <a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="node-id-format_3">Node ID Format<a class="headerlink" href="#node-id-format_3" title="Permanent link">&para;</a></h3>
+<h3 id="node-id-format_3">Node ID Format</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>infra:data.{data_type}.{data_name}
 </code></pre></div>
-<h2 id="locals">Locals<a class="headerlink" href="#locals" title="Permanent link">&para;</a></h2>
+<h2 id="locals">Locals</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># ✅ Detected as infra:local.database_host</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">locals</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="na">database_host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">var.database_url</span>
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="na">api_endpoint</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://${var.domain}/api&quot;</span>
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="node-id-format_4">Node ID Format<a class="headerlink" href="#node-id-format_4" title="Permanent link">&para;</a></h3>
+<h3 id="node-id-format_4">Node ID Format</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>infra:local.{local_name}
 </code></pre></div>
-<h2 id="modules">Modules<a class="headerlink" href="#modules" title="Permanent link">&para;</a></h2>
+<h2 id="modules">Modules</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># ✅ Detected as infra:module.vpc</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kr">module</span><span class="w"> </span><span class="nv">&quot;vpc&quot;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="na">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;./modules/vpc&quot;</span>
@@ -6385,29 +6385,29 @@
 <a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="na">cidr_block</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">var.vpc_cidr</span>
 <a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="node-id-format_5">Node ID Format<a class="headerlink" href="#node-id-format_5" title="Permanent link">&para;</a></h3>
+<h3 id="node-id-format_5">Node ID Format</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>infra:module.{module_name}
 </code></pre></div>
-<h2 id="dependencies-detected">Dependencies Detected<a class="headerlink" href="#dependencies-detected" title="Permanent link">&para;</a></h2>
+<h2 id="dependencies-detected">Dependencies Detected</h2>
 <p>Jnkn creates edges for:</p>
-<h3 id="variable-references">Variable References<a class="headerlink" href="#variable-references" title="Permanent link">&para;</a></h3>
+<h3 id="variable-references">Variable References</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_instance&quot;</span><span class="w"> </span><span class="nv">&quot;web&quot;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="na">ami</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">var.ami_id</span><span class="c1">  # Edge: infra:aws_instance.web → infra:var.ami_id</span>
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="resource-references">Resource References<a class="headerlink" href="#resource-references" title="Permanent link">&para;</a></h3>
+<h3 id="resource-references">Resource References</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kr">resource</span><span class="w"> </span><span class="nc">&quot;aws_security_group_rule&quot;</span><span class="w"> </span><span class="nv">&quot;allow&quot;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="na">security_group_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_security_group.main.id</span>
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="c1">  # Edge: infra:aws_security_group_rule.allow → infra:aws_security_group.main</span>
 <a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="output-references">Output References<a class="headerlink" href="#output-references" title="Permanent link">&para;</a></h3>
+<h3 id="output-references">Output References</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kr">output</span><span class="w"> </span><span class="nv">&quot;instance_ip&quot;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="na">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_instance.web.public_ip</span>
 <a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="c1">  # Edge: infra:output.instance_ip → infra:aws_instance.web</span>
 <a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="p">}</span>
 </code></pre></div>
-<h2 id="cross-domain-matching">Cross-Domain Matching<a class="headerlink" href="#cross-domain-matching" title="Permanent link">&para;</a></h2>
+<h2 id="cross-domain-matching">Cross-Domain Matching</h2>
 <p>Terraform resources are matched to env vars via token matching:</p>
 <table>
 <thead>
@@ -6435,7 +6435,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="not-detected">Not Detected<a class="headerlink" href="#not-detected" title="Permanent link">&para;</a></h2>
+<h2 id="not-detected">Not Detected</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># ❌ Dynamic blocks (partial support)</span>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="err">dynamic</span><span class="w"> </span><span class="s2">&quot;setting&quot;</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="na">for_each</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">var.settings</span>
@@ -6509,6 +6509,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

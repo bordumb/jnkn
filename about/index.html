@@ -5730,8 +5730,8 @@
   
 
 
-<h1 id="about-junkan-jnkn">About Junkan (<code>jnkn</code>)<a class="headerlink" href="#about-junkan-jnkn" title="Permanent link">&para;</a></h1>
-<h2 id="the-name">The Name<a class="headerlink" href="#the-name" title="Permanent link">&para;</a></h2>
+<h1 id="about-junkan-jnkn">About Junkan (<code>jnkn</code>)</h1>
+<h2 id="the-name">The Name</h2>
 <p><strong>Junkan</strong> (循環, じゅんかん, jun-kan) is Japanese for "circulation" or "cycle."</p>
 <p>In Japanese, you can have:</p>
 <ul>
@@ -5742,7 +5742,7 @@
 <p>When everything is connected but nothing is tracked, you get a vicious cycle: change something, break something else, scramble to fix it, break a third thing. Repeat at 3am.</p>
 <p>Junkan breaks that cycle by going around your entire infrastructure — Python, Terraform, Kubernetes, dbt — and showing you the connections before they become incidents.</p>
 <p><strong><code>jnkn</code></strong> is just the shorthand. Easier to type, fits nicely in a CLI.</p>
-<h2 id="the-philosophy">The Philosophy<a class="headerlink" href="#the-philosophy" title="Permanent link">&para;</a></h2>
+<h2 id="the-philosophy">The Philosophy</h2>
 <p>Most tools check their own domain:</p>
 <ul>
 <li>Terraform validates Terraform</li>
@@ -5751,7 +5751,7 @@
 </ul>
 <p>Nobody checks the seams. The gaps between domains are where production breaks hide.</p>
 <p>Junkan's job is to trace the circle — follow a variable from your Python config, through your Terraform outputs, into your Kubernetes secrets, and back. If renaming one thing ripples across your stack, you should know <em>before</em> you merge.</p>
-<h2 id="the-goal">The Goal<a class="headerlink" href="#the-goal" title="Permanent link">&para;</a></h2>
+<h2 id="the-goal">The Goal</h2>
 <p>Turn 悪循環 into 好循環.</p>
 <p>Instead of: <em>change → deploy → break → page → fix → repeat</em></p>
 <p>You get: <em>change → analyze → fix → deploy → sleep</em></p>
@@ -5815,6 +5815,8 @@
     
     
       <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

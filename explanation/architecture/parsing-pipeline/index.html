@@ -6021,9 +6021,9 @@
   
 
 
-<h1 id="parsing-pipeline">Parsing Pipeline<a class="headerlink" href="#parsing-pipeline" title="Permanent link">&para;</a></h1>
+<h1 id="parsing-pipeline">Parsing Pipeline</h1>
 <p>How source files become nodes and edges.</p>
-<h2 id="pipeline-stages">Pipeline Stages<a class="headerlink" href="#pipeline-stages" title="Permanent link">&para;</a></h2>
+<h2 id="pipeline-stages">Pipeline Stages</h2>
 <pre class="mermaid"><code>graph LR
     F[File] --&gt; D{Discover}
     D --&gt; R[Read]
@@ -6031,7 +6031,7 @@
     P --&gt; E[Extract]
     E --&gt; N[Nodes]
     E --&gt; Ed[Edges]</code></pre>
-<h2 id="stage-1-discovery">Stage 1: Discovery<a class="headerlink" href="#stage-1-discovery" title="Permanent link">&para;</a></h2>
+<h2 id="stage-1-discovery">Stage 1: Discovery</h2>
 <p>The parser engine discovers files to scan:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Pseudocode</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">walk_directory</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
@@ -6042,7 +6042,7 @@
 - <code>.jnknignore</code> patterns
 - Built-in ignores (<code>.git</code>, <code>node_modules</code>, etc.)
 - File extension whitelist</p>
-<h2 id="stage-2-read-hash">Stage 2: Read &amp; Hash<a class="headerlink" href="#stage-2-read-hash" title="Permanent link">&para;</a></h2>
+<h2 id="stage-2-read-hash">Stage 2: Read &amp; Hash</h2>
 <p>Files are read and hashed for incremental scanning:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">content</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">()</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">hash</span> <span class="o">=</span> <span class="n">xxhash</span><span class="o">.</span><span class="n">xxh64</span><span class="p">(</span><span class="n">content</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
@@ -6050,7 +6050,7 @@
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">if</span> <span class="nb">hash</span> <span class="o">==</span> <span class="n">stored_hash</span><span class="p">:</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">skip</span><span class="p">()</span>  <span class="c1"># File unchanged</span>
 </code></pre></div>
-<h2 id="stage-3-parse-ast">Stage 3: Parse AST<a class="headerlink" href="#stage-3-parse-ast" title="Permanent link">&para;</a></h2>
+<h2 id="stage-3-parse-ast">Stage 3: Parse AST</h2>
 <p>Tree-sitter parses the file into an Abstract Syntax Tree:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">parser</span> <span class="o">=</span> <span class="n">get_parser</span><span class="p">(</span><span class="s2">&quot;python&quot;</span><span class="p">)</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">tree</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
@@ -6067,7 +6067,7 @@
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        arguments: (argument_list
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>          (string))))))  # &quot;DATABASE_URL&quot;
 </code></pre></div>
-<h2 id="stage-4-extract">Stage 4: Extract<a class="headerlink" href="#stage-4-extract" title="Permanent link">&para;</a></h2>
+<h2 id="stage-4-extract">Stage 4: Extract</h2>
 <p>Extractors run tree-sitter queries to find patterns:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">query</span> <span class="o">=</span> <span class="n">language</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="s2">(call</span>
@@ -6087,7 +6087,7 @@
 2. PydanticExtractor (90) — BaseSettings
 3. ClickTyperExtractor (80) — <code>envvar=</code>
 4. HeuristicExtractor (10) — Fallback patterns</p>
-<h2 id="stage-5-yield-nodes-edges">Stage 5: Yield Nodes &amp; Edges<a class="headerlink" href="#stage-5-yield-nodes-edges" title="Permanent link">&para;</a></h2>
+<h2 id="stage-5-yield-nodes-edges">Stage 5: Yield Nodes &amp; Edges</h2>
 <p>Extractors yield graph elements:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Node: The env var itself</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">yield</span> <span class="n">Node</span><span class="p">(</span>
@@ -6103,7 +6103,7 @@
 <a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="nb">type</span><span class="o">=</span><span class="n">RelationshipType</span><span class="o">.</span><span class="n">READS</span>
 <a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="p">)</span>
 </code></pre></div>
-<h2 id="complete-example">Complete Example<a class="headerlink" href="#complete-example" title="Permanent link">&para;</a></h2>
+<h2 id="complete-example">Complete Example</h2>
 <p>Input file <code>src/config.py</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
@@ -6120,7 +6120,7 @@
 <a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>  - file://src/config.py → env:DATABASE_URL (reads)
 <a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>  - file://src/config.py → env:REDIS_HOST (reads)
 </code></pre></div>
-<h2 id="fallback-regex-parsing">Fallback: Regex Parsing<a class="headerlink" href="#fallback-regex-parsing" title="Permanent link">&para;</a></h2>
+<h2 id="fallback-regex-parsing">Fallback: Regex Parsing</h2>
 <p>When tree-sitter isn't available, regex patterns are used:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">ENV_VAR_PATTERNS</span> <span class="o">=</span> <span class="p">[</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;os\.getenv\s*\(\s*[&quot;</span><span class="se">\&#39;</span><span class="s1">]([^&quot;</span><span class="se">\&#39;</span><span class="s1">]+)[&quot;</span><span class="se">\&#39;</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="s2">&quot;os.getenv&quot;</span><span class="p">),</span>
@@ -6129,7 +6129,7 @@
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">]</span>
 </code></pre></div>
 <p>Regex is less accurate but provides broad compatibility.</p>
-<h2 id="adding-a-new-extractor">Adding a New Extractor<a class="headerlink" href="#adding-a-new-extractor" title="Permanent link">&para;</a></h2>
+<h2 id="adding-a-new-extractor">Adding a New Extractor</h2>
 <ol>
 <li>Implement <code>BaseExtractor</code></li>
 <li>Define tree-sitter query or regex pattern</li>
@@ -6196,6 +6196,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

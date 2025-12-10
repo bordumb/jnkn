@@ -6192,12 +6192,12 @@
   
 
 
-<h1 id="calculate-blast-radius">Calculate Blast Radius<a class="headerlink" href="#calculate-blast-radius" title="Permanent link">&para;</a></h1>
+<h1 id="calculate-blast-radius">Calculate Blast Radius</h1>
 <p>Find all artifacts impacted by a change.</p>
-<h2 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h2>
+<h2 id="basic-usage">Basic Usage</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>&lt;artifact-id&gt;
 </code></pre></div>
-<h2 id="artifact-id-formats">Artifact ID Formats<a class="headerlink" href="#artifact-id-formats" title="Permanent link">&para;</a></h2>
+<h2 id="artifact-id-formats">Artifact ID Formats</h2>
 <table>
 <thead>
 <tr>
@@ -6234,26 +6234,26 @@
 </tr>
 </tbody>
 </table>
-<h2 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h2>
-<h3 id="limit-depth">Limit Depth<a class="headerlink" href="#limit-depth" title="Permanent link">&para;</a></h3>
+<h2 id="options">Options</h2>
+<h3 id="limit-depth">Limit Depth</h3>
 <p>Only show direct dependencies:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--max-depth<span class="w"> </span><span class="m">1</span>
 </code></pre></div>
 <p>Show up to 3 levels:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--max-depth<span class="w"> </span><span class="m">3</span>
 </code></pre></div>
-<h3 id="multiple-sources">Multiple Sources<a class="headerlink" href="#multiple-sources" title="Permanent link">&para;</a></h3>
+<h3 id="multiple-sources">Multiple Sources</h3>
 <p>Analyze several artifacts at once:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:DATABASE_URL<span class="w"> </span>env:REDIS_URL<span class="w"> </span>infra:aws_rds.main
 </code></pre></div>
-<h3 id="filter-by-type">Filter by Type<a class="headerlink" href="#filter-by-type" title="Permanent link">&para;</a></h3>
+<h3 id="filter-by-type">Filter by Type</h3>
 <p>Only show infrastructure impacts:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--type<span class="w"> </span>infra
 </code></pre></div>
 <p>Only show code files:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--type<span class="w"> </span>code
 </code></pre></div>
-<h3 id="output-formats">Output Formats<a class="headerlink" href="#output-formats" title="Permanent link">&para;</a></h3>
+<h3 id="output-formats">Output Formats</h3>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">JSON (default)</label><label for="__tabbed_1_2">Markdown</label><label for="__tabbed_1_3">Plain</label><label for="__tabbed_1_4">SARIF</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -6274,8 +6274,8 @@
 </div>
 </div>
 </div>
-<h2 id="scripting">Scripting<a class="headerlink" href="#scripting" title="Permanent link">&para;</a></h2>
-<h3 id="check-impact-count">Check Impact Count<a class="headerlink" href="#check-impact-count" title="Permanent link">&para;</a></h3>
+<h2 id="scripting">Scripting</h2>
+<h3 id="check-impact-count">Check Impact Count</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">IMPACT</span><span class="o">=</span><span class="k">$(</span>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.total_impacted_count&#39;</span><span class="k">)</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$IMPACT</span><span class="s2">&quot;</span><span class="w"> </span>-gt<span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
@@ -6283,17 +6283,17 @@
 <a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
 <a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="k">fi</span>
 </code></pre></div>
-<h3 id="get-impacted-files-only">Get Impacted Files Only<a class="headerlink" href="#get-impacted-files-only" title="Permanent link">&para;</a></h3>
+<h3 id="get-impacted-files-only">Get Impacted Files Only</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.impacted_artifacts[]&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;^file://&#39;</span>
 </code></pre></div>
-<h3 id="pipe-to-other-tools">Pipe to Other Tools<a class="headerlink" href="#pipe-to-other-tools" title="Permanent link">&para;</a></h3>
+<h3 id="pipe-to-other-tools">Pipe to Other Tools</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Send to Slack</span>
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--format<span class="w"> </span>markdown<span class="w"> </span><span class="p">|</span><span class="w"> </span>slack-cli<span class="w"> </span>post<span class="w"> </span><span class="s2">&quot;#alerts&quot;</span>
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1"># Create Jira ticket</span>
 <a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jira-create-ticket.sh
 </code></pre></div>
-<h2 id="understanding-results">Understanding Results<a class="headerlink" href="#understanding-results" title="Permanent link">&para;</a></h2>
+<h2 id="understanding-results">Understanding Results</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="p">{</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">&quot;source_artifacts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;env:DATABASE_URL&quot;</span><span class="p">],</span>
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nt">&quot;total_impacted_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
@@ -6317,12 +6317,12 @@
 <li><code>breakdown</code>: Grouped by artifact type</li>
 <li><code>max_depth_reached</code>: How many hops the deepest impact is</li>
 </ul>
-<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
-<h3 id="artifact-not-found">"Artifact not found"<a class="headerlink" href="#artifact-not-found" title="Permanent link">&para;</a></h3>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="artifact-not-found">"Artifact not found"</h3>
 <p>The artifact ID may not exist in the graph. Check with:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>jnkn<span class="w"> </span>stats<span class="w"> </span>--show-nodes<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;DATABASE_URL&quot;</span>
 </code></pre></div>
-<h3 id="results-seem-incomplete">Results seem incomplete<a class="headerlink" href="#results-seem-incomplete" title="Permanent link">&para;</a></h3>
+<h3 id="results-seem-incomplete">Results seem incomplete</h3>
 <p>Ensure you've scanned all relevant directories:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--dir<span class="w"> </span>.<span class="w"> </span>--full
 </code></pre></div>
@@ -6385,6 +6385,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

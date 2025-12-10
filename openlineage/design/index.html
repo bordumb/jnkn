@@ -6192,14 +6192,14 @@
   
 
 
-<h1 id="openlineage-integration-architecture">OpenLineage Integration Architecture<a class="headerlink" href="#openlineage-integration-architecture" title="Permanent link">&para;</a></h1>
+<h1 id="openlineage-integration-architecture">OpenLineage Integration Architecture</h1>
 <blockquote>
 <p><strong>Version:</strong> 1.0.0<br />
 <strong>Last Updated:</strong> December 2024</p>
 </blockquote>
 <p>This document describes how Jnkn integrates with OpenLineage to provide complete pre-merge impact analysis for data pipelines.</p>
 <hr />
-<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
+<h2 id="table-of-contents">Table of Contents</h2>
 <ol>
 <li><a href="#executive-summary">Executive Summary</a></li>
 <li><a href="#the-problem">The Problem</a></li>
@@ -6214,7 +6214,7 @@
 <li><a href="#deployment-options">Deployment Options</a></li>
 </ol>
 <hr />
-<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<h2 id="executive-summary">Executive Summary</h2>
 <p><strong>The Problem:</strong> Data pipeline failures are often caused by upstream code changes that existing tools only detect after downstream damage occurs.</p>
 <p><strong>The Gap:</strong> OpenLineage captures runtime lineage (what happened), but cannot predict the impact of code changes before they're deployed.</p>
 <p><strong>The Solution:</strong> Jnkn combines static code analysis with OpenLineage runtime data to provide pre-merge impact prediction with production-grade confidence.</p>
@@ -6228,8 +6228,8 @@
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>└─────────────────────────────────────────────────────────────────────┘
 </code></pre></div>
 <hr />
-<h2 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link">&para;</a></h2>
-<h3 id="silent-data-pipeline-failures">Silent Data Pipeline Failures<a class="headerlink" href="#silent-data-pipeline-failures" title="Permanent link">&para;</a></h3>
+<h2 id="the-problem">The Problem</h2>
+<h3 id="silent-data-pipeline-failures">Silent Data Pipeline Failures</h3>
 <p>Data pipelines fail silently. Unlike application code that throws errors, data issues often manifest as:</p>
 <ul>
 <li>Wrong numbers in dashboards</li>
@@ -6237,7 +6237,7 @@
 <li>Compliance reports with incorrect values</li>
 <li>Analytics that "look fine" but are subtly wrong</li>
 </ul>
-<h3 id="the-root-cause">The Root Cause<a class="headerlink" href="#the-root-cause" title="Permanent link">&para;</a></h3>
+<h3 id="the-root-cause">The Root Cause</h3>
 <p>Most data incidents trace back to upstream changes:</p>
 <pre class="mermaid"><code>graph LR
     subgraph "Root Causes"
@@ -6266,7 +6266,7 @@
     style H fill:#ff6b6b,stroke:#c92a2a,color:#fff
     style I fill:#ff6b6b,stroke:#c92a2a,color:#fff
     style J fill:#ff6b6b,stroke:#c92a2a,color:#fff</code></pre>
-<h3 id="current-state-siloed-tooling">Current State: Siloed Tooling<a class="headerlink" href="#current-state-siloed-tooling" title="Permanent link">&para;</a></h3>
+<h3 id="current-state-siloed-tooling">Current State: Siloed Tooling</h3>
 <table>
 <thead>
 <tr>
@@ -6299,7 +6299,7 @@
 </tbody>
 </table>
 <hr />
-<h2 id="why-openlineage-alone-isnt-enough">Why OpenLineage Alone Isn't Enough<a class="headerlink" href="#why-openlineage-alone-isnt-enough" title="Permanent link">&para;</a></h2>
+<h2 id="why-openlineage-alone-isnt-enough">Why OpenLineage Alone Isn't Enough</h2>
 <p>OpenLineage is excellent at capturing <strong>what happened</strong>. It records:</p>
 <ul>
 <li>Which jobs ran</li>
@@ -6321,7 +6321,7 @@
 
     Note over Marquez: Now we know table_a → table_b
     Note over Marquez: But only AFTER execution</code></pre>
-<h3 id="the-timing-gap">The Timing Gap<a class="headerlink" href="#the-timing-gap" title="Permanent link">&para;</a></h3>
+<h3 id="the-timing-gap">The Timing Gap</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Timeline:
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>─────────────────────────────────────────────────────────────────────►
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
@@ -6340,7 +6340,7 @@
 </code></pre></div>
 <p><strong>OpenLineage tells you what broke. It cannot tell you what will break.</strong></p>
 <hr />
-<h2 id="the-jnkn-openlineage-solution">The Jnkn + OpenLineage Solution<a class="headerlink" href="#the-jnkn-openlineage-solution" title="Permanent link">&para;</a></h2>
+<h2 id="the-jnkn-openlineage-solution">The Jnkn + OpenLineage Solution</h2>
 <p>Jnkn bridges the timing gap by combining:</p>
 <ol>
 <li><strong>Static Analysis</strong> (pre-merge): Parse code to understand what changes</li>
@@ -6386,7 +6386,7 @@
     style BLOCK fill:#ff6b6b,stroke:#c92a2a,color:#fff
     style WARN fill:#fab005,stroke:#f59f00,color:#000
     style PASS fill:#40c057,stroke:#2f9e44,color:#fff</code></pre>
-<h3 id="value-proposition">Value Proposition<a class="headerlink" href="#value-proposition" title="Permanent link">&para;</a></h3>
+<h3 id="value-proposition">Value Proposition</h3>
 <table>
 <thead>
 <tr>
@@ -6429,8 +6429,8 @@
 </tbody>
 </table>
 <hr />
-<h2 id="architecture-overview">Architecture Overview<a class="headerlink" href="#architecture-overview" title="Permanent link">&para;</a></h2>
-<h3 id="system-components">System Components<a class="headerlink" href="#system-components" title="Permanent link">&para;</a></h3>
+<h2 id="architecture-overview">Architecture Overview</h2>
+<h3 id="system-components">System Components</h3>
 <pre class="mermaid"><code>graph TB
     subgraph "Developer Workflow"
         DEV[Developer]
@@ -6489,7 +6489,7 @@
 
     style OL_PARSER fill:#4dabf7,stroke:#1971c2,color:#fff
     style GRAPH fill:#40c057,stroke:#2f9e44,color:#fff</code></pre>
-<h3 id="data-model">Data Model<a class="headerlink" href="#data-model" title="Permanent link">&para;</a></h3>
+<h3 id="data-model">Data Model</h3>
 <pre class="mermaid"><code>classDiagram
     class Node {
         +str id
@@ -6532,8 +6532,8 @@
     Edge --&gt; Node : source
     Edge --&gt; Node : target</code></pre>
 <hr />
-<h2 id="data-flow">Data Flow<a class="headerlink" href="#data-flow" title="Permanent link">&para;</a></h2>
-<h3 id="end-to-end-flow">End-to-End Flow<a class="headerlink" href="#end-to-end-flow" title="Permanent link">&para;</a></h3>
+<h2 id="data-flow">Data Flow</h2>
+<h3 id="end-to-end-flow">End-to-End Flow</h3>
 <pre class="mermaid"><code>sequenceDiagram
     participant Dev as Developer
     participant Git as GitHub/GitLab
@@ -6579,7 +6579,7 @@
         Jnkn-&gt;&gt;CI: Pass
         CI-&gt;&gt;Git: Post success
     end</code></pre>
-<h3 id="openlineage-data-ingestion">OpenLineage Data Ingestion<a class="headerlink" href="#openlineage-data-ingestion" title="Permanent link">&para;</a></h3>
+<h3 id="openlineage-data-ingestion">OpenLineage Data Ingestion</h3>
 <pre class="mermaid"><code>flowchart TB
     subgraph "OpenLineage Sources"
         SPARK_EVENTS[Spark Events]
@@ -6628,8 +6628,8 @@
 
     style OL_PARSER fill:#4dabf7,stroke:#1971c2,color:#fff</code></pre>
 <hr />
-<h2 id="integration-patterns">Integration Patterns<a class="headerlink" href="#integration-patterns" title="Permanent link">&para;</a></h2>
-<h3 id="pattern-1-api-based-real-time">Pattern 1: API-Based (Real-Time)<a class="headerlink" href="#pattern-1-api-based-real-time" title="Permanent link">&para;</a></h3>
+<h2 id="integration-patterns">Integration Patterns</h2>
+<h3 id="pattern-1-api-based-real-time">Pattern 1: API-Based (Real-Time)</h3>
 <p>Query OpenLineage at PR time for freshest data.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># In CI pipeline</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">jnkn.parsing.openlineage</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenLineageParser</span>
@@ -6645,7 +6645,7 @@
 </code></pre></div>
 <p><strong>Pros:</strong> Always current<br />
 <strong>Cons:</strong> Adds latency, requires network access from CI</p>
-<h3 id="pattern-2-snapshot-based-periodic-sync">Pattern 2: Snapshot-Based (Periodic Sync)<a class="headerlink" href="#pattern-2-snapshot-based-periodic-sync" title="Permanent link">&para;</a></h3>
+<h3 id="pattern-2-snapshot-based-periodic-sync">Pattern 2: Snapshot-Based (Periodic Sync)</h3>
 <p>Export OpenLineage data periodically, commit to repo or artifact store.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># .github/workflows/sync-lineage.yml</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sync OpenLineage</span>
@@ -6667,7 +6667,7 @@
 </code></pre></div>
 <p><strong>Pros:</strong> Fast CI, no runtime dependency<br />
 <strong>Cons:</strong> Up to 6 hours stale</p>
-<h3 id="pattern-3-hybrid-cached-delta">Pattern 3: Hybrid (Cached + Delta)<a class="headerlink" href="#pattern-3-hybrid-cached-delta" title="Permanent link">&para;</a></h3>
+<h3 id="pattern-3-hybrid-cached-delta">Pattern 3: Hybrid (Cached + Delta)</h3>
 <p>Use cached snapshot, fetch only recent changes.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Load cached baseline</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">cached_graph</span> <span class="o">=</span> <span class="n">load_from_cache</span><span class="p">(</span><span class="s2">&quot;lineage-snapshot.json&quot;</span><span class="p">)</span>
@@ -6685,8 +6685,8 @@
 <p><strong>Pros:</strong> Fast + fresh<br />
 <strong>Cons:</strong> More complex implementation</p>
 <hr />
-<h2 id="technical-implementation">Technical Implementation<a class="headerlink" href="#technical-implementation" title="Permanent link">&para;</a></h2>
-<h3 id="openlineage-parser">OpenLineage Parser<a class="headerlink" href="#openlineage-parser" title="Permanent link">&para;</a></h3>
+<h2 id="technical-implementation">Technical Implementation</h2>
+<h3 id="openlineage-parser">OpenLineage Parser</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenLineageParser</span><span class="p">:</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="sd">    Converts OpenLineage events to Jnkn nodes and edges.</span>
@@ -6726,7 +6726,7 @@
 <a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a>            <span class="c1"># Extract column lineage if present</span>
 <a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a>            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_column_lineage</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="cross-domain-stitching">Cross-Domain Stitching<a class="headerlink" href="#cross-domain-stitching" title="Permanent link">&para;</a></h3>
+<h3 id="cross-domain-stitching">Cross-Domain Stitching</h3>
 <p>Jnkn links code files to OpenLineage jobs via token matching:</p>
 <pre class="mermaid"><code>graph LR
     subgraph "Static Analysis"
@@ -6751,7 +6751,7 @@
     MATCH --&gt; EDGE
 
     style EDGE fill:#40c057,stroke:#2f9e44,color:#fff</code></pre>
-<h3 id="unified-graph-queries">Unified Graph Queries<a class="headerlink" href="#unified-graph-queries" title="Permanent link">&para;</a></h3>
+<h3 id="unified-graph-queries">Unified Graph Queries</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Find all downstream consumers of a table</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">downstream</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_downstream</span><span class="p">(</span><span class="s2">&quot;data:s3/warehouse/dim_users&quot;</span><span class="p">)</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
@@ -6770,8 +6770,8 @@
 <a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="c1"># - Code files (static analysis)</span>
 </code></pre></div>
 <hr />
-<h2 id="confidence-model">Confidence Model<a class="headerlink" href="#confidence-model" title="Permanent link">&para;</a></h2>
-<h3 id="confidence-levels-by-source">Confidence Levels by Source<a class="headerlink" href="#confidence-levels-by-source" title="Permanent link">&para;</a></h3>
+<h2 id="confidence-model">Confidence Model</h2>
+<h3 id="confidence-levels-by-source">Confidence Levels by Source</h3>
 <table>
 <thead>
 <tr>
@@ -6813,7 +6813,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="confidence-propagation">Confidence Propagation<a class="headerlink" href="#confidence-propagation" title="Permanent link">&para;</a></h3>
+<h3 id="confidence-propagation">Confidence Propagation</h3>
 <pre class="mermaid"><code>graph LR
     A[Code File&lt;br/&gt;conf: 0.95] --&gt;|PROVIDES| B[Job&lt;br/&gt;conf: 1.0]
     B --&gt;|WRITES| C[Table A&lt;br/&gt;conf: 1.0]
@@ -6825,8 +6825,8 @@
     end</code></pre>
 <p>Path confidence = minimum confidence along the path.</p>
 <hr />
-<h2 id="cicd-integration">CI/CD Integration<a class="headerlink" href="#cicd-integration" title="Permanent link">&para;</a></h2>
-<h3 id="github-actions-example">GitHub Actions Example<a class="headerlink" href="#github-actions-example" title="Permanent link">&para;</a></h3>
+<h2 id="cicd-integration">CI/CD Integration</h2>
+<h3 id="github-actions-example">GitHub Actions Example</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Jnkn Impact Analysis</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nt">on</span><span class="p">:</span>
@@ -6904,7 +6904,7 @@
 <a id="__codelineno-7-75" name="__codelineno-7-75" href="#__codelineno-7-75"></a><span class="w">            </span><span class="no">exit 1</span>
 <a id="__codelineno-7-76" name="__codelineno-7-76" href="#__codelineno-7-76"></a><span class="w">          </span><span class="no">fi</span>
 </code></pre></div>
-<h3 id="critical-tables-configuration">Critical Tables Configuration<a class="headerlink" href="#critical-tables-configuration" title="Permanent link">&para;</a></h3>
+<h3 id="critical-tables-configuration">Critical Tables Configuration</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># config/critical-tables.yaml</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">critical</span><span class="p">:</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="c1"># Executive dashboards</span>
@@ -6932,8 +6932,8 @@
 <a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">    </span><span class="nt">notify_always</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
 <hr />
-<h2 id="deployment-options">Deployment Options<a class="headerlink" href="#deployment-options" title="Permanent link">&para;</a></h2>
-<h3 id="option-1-standalone-cli">Option 1: Standalone CLI<a class="headerlink" href="#option-1-standalone-cli" title="Permanent link">&para;</a></h3>
+<h2 id="deployment-options">Deployment Options</h2>
+<h3 id="option-1-standalone-cli">Option 1: Standalone CLI</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Install</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>pip<span class="w"> </span>install<span class="w"> </span>jnkn
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
@@ -6943,13 +6943,13 @@
 <a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span>--openlineage-url<span class="w"> </span>http://marquez:5000<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">  </span>--output<span class="w"> </span>report.json
 </code></pre></div>
-<h3 id="option-2-cicd-integration">Option 2: CI/CD Integration<a class="headerlink" href="#option-2-cicd-integration" title="Permanent link">&para;</a></h3>
+<h3 id="option-2-cicd-integration">Option 2: CI/CD Integration</h3>
 <p>See GitHub Actions example above. Also supports:
 - GitLab CI
 - Jenkins
 - CircleCI
 - Azure DevOps</p>
-<h3 id="option-3-service-mode-planned">Option 3: Service Mode (Planned)<a class="headerlink" href="#option-3-service-mode-planned" title="Permanent link">&para;</a></h3>
+<h3 id="option-3-service-mode-planned">Option 3: Service Mode (Planned)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># docker-compose.yml</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nt">services</span><span class="p">:</span>
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">jnkn</span><span class="p">:</span>
@@ -6968,20 +6968,20 @@
 - Continuous lineage sync
 - Web UI for exploration</p>
 <hr />
-<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
-<h3 id="before-reactive-firefighting">Before: Reactive Firefighting<a class="headerlink" href="#before-reactive-firefighting" title="Permanent link">&para;</a></h3>
+<h2 id="summary">Summary</h2>
+<h3 id="before-reactive-firefighting">Before: Reactive Firefighting</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Code Change → Deploy → Run → Failure → Alert → Debug → Fix → Deploy
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>                                         │
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>                                    Hours/Days of
 <a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>                                    wrong data
 </code></pre></div>
-<h3 id="after-proactive-prevention">After: Proactive Prevention<a class="headerlink" href="#after-proactive-prevention" title="Permanent link">&para;</a></h3>
+<h3 id="after-proactive-prevention">After: Proactive Prevention</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Code Change → Jnkn + OpenLineage → Impact Known → Coordinated Deploy
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>                     │
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>              Block if critical,
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>              notify stakeholders
 </code></pre></div>
-<h3 id="key-takeaways">Key Takeaways<a class="headerlink" href="#key-takeaways" title="Permanent link">&para;</a></h3>
+<h3 id="key-takeaways">Key Takeaways</h3>
 <ol>
 <li>
 <p><strong>OpenLineage is necessary but not sufficient</strong> - It captures runtime truth but can't predict future impact.</p>
@@ -7000,7 +7000,7 @@
 </li>
 </ol>
 <hr />
-<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<h2 id="references">References</h2>
 <ul>
 <li><a href="https://openlineage.io/spec">OpenLineage Specification</a></li>
 <li><a href="https://marquezproject.ai/docs">Marquez Documentation</a></li>
@@ -7067,6 +7067,8 @@
     
     
       <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

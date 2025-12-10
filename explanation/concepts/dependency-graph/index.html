@@ -6101,9 +6101,9 @@
   
 
 
-<h1 id="dependency-graph">Dependency Graph<a class="headerlink" href="#dependency-graph" title="Permanent link">&para;</a></h1>
+<h1 id="dependency-graph">Dependency Graph</h1>
 <p>The core data structure of Jnkn.</p>
-<h2 id="what-is-it">What Is It?<a class="headerlink" href="#what-is-it" title="Permanent link">&para;</a></h2>
+<h2 id="what-is-it">What Is It?</h2>
 <p>A dependency graph is a directed graph where:</p>
 <ul>
 <li><strong>Nodes</strong> are artifacts (files, env vars, infrastructure)</li>
@@ -6114,7 +6114,7 @@
     E --&gt; T[aws_db_instance.main]
     F --&gt; R[env:REDIS_HOST]
     R --&gt; C[aws_elasticache.redis]</code></pre>
-<h2 id="nodes">Nodes<a class="headerlink" href="#nodes" title="Permanent link">&para;</a></h2>
+<h2 id="nodes">Nodes</h2>
 <p>Each node represents an artifact in your system:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;env:DATABASE_URL&quot;</span><span class="p">,</span>
@@ -6127,7 +6127,7 @@
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="p">}</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="node-types">Node Types<a class="headerlink" href="#node-types" title="Permanent link">&para;</a></h3>
+<h3 id="node-types">Node Types</h3>
 <table>
 <thead>
 <tr>
@@ -6169,7 +6169,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="edges">Edges<a class="headerlink" href="#edges" title="Permanent link">&para;</a></h2>
+<h2 id="edges">Edges</h2>
 <p>Edges represent dependencies:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file://src/config.py&quot;</span><span class="p">,</span>
@@ -6181,7 +6181,7 @@
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="p">}</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="edge-types">Edge Types<a class="headerlink" href="#edge-types" title="Permanent link">&para;</a></h3>
+<h3 id="edge-types">Edge Types</h3>
 <table>
 <thead>
 <tr>
@@ -6223,21 +6223,21 @@
 </tr>
 </tbody>
 </table>
-<h2 id="graph-properties">Graph Properties<a class="headerlink" href="#graph-properties" title="Permanent link">&para;</a></h2>
+<h2 id="graph-properties">Graph Properties</h2>
 <p><strong>Directed</strong> — Edges have direction. <code>A → B</code> means "A depends on B."</p>
 <p><strong>Mostly Acyclic</strong> — Well-designed systems don't have circular dependencies.</p>
 <p><strong>Multi-Domain</strong> — Nodes span different technology domains (Python, Terraform, K8s).</p>
-<h2 id="querying-the-graph">Querying the Graph<a class="headerlink" href="#querying-the-graph" title="Permanent link">&para;</a></h2>
-<h3 id="find-dependencies">Find Dependencies<a class="headerlink" href="#find-dependencies" title="Permanent link">&para;</a></h3>
+<h2 id="querying-the-graph">Querying the Graph</h2>
+<h3 id="find-dependencies">Find Dependencies</h3>
 <p>"What does X depend on?"</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:DATABASE_URL
 </code></pre></div>
-<h3 id="view-statistics">View Statistics<a class="headerlink" href="#view-statistics" title="Permanent link">&para;</a></h3>
+<h3 id="view-statistics">View Statistics</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>jnkn<span class="w"> </span>stats
 </code></pre></div>
-<h2 id="storage">Storage<a class="headerlink" href="#storage" title="Permanent link">&para;</a></h2>
+<h2 id="storage">Storage</h2>
 <p>The graph is stored in SQLite at <code>.jnkn/jnkn.db</code>.</p>
-<h2 id="why-a-graph">Why a Graph?<a class="headerlink" href="#why-a-graph" title="Permanent link">&para;</a></h2>
+<h2 id="why-a-graph">Why a Graph?</h2>
 <p>Graphs enable:</p>
 <ol>
 <li><strong>Traversal</strong> — Follow dependencies to any depth</li>
@@ -6304,6 +6304,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

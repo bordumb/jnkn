@@ -6055,9 +6055,9 @@
   
 
 
-<h1 id="cross-domain-dependencies">Cross-Domain Dependencies<a class="headerlink" href="#cross-domain-dependencies" title="Permanent link">&para;</a></h1>
+<h1 id="cross-domain-dependencies">Cross-Domain Dependencies</h1>
 <p>The "glue" problem Jnkn solves.</p>
-<h2 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link">&para;</a></h2>
+<h2 id="the-problem">The Problem</h2>
 <p>Modern systems span multiple domains:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│   Python    │     │  Terraform  │     │ Kubernetes  │
@@ -6096,8 +6096,8 @@
 </tbody>
 </table>
 <p><strong>No tool checks across domains.</strong></p>
-<h2 id="real-world-scenarios">Real-World Scenarios<a class="headerlink" href="#real-world-scenarios" title="Permanent link">&para;</a></h2>
-<h3 id="scenario-1-renamed-variable">Scenario 1: Renamed Variable<a class="headerlink" href="#scenario-1-renamed-variable" title="Permanent link">&para;</a></h3>
+<h2 id="real-world-scenarios">Real-World Scenarios</h2>
+<h3 id="scenario-1-renamed-variable">Scenario 1: Renamed Variable</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Before</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kr">output</span><span class="w"> </span><span class="nv">&quot;db_host&quot;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="na">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_rds.main.endpoint</span><span class="w"> </span><span class="p">}</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
@@ -6110,7 +6110,7 @@
 <p><strong>Terraform plan:</strong> ✅ Success<br />
 <strong>Python tests:</strong> ✅ Success (mocked)<br />
 <strong>Production:</strong> 💥 Crash</p>
-<h3 id="scenario-2-deleted-secret">Scenario 2: Deleted Secret<a class="headerlink" href="#scenario-2-deleted-secret" title="Permanent link">&para;</a></h3>
+<h3 id="scenario-2-deleted-secret">Scenario 2: Deleted Secret</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Removed from Kubernetes</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># apiVersion: v1</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># kind: Secret</span>
@@ -6120,21 +6120,21 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Still expects the secret</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">API_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;API_KEY&quot;</span><span class="p">]</span>  <span class="c1"># KeyError in production</span>
 </code></pre></div>
-<h3 id="scenario-3-schema-change">Scenario 3: Schema Change<a class="headerlink" href="#scenario-3-schema-change" title="Permanent link">&para;</a></h3>
+<h3 id="scenario-3-schema-change">Scenario 3: Schema Change</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">-- dbt model change</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1">-- Renamed column: user_id → customer_id</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># API still queries old column</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT user_id FROM fct_orders&quot;</span>  <span class="c1"># Column doesn&#39;t exist</span>
 </code></pre></div>
-<h2 id="why-this-happens">Why This Happens<a class="headerlink" href="#why-this-happens" title="Permanent link">&para;</a></h2>
+<h2 id="why-this-happens">Why This Happens</h2>
 <ol>
 <li><strong>No explicit links</strong> — Code references env vars by string, not by import</li>
 <li><strong>Convention-based</strong> — <code>DATABASE_URL</code> in code is expected to match infra output</li>
 <li><strong>Different ownership</strong> — Platform team manages infra, app team manages code</li>
 <li><strong>Async changes</strong> — Changes merged at different times</li>
 </ol>
-<h2 id="how-jnkn-helps">How Jnkn Helps<a class="headerlink" href="#how-jnkn-helps" title="Permanent link">&para;</a></h2>
+<h2 id="how-jnkn-helps">How Jnkn Helps</h2>
 <p>Jnkn creates <strong>implicit links</strong> based on naming:</p>
 <pre class="mermaid"><code>graph LR
     subgraph Python
@@ -6152,7 +6152,7 @@
 <p>You see:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Impacted: env:DATABASE_URL, file://src/config.py
 </code></pre></div>
-<h2 id="the-stitching-process">The Stitching Process<a class="headerlink" href="#the-stitching-process" title="Permanent link">&para;</a></h2>
+<h2 id="the-stitching-process">The Stitching Process</h2>
 <pre class="mermaid"><code>graph TD
     P[Parse All Files] --&gt; N[Extract Nodes]
     N --&gt; T[Tokenize Names]
@@ -6166,7 +6166,7 @@
 <li><strong>Score</strong> — Calculate match confidence</li>
 <li><strong>Link</strong> — Create edges above threshold</li>
 </ol>
-<h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
+<h2 id="limitations">Limitations</h2>
 <p>Jnkn uses <strong>lexical matching</strong>, not semantic understanding:</p>
 <table>
 <thead>
@@ -6191,7 +6191,7 @@
 </tbody>
 </table>
 <p>For semantic understanding, you need runtime observability or explicit documentation.</p>
-<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<h2 id="best-practices">Best Practices</h2>
 <ol>
 <li><strong>Use consistent naming</strong> — <code>DATABASE_URL</code> everywhere, not <code>DB_URL</code> in one place</li>
 <li><strong>Run Jnkn in CI</strong> — Catch cross-domain breaks before merge</li>
@@ -6257,6 +6257,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

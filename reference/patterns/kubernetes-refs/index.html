@@ -6236,16 +6236,16 @@
   
 
 
-<h1 id="kubernetes-reference-patterns">Kubernetes Reference Patterns<a class="headerlink" href="#kubernetes-reference-patterns" title="Permanent link">&para;</a></h1>
+<h1 id="kubernetes-reference-patterns">Kubernetes Reference Patterns</h1>
 <p>All Kubernetes patterns Jnkn detects.</p>
-<h2 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h2>
-<h3 id="direct-values">Direct Values<a class="headerlink" href="#direct-values" title="Permanent link">&para;</a></h3>
+<h2 id="environment-variables">Environment Variables</h2>
+<h3 id="direct-values">Direct Values</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># ✅ Detected as env:DATABASE_URL</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">env</span><span class="p">:</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DATABASE_URL</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">value</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;postgresql://localhost/db&quot;</span>
 </code></pre></div>
-<h3 id="configmap-references">ConfigMap References<a class="headerlink" href="#configmap-references" title="Permanent link">&para;</a></h3>
+<h3 id="configmap-references">ConfigMap References</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># ✅ Detected as env:DATABASE_HOST</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># ✅ Creates edge to k8s:default/configmap/app-config</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nt">env</span><span class="p">:</span>
@@ -6255,7 +6255,7 @@
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-config</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">        </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">db-host</span>
 </code></pre></div>
-<h3 id="secret-references">Secret References<a class="headerlink" href="#secret-references" title="Permanent link">&para;</a></h3>
+<h3 id="secret-references">Secret References</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># ✅ Detected as env:DATABASE_PASSWORD</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># ✅ Creates edge to k8s:default/secret/app-secrets</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">env</span><span class="p">:</span>
@@ -6265,7 +6265,7 @@
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-secrets</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">        </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">db-password</span>
 </code></pre></div>
-<h3 id="field-references">Field References<a class="headerlink" href="#field-references" title="Permanent link">&para;</a></h3>
+<h3 id="field-references">Field References</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># ✅ Detected as env:POD_NAME</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">env</span><span class="p">:</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">POD_NAME</span>
@@ -6273,20 +6273,20 @@
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">      </span><span class="nt">fieldRef</span><span class="p">:</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">        </span><span class="nt">fieldPath</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">metadata.name</span>
 </code></pre></div>
-<h2 id="envfrom">envFrom<a class="headerlink" href="#envfrom" title="Permanent link">&para;</a></h2>
-<h3 id="all-keys-from-configmap">All Keys from ConfigMap<a class="headerlink" href="#all-keys-from-configmap" title="Permanent link">&para;</a></h3>
+<h2 id="envfrom">envFrom</h2>
+<h3 id="all-keys-from-configmap">All Keys from ConfigMap</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># ✅ Creates edge to k8s:default/configmap/app-config</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">envFrom</span><span class="p">:</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">configMapRef</span><span class="p">:</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-config</span>
 </code></pre></div>
-<h3 id="all-keys-from-secret">All Keys from Secret<a class="headerlink" href="#all-keys-from-secret" title="Permanent link">&para;</a></h3>
+<h3 id="all-keys-from-secret">All Keys from Secret</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># ✅ Creates edge to k8s:default/secret/app-secrets</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">envFrom</span><span class="p">:</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">secretRef</span><span class="p">:</span>
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-secrets</span>
 </code></pre></div>
-<h2 id="workload-types">Workload Types<a class="headerlink" href="#workload-types" title="Permanent link">&para;</a></h2>
+<h2 id="workload-types">Workload Types</h2>
 <p>Jnkn parses these Kubernetes resources:</p>
 <table>
 <thead>
@@ -6326,7 +6326,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="node-id-format">Node ID Format<a class="headerlink" href="#node-id-format" title="Permanent link">&para;</a></h2>
+<h2 id="node-id-format">Node ID Format</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>k8s:{namespace}/{kind}/{name}
 </code></pre></div>
 <p>Examples:
@@ -6334,8 +6334,8 @@
 - <code>k8s:production/statefulset/database</code>
 - <code>k8s:default/configmap/app-config</code>
 - <code>k8s:default/secret/app-secrets</code></p>
-<h2 id="dependencies-detected">Dependencies Detected<a class="headerlink" href="#dependencies-detected" title="Permanent link">&para;</a></h2>
-<h3 id="workload-configmap">Workload → ConfigMap<a class="headerlink" href="#workload-configmap" title="Permanent link">&para;</a></h3>
+<h2 id="dependencies-detected">Dependencies Detected</h2>
+<h3 id="workload-configmap">Workload → ConfigMap</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nt">metadata</span><span class="p">:</span>
@@ -6351,7 +6351,7 @@
 <a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">                </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">api-config</span>
 <a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="c1"># Edge: k8s:default/deployment/api-server → k8s:default/configmap/api-config</span>
 </code></pre></div>
-<h3 id="workload-secret">Workload → Secret<a class="headerlink" href="#workload-secret" title="Permanent link">&para;</a></h3>
+<h3 id="workload-secret">Workload → Secret</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nt">metadata</span><span class="p">:</span>
@@ -6369,7 +6369,7 @@
 <a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">                  </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">password</span>
 <a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="c1"># Edge: k8s:default/deployment/api-server → k8s:default/secret/db-creds</span>
 </code></pre></div>
-<h3 id="workload-serviceaccount">Workload → ServiceAccount<a class="headerlink" href="#workload-serviceaccount" title="Permanent link">&para;</a></h3>
+<h3 id="workload-serviceaccount">Workload → ServiceAccount</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nt">metadata</span><span class="p">:</span>
@@ -6380,7 +6380,7 @@
 <a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">      </span><span class="nt">serviceAccountName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">api-sa</span>
 <a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="c1"># Edge: k8s:default/deployment/api-server → k8s:default/serviceaccount/api-sa</span>
 </code></pre></div>
-<h2 id="cross-domain-matching">Cross-Domain Matching<a class="headerlink" href="#cross-domain-matching" title="Permanent link">&para;</a></h2>
+<h2 id="cross-domain-matching">Cross-Domain Matching</h2>
 <p>K8s env vars are matched to other domains:</p>
 <table>
 <thead>
@@ -6419,7 +6419,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="multi-document-yaml">Multi-Document YAML<a class="headerlink" href="#multi-document-yaml" title="Permanent link">&para;</a></h2>
+<h2 id="multi-document-yaml">Multi-Document YAML</h2>
 <p>Jnkn handles multi-document YAML files:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nn">---</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
@@ -6443,7 +6443,7 @@
 <a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">                </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app-config</span>
 </code></pre></div>
 <p>Both resources are detected and linked.</p>
-<h2 id="not-detected">Not Detected<a class="headerlink" href="#not-detected" title="Permanent link">&para;</a></h2>
+<h2 id="not-detected">Not Detected</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># ❌ Helm templates (pre-rendered)</span>
 <a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nt">env</span><span class="p">:</span>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">.Values.envName</span><span class="w"> </span><span class="p p-Indicator">}}</span>
@@ -6511,6 +6511,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

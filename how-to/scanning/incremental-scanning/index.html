@@ -6036,20 +6036,20 @@
   
 
 
-<h1 id="incremental-scanning">Incremental Scanning<a class="headerlink" href="#incremental-scanning" title="Permanent link">&para;</a></h1>
+<h1 id="incremental-scanning">Incremental Scanning</h1>
 <p>Only re-scan files that have changed since the last scan.</p>
-<h2 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<h2 id="how-it-works">How It Works</h2>
 <p>Jnkn stores a hash of each file. On subsequent scans, unchanged files are skipped:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>First scan:  847 files parsed
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Second scan: 12 files parsed (835 unchanged)
 </code></pre></div>
-<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<h2 id="usage">Usage</h2>
 <p>Incremental scanning is <strong>automatic</strong>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>jnkn<span class="w"> </span>scan<span class="w">  </span><span class="c1"># First time: full scan</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># ... make changes ...</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>jnkn<span class="w"> </span>scan<span class="w">  </span><span class="c1"># Only changed files</span>
 </code></pre></div>
-<h2 id="force-full-rescan">Force Full Rescan<a class="headerlink" href="#force-full-rescan" title="Permanent link">&para;</a></h2>
+<h2 id="force-full-rescan">Force Full Rescan</h2>
 <p>When you need to regenerate everything:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--full
 </code></pre></div>
@@ -6059,7 +6059,7 @@
 <li>Changing configuration</li>
 <li>Debugging issues</li>
 </ul>
-<h2 id="check-file-status">Check File Status<a class="headerlink" href="#check-file-status" title="Permanent link">&para;</a></h2>
+<h2 id="check-file-status">Check File Status</h2>
 <p>See which files would be scanned:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--dry-run
 </code></pre></div>
@@ -6073,7 +6073,7 @@
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>  src/utils.py (unchanged)
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>  ... 842 more unchanged files
 </code></pre></div>
-<h2 id="git-integration">Git Integration<a class="headerlink" href="#git-integration" title="Permanent link">&para;</a></h2>
+<h2 id="git-integration">Git Integration</h2>
 <p>Scan only files changed in a PR:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Get changed files from git</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nv">CHANGED</span><span class="o">=</span><span class="k">$(</span>git<span class="w"> </span>diff<span class="w"> </span>--name-only<span class="w"> </span>origin/main...HEAD<span class="k">)</span>
@@ -6087,17 +6087,17 @@
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="no">CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="no">jnkn scan --files $CHANGED</span>
 </code></pre></div>
-<h2 id="cache-location">Cache Location<a class="headerlink" href="#cache-location" title="Permanent link">&para;</a></h2>
+<h2 id="cache-location">Cache Location</h2>
 <p>The database is stored at <code>.jnkn/jnkn.db</code> by default.</p>
 <p>To use a different location:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--db<span class="w"> </span>/path/to/jnkn.db
 </code></pre></div>
-<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
-<h3 id="files-not-being-detected-as-changed">Files not being detected as changed<a class="headerlink" href="#files-not-being-detected-as-changed" title="Permanent link">&para;</a></h3>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="files-not-being-detected-as-changed">Files not being detected as changed</h3>
 <p>Check the stored hash:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>jnkn<span class="w"> </span>stats<span class="w"> </span>--show-hashes<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>myfile.py
 </code></pre></div>
-<h3 id="scan-is-slow-despite-few-changes">Scan is slow despite few changes<a class="headerlink" href="#scan-is-slow-despite-few-changes" title="Permanent link">&para;</a></h3>
+<h3 id="scan-is-slow-despite-few-changes">Scan is slow despite few changes</h3>
 <p>The stitching phase runs on all nodes, not just changed files. This is necessary to detect new cross-domain links.</p>
 <p>For very large graphs, consider splitting by domain (see <a href="../scan-monorepo/">Scan a Monorepo</a>).</p>
 
@@ -6159,6 +6159,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

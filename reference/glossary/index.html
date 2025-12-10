@@ -6116,118 +6116,90 @@
   
 
 
-<h1 id="glossary">Glossary<a class="headerlink" href="#glossary" title="Permanent link">&para;</a></h1>
+<h1 id="glossary">Glossary</h1>
 <p>Terms used in Jnkn documentation.</p>
-<h2 id="a">A<a class="headerlink" href="#a" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Artifact</strong></dt>
-<dd>A node in the dependency graph representing code, configuration, or infrastructure. Examples: env var, file, Terraform resource.</dd>
-</dl>
-<h2 id="b">B<a class="headerlink" href="#b" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Blast Radius</strong></dt>
-<dd>The set of artifacts that would be affected by a change to a given artifact. Computed by traversing downstream dependencies.</dd>
-<dt><strong>Blocked Token</strong></dt>
-<dd>A token (like "id", "key") that provides no signal for matching and is ignored during stitching.</dd>
-</dl>
-<h2 id="c">C<a class="headerlink" href="#c" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Confidence</strong></dt>
-<dd>A score from 0.0 to 1.0 indicating how likely a cross-domain match is correct. Higher = more certain.</dd>
-<dt><strong>Cross-Domain Dependency</strong></dt>
-<dd>A dependency that spans different technology domains (e.g., Python code depending on a Terraform resource).</dd>
-</dl>
-<h2 id="d">D<a class="headerlink" href="#d" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Dependency Graph</strong></dt>
-<dd>A directed graph where nodes are artifacts and edges are dependencies between them.</dd>
-</dl>
-<h2 id="e">E<a class="headerlink" href="#e" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Edge</strong></dt>
-<dd>A connection between two nodes in the dependency graph. Has a type (reads, imports, etc.) and optional metadata.</dd>
-<dt><strong>Extractor</strong></dt>
-<dd>A component that detects specific patterns in source code (e.g., <code>os.getenv()</code> calls).</dd>
-</dl>
-<h2 id="g">G<a class="headerlink" href="#g" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Graph</strong></dt>
-<dd>See Dependency Graph.</dd>
-</dl>
-<h2 id="m">M<a class="headerlink" href="#m" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Matcher</strong></dt>
-<dd>A component that determines if two artifacts should be linked based on name similarity.</dd>
-</dl>
-<h2 id="n">N<a class="headerlink" href="#n" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Node</strong></dt>
-<dd>An entity in the dependency graph. Has an ID, type, and metadata.</dd>
-<dt><strong>Normalized Name</strong></dt>
-<dd>A standardized form of an artifact name used for matching. Example: <code>DATABASE_URL</code> → <code>databaseurl</code>.</dd>
-</dl>
-<h2 id="p">P<a class="headerlink" href="#p" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Parser</strong></dt>
-<dd>A component that reads source files and extracts nodes and edges.</dd>
-<dt><strong>Pattern</strong></dt>
-<dd>A code construct that Jnkn recognizes (e.g., <code>os.getenv("VAR")</code>).</dd>
-<dt><strong>Penalty</strong></dt>
-<dd>A multiplier that reduces confidence (e.g., 0.5 for short tokens).</dd>
-</dl>
-<h2 id="r">R<a class="headerlink" href="#r" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Rule</strong></dt>
-<dd>See Stitching Rule.</dd>
-</dl>
-<h2 id="s">S<a class="headerlink" href="#s" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Signal</strong></dt>
-<dd>A factor that increases confidence in a match (e.g., exact token overlap).</dd>
-<dt><strong>Stitching</strong></dt>
-<dd>The process of creating edges between nodes from different domains based on name similarity.</dd>
-<dt><strong>Stitching Rule</strong></dt>
-<dd>A rule that defines which node types can be matched and how confidence is calculated.</dd>
-<dt><strong>Suppression</strong></dt>
-<dd>A user-defined rule to ignore specific matches (false positives).</dd>
-</dl>
-<h2 id="t">T<a class="headerlink" href="#t" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>Token</strong></dt>
-<dd>A word extracted from an artifact name. <code>DATABASE_URL</code> → <code>["database", "url"]</code>.</dd>
-<dt><strong>Token Matching</strong></dt>
-<dd>The technique of linking artifacts by comparing their tokenized names.</dd>
-</dl>
-<h2 id="artifact-types">Artifact Types<a class="headerlink" href="#artifact-types" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>code_file</strong></dt>
-<dd>A source code file (<code>.py</code>, <code>.js</code>, etc.).</dd>
-<dt><strong>code_entity</strong></dt>
-<dd>A function or class definition within a file.</dd>
-<dt><strong>env_var</strong></dt>
-<dd>An environment variable.</dd>
-<dt><strong>infra_resource</strong></dt>
-<dd>A Terraform resource, variable, output, or data source.</dd>
-<dt><strong>k8s_resource</strong></dt>
-<dd>A Kubernetes resource (Deployment, ConfigMap, Secret, etc.).</dd>
-<dt><strong>data_asset</strong></dt>
-<dd>A dbt model, source, or seed.</dd>
-</dl>
-<h2 id="edge-types">Edge Types<a class="headerlink" href="#edge-types" title="Permanent link">&para;</a></h2>
-<dl>
-<dt><strong>reads</strong></dt>
-<dd>Source reads a value from target (e.g., file reads env var).</dd>
-<dt><strong>imports</strong></dt>
-<dd>Source imports target (e.g., Python import).</dd>
-<dt><strong>provides</strong></dt>
-<dd>Source provides target (e.g., Terraform outputs an env var value).</dd>
-<dt><strong>configures</strong></dt>
-<dd>Source configures target (e.g., K8s deployment uses ServiceAccount).</dd>
-<dt><strong>contains</strong></dt>
-<dd>Source contains target (e.g., file contains function definition).</dd>
-<dt><strong>references</strong></dt>
-<dd>Generic reference between artifacts.</dd>
-</dl>
+<h2 id="a">A</h2>
+<p><strong>Artifact</strong>
+: A node in the dependency graph representing code, configuration, or infrastructure. Examples: env var, file, Terraform resource.</p>
+<h2 id="b">B</h2>
+<p><strong>Blast Radius</strong>
+: The set of artifacts that would be affected by a change to a given artifact. Computed by traversing downstream dependencies.</p>
+<p><strong>Blocked Token</strong>
+: A token (like "id", "key") that provides no signal for matching and is ignored during stitching.</p>
+<h2 id="c">C</h2>
+<p><strong>Confidence</strong>
+: A score from 0.0 to 1.0 indicating how likely a cross-domain match is correct. Higher = more certain.</p>
+<p><strong>Cross-Domain Dependency</strong>
+: A dependency that spans different technology domains (e.g., Python code depending on a Terraform resource).</p>
+<h2 id="d">D</h2>
+<p><strong>Dependency Graph</strong>
+: A directed graph where nodes are artifacts and edges are dependencies between them.</p>
+<h2 id="e">E</h2>
+<p><strong>Edge</strong>
+: A connection between two nodes in the dependency graph. Has a type (reads, imports, etc.) and optional metadata.</p>
+<p><strong>Extractor</strong>
+: A component that detects specific patterns in source code (e.g., <code>os.getenv()</code> calls).</p>
+<h2 id="g">G</h2>
+<p><strong>Graph</strong>
+: See Dependency Graph.</p>
+<h2 id="m">M</h2>
+<p><strong>Matcher</strong>
+: A component that determines if two artifacts should be linked based on name similarity.</p>
+<h2 id="n">N</h2>
+<p><strong>Node</strong>
+: An entity in the dependency graph. Has an ID, type, and metadata.</p>
+<p><strong>Normalized Name</strong>
+: A standardized form of an artifact name used for matching. Example: <code>DATABASE_URL</code> → <code>databaseurl</code>.</p>
+<h2 id="p">P</h2>
+<p><strong>Parser</strong>
+: A component that reads source files and extracts nodes and edges.</p>
+<p><strong>Pattern</strong>
+: A code construct that Jnkn recognizes (e.g., <code>os.getenv("VAR")</code>).</p>
+<p><strong>Penalty</strong>
+: A multiplier that reduces confidence (e.g., 0.5 for short tokens).</p>
+<h2 id="r">R</h2>
+<p><strong>Rule</strong>
+: See Stitching Rule.</p>
+<h2 id="s">S</h2>
+<p><strong>Signal</strong>
+: A factor that increases confidence in a match (e.g., exact token overlap).</p>
+<p><strong>Stitching</strong>
+: The process of creating edges between nodes from different domains based on name similarity.</p>
+<p><strong>Stitching Rule</strong>
+: A rule that defines which node types can be matched and how confidence is calculated.</p>
+<p><strong>Suppression</strong>
+: A user-defined rule to ignore specific matches (false positives).</p>
+<h2 id="t">T</h2>
+<p><strong>Token</strong>
+: A word extracted from an artifact name. <code>DATABASE_URL</code> → <code>["database", "url"]</code>.</p>
+<p><strong>Token Matching</strong>
+: The technique of linking artifacts by comparing their tokenized names.</p>
+<h2 id="artifact-types">Artifact Types</h2>
+<p><strong>code_file</strong>
+: A source code file (<code>.py</code>, <code>.js</code>, etc.).</p>
+<p><strong>code_entity</strong>
+: A function or class definition within a file.</p>
+<p><strong>env_var</strong>
+: An environment variable.</p>
+<p><strong>infra_resource</strong>
+: A Terraform resource, variable, output, or data source.</p>
+<p><strong>k8s_resource</strong>
+: A Kubernetes resource (Deployment, ConfigMap, Secret, etc.).</p>
+<p><strong>data_asset</strong>
+: A dbt model, source, or seed.</p>
+<h2 id="edge-types">Edge Types</h2>
+<p><strong>reads</strong>
+: Source reads a value from target (e.g., file reads env var).</p>
+<p><strong>imports</strong>
+: Source imports target (e.g., Python import).</p>
+<p><strong>provides</strong>
+: Source provides target (e.g., Terraform outputs an env var value).</p>
+<p><strong>configures</strong>
+: Source configures target (e.g., K8s deployment uses ServiceAccount).</p>
+<p><strong>contains</strong>
+: Source contains target (e.g., file contains function definition).</p>
+<p><strong>references</strong>
+: Generic reference between artifacts.</p>
 
 
 
@@ -6287,6 +6259,8 @@
     
     
       <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

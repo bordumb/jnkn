@@ -6052,17 +6052,17 @@
   
 
 
-<h1 id="cicd-integration">CI/CD Integration<a class="headerlink" href="#cicd-integration" title="Permanent link">&para;</a></h1>
+<h1 id="cicd-integration">CI/CD Integration</h1>
 <p>Set up a complete CI pipeline with impact analysis, blocking, and notifications.</p>
 <p><strong>Time:</strong> 25 minutes</p>
-<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<h2 id="architecture">Architecture</h2>
 <pre class="mermaid"><code>graph LR
     PR[Pull Request] --&gt; Scan[jnkn scan]
     Scan --&gt; Diff[jnkn diff]
     Diff --&gt; Check{Impact &gt; threshold?}
     Check --&gt;|No| Pass[✅ Pass]
     Check --&gt;|Yes| Block[❌ Block + Comment]</code></pre>
-<h2 id="github-actions-full-setup">GitHub Actions: Full Setup<a class="headerlink" href="#github-actions-full-setup" title="Permanent link">&para;</a></h2>
+<h2 id="github-actions-full-setup">GitHub Actions: Full Setup</h2>
 <p>Create <code>.github/workflows/jnkn.yml</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Jnkn Impact Analysis</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -6175,14 +6175,14 @@
 <a id="__codelineno-0-109" name="__codelineno-0-109" href="#__codelineno-0-109"></a><span class="w">          </span><span class="no">echo &quot;::error::Impact (${{ steps.impact.outputs.total }}) exceeds threshold (${{ env.IMPACT_THRESHOLD }})&quot;</span>
 <a id="__codelineno-0-110" name="__codelineno-0-110" href="#__codelineno-0-110"></a><span class="w">          </span><span class="no">exit 1</span>
 </code></pre></div>
-<h2 id="what-this-does">What This Does<a class="headerlink" href="#what-this-does" title="Permanent link">&para;</a></h2>
+<h2 id="what-this-does">What This Does</h2>
 <ol>
 <li><strong>Scans both branches</strong> — Compares base and PR states</li>
 <li><strong>Calculates impact</strong> — For each changed file</li>
 <li><strong>Posts a comment</strong> — With detailed breakdown</li>
 <li><strong>Blocks if too risky</strong> — Fails the check if impact exceeds threshold</li>
 </ol>
-<h2 id="example-pr-comment">Example PR Comment<a class="headerlink" href="#example-pr-comment" title="Permanent link">&para;</a></h2>
+<h2 id="example-pr-comment">Example PR Comment</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gu">## 🔴 Jnkn Impact Analysis</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="gs">**Total Impact:**</span> 15 artifacts
@@ -6204,8 +6204,8 @@
 <a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="gu">### `src/config.py` — 7 artifacts</span>
 <a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>...
 </code></pre></div>
-<h2 id="customization-options">Customization Options<a class="headerlink" href="#customization-options" title="Permanent link">&para;</a></h2>
-<h3 id="adjust-threshold-by-path">Adjust Threshold by Path<a class="headerlink" href="#adjust-threshold-by-path" title="Permanent link">&para;</a></h3>
+<h2 id="customization-options">Customization Options</h2>
+<h3 id="adjust-threshold-by-path">Adjust Threshold by Path</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set threshold</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="no">if [[ &quot;${{ github.event.pull_request.base.ref }}&quot; == &quot;main&quot; ]]; then</span>
@@ -6214,12 +6214,12 @@
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="no">echo &quot;IMPACT_THRESHOLD=20&quot; &gt;&gt; $GITHUB_ENV</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="no">fi</span>
 </code></pre></div>
-<h3 id="skip-analysis-for-certain-prs">Skip Analysis for Certain PRs<a class="headerlink" href="#skip-analysis-for-certain-prs" title="Permanent link">&para;</a></h3>
+<h3 id="skip-analysis-for-certain-prs">Skip Analysis for Certain PRs</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check skip label</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">contains(github.event.pull_request.labels.*.name, &#39;skip-jnkn&#39;)</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo &quot;Skipping Jnkn analysis&quot;</span>
 </code></pre></div>
-<h3 id="notify-slack-on-high-impact">Notify Slack on High Impact<a class="headerlink" href="#notify-slack-on-high-impact" title="Permanent link">&para;</a></h3>
+<h3 id="notify-slack-on-high-impact">Notify Slack on High Impact</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Notify Slack</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steps.impact.outputs.total &gt; 15</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slackapi/slack-github-action@v1</span>
@@ -6231,7 +6231,7 @@
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="nt">env</span><span class="p">:</span>
 <a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="nt">SLACK_WEBHOOK_URL</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.SLACK_WEBHOOK }}</span>
 </code></pre></div>
-<h2 id="caching-for-speed">Caching for Speed<a class="headerlink" href="#caching-for-speed" title="Permanent link">&para;</a></h2>
+<h2 id="caching-for-speed">Caching for Speed</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Cache Jnkn database</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/cache@v4</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">with</span><span class="p">:</span>
@@ -6239,10 +6239,10 @@
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jnkn-${{ hashFiles(&#39;**/*.py&#39;, &#39;**/*.tf&#39;) }}</span>
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">restore-keys</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jnkn-</span>
 </code></pre></div>
-<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<h2 id="next-steps">Next Steps</h2>
 <ul>
-<li><a href="../../../how-to/integration/gitlab-ci/">:octicons-arrow-right-24: GitLab CI setup</a></li>
-<li><a href="../../../how-to/configuration/configure-confidence/">:octicons-arrow-right-24: Configure thresholds</a></li>
+<li><a href="../../../how-to/integration/gitlab-ci/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> GitLab CI setup</a></li>
+<li><a href="../../../how-to/configuration/configure-confidence/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Configure thresholds</a></li>
 </ul>
 
 
@@ -6303,6 +6303,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

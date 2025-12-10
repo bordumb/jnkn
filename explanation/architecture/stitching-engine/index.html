@@ -6043,22 +6043,22 @@
   
 
 
-<h1 id="stitching-engine">Stitching Engine<a class="headerlink" href="#stitching-engine" title="Permanent link">&para;</a></h1>
+<h1 id="stitching-engine">Stitching Engine</h1>
 <p>How cross-domain links are discovered.</p>
-<h2 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link">&para;</a></h2>
+<h2 id="the-problem">The Problem</h2>
 <p>After parsing, we have nodes from different domains:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Python: env:DATABASE_URL, env:REDIS_HOST
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Terraform: infra:aws_db_instance.main, infra:aws_elasticache.redis
 </code></pre></div>
 <p>These are <strong>semantically related</strong> but not explicitly connected. Stitching finds these implicit dependencies.</p>
-<h2 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<h2 id="how-it-works">How It Works</h2>
 <pre class="mermaid"><code>graph TD
     N[All Nodes] --&gt; R{Rules Filter}
     R --&gt; |Candidate Pairs| M[Matcher]
     M --&gt; C[Confidence Calculator]
     C --&gt; |Score ≥ Threshold| E[Create Edge]
     C --&gt; |Score &lt; Threshold| X[Reject]</code></pre>
-<h2 id="stage-1-rule-filtering">Stage 1: Rule Filtering<a class="headerlink" href="#stage-1-rule-filtering" title="Permanent link">&para;</a></h2>
+<h2 id="stage-1-rule-filtering">Stage 1: Rule Filtering</h2>
 <p>Rules define which node pairs to consider:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">EnvVarToInfraRule</span><span class="p">(</span><span class="n">StitchingRule</span><span class="p">):</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">source_types</span> <span class="o">=</span> <span class="p">{</span><span class="n">NodeType</span><span class="o">.</span><span class="n">ENV_VAR</span><span class="p">}</span>
@@ -6069,7 +6069,7 @@
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">tokens</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">tokens</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
 </code></pre></div>
 <p>This reduces the search space from O(n²) to relevant pairs.</p>
-<h2 id="stage-2-token-extraction">Stage 2: Token Extraction<a class="headerlink" href="#stage-2-token-extraction" title="Permanent link">&para;</a></h2>
+<h2 id="stage-2-token-extraction">Stage 2: Token Extraction</h2>
 <p>Names are tokenized for comparison:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">&quot;DATABASE_URL&quot;</span>     <span class="err">→</span> <span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">]</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="s2">&quot;aws_db_instance&quot;</span>  <span class="err">→</span> <span class="p">[</span><span class="s2">&quot;aws&quot;</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">,</span> <span class="s2">&quot;instance&quot;</span><span class="p">]</span>
@@ -6080,7 +6080,7 @@
 - Lowercase everything
 - Remove blocked tokens (<code>id</code>, <code>key</code>, etc.)
 - Filter tokens shorter than <code>min_token_length</code></p>
-<h2 id="stage-3-matching">Stage 3: Matching<a class="headerlink" href="#stage-3-matching" title="Permanent link">&para;</a></h2>
+<h2 id="stage-3-matching">Stage 3: Matching</h2>
 <p>The matcher computes similarity:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">source_tokens</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;database&quot;</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">}</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">target_tokens</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;database&quot;</span><span class="p">,</span> <span class="s2">&quot;instance&quot;</span><span class="p">}</span>
@@ -6131,7 +6131,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="stage-4-confidence-calculation">Stage 4: Confidence Calculation<a class="headerlink" href="#stage-4-confidence-calculation" title="Permanent link">&para;</a></h2>
+<h2 id="stage-4-confidence-calculation">Stage 4: Confidence Calculation</h2>
 <p>Penalties adjust the base score:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">base_score</span> <span class="o">=</span> <span class="mf">0.85</span>  <span class="c1"># High token overlap</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
@@ -6143,7 +6143,7 @@
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">final_score</span> <span class="o">=</span> <span class="n">base_score</span> <span class="o">*</span> <span class="n">product</span><span class="p">(</span><span class="n">penalties</span><span class="p">)</span>
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1"># 0.85 * 0.5 = 0.425</span>
 </code></pre></div>
-<h2 id="stage-5-edge-creation">Stage 5: Edge Creation<a class="headerlink" href="#stage-5-edge-creation" title="Permanent link">&para;</a></h2>
+<h2 id="stage-5-edge-creation">Stage 5: Edge Creation</h2>
 <p>If confidence ≥ threshold, create an edge:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">if</span> <span class="n">confidence</span><span class="o">.</span><span class="n">score</span> <span class="o">&gt;=</span> <span class="n">min_confidence</span><span class="p">:</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
@@ -6157,7 +6157,7 @@
 <a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>        <span class="p">}</span>
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="p">)</span>
 </code></pre></div>
-<h2 id="example-walkthrough">Example Walkthrough<a class="headerlink" href="#example-walkthrough" title="Permanent link">&para;</a></h2>
+<h2 id="example-walkthrough">Example Walkthrough</h2>
 <p><strong>Input:</strong>
 - <code>env:DATABASE_URL</code> (from Python)
 - <code>infra:output.database_url</code> (from Terraform)</p>
@@ -6175,7 +6175,7 @@
 - Final: 0.9 (HIGH)</p>
 <p><strong>Step 5: Create edge</strong>
 - <code>env:DATABASE_URL → infra:output.database_url</code> (confidence: 0.9)</p>
-<h2 id="performance">Performance<a class="headerlink" href="#performance" title="Permanent link">&para;</a></h2>
+<h2 id="performance">Performance</h2>
 <p>Stitching is O(n × m) where n and m are node counts per type. Optimizations:</p>
 <ol>
 <li><strong>Rule filtering</strong> — Only evaluate relevant pairs</li>
@@ -6183,7 +6183,7 @@
 <li><strong>Early termination</strong> — Skip if no token overlap possible</li>
 <li><strong>Batch processing</strong> — Process in chunks for large graphs</li>
 </ol>
-<h2 id="adding-custom-rules">Adding Custom Rules<a class="headerlink" href="#adding-custom-rules" title="Permanent link">&para;</a></h2>
+<h2 id="adding-custom-rules">Adding Custom Rules</h2>
 <p>See <a href="../../../tutorials/advanced/custom-stitching-rules/">Custom Stitching Rules Tutorial</a>.</p>
 
 
@@ -6244,6 +6244,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

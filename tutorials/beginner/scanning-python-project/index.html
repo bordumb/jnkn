@@ -5996,15 +5996,15 @@
   
 
 
-<h1 id="scanning-a-python-project">Scanning a Python Project<a class="headerlink" href="#scanning-a-python-project" title="Permanent link">&para;</a></h1>
+<h1 id="scanning-a-python-project">Scanning a Python Project</h1>
 <p>Learn to detect environment variables in a Python application.</p>
 <p><strong>Time:</strong> 10 minutes</p>
-<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<h2 id="prerequisites">Prerequisites</h2>
 <ul>
 <li>Jnkn installed (<code>pip install jnkn[full]</code>)</li>
 <li>A Python project (or use our example)</li>
 </ul>
-<h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h2>
+<h2 id="setup">Setup</h2>
 <p>If you don't have a project, create a sample:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>mkdir<span class="w"> </span>jnkn-tutorial<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>jnkn-tutorial
 </code></pre></div>
@@ -6036,7 +6036,7 @@
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_cache</span><span class="p">():</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="k">return</span> <span class="n">Redis</span><span class="o">.</span><span class="n">from_url</span><span class="p">(</span><span class="n">REDIS_URL</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="scan">Scan<a class="headerlink" href="#scan" title="Permanent link">&para;</a></h2>
+<h2 id="scan">Scan</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>jnkn<span class="w"> </span>init
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>jnkn<span class="w"> </span>scan
 </code></pre></div>
@@ -6053,7 +6053,7 @@
 <a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>  env:LOG_LEVEL            (os.environ.get)
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>  env:DATABASE_URL         (os.getenv)
 </code></pre></div>
-<h2 id="understanding-the-output">Understanding the Output<a class="headerlink" href="#understanding-the-output" title="Permanent link">&para;</a></h2>
+<h2 id="understanding-the-output">Understanding the Output</h2>
 <p>Jnkn detected <strong>6 environment variables</strong> from multiple patterns:</p>
 <table>
 <thead>
@@ -6100,7 +6100,7 @@
 <p class="admonition-title">Potential Bug Detected</p>
 <p>Notice <code>DATABASE_URL</code> and <code>APP_DATABASE_URL</code> — these might be the same intent but different names. Jnkn helps you spot these inconsistencies.</p>
 </div>
-<h2 id="view-the-graph">View the Graph<a class="headerlink" href="#view-the-graph" title="Permanent link">&para;</a></h2>
+<h2 id="view-the-graph">View the Graph</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>jnkn<span class="w"> </span>stats
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>📊 Graph Statistics
@@ -6112,7 +6112,7 @@
 <a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>Edges by Type:
 <a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>  reads:        6
 </code></pre></div>
-<h2 id="explore-dependencies">Explore Dependencies<a class="headerlink" href="#explore-dependencies" title="Permanent link">&para;</a></h2>
+<h2 id="explore-dependencies">Explore Dependencies</h2>
 <p>Which files read <code>REDIS_URL</code>?</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:REDIS_URL
 </code></pre></div>
@@ -6122,7 +6122,7 @@
 <a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;total_impacted&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">}</span>
 </code></pre></div>
-<h2 id="supported-python-patterns">Supported Python Patterns<a class="headerlink" href="#supported-python-patterns" title="Permanent link">&para;</a></h2>
+<h2 id="supported-python-patterns">Supported Python Patterns</h2>
 <p>Jnkn detects these patterns automatically:</p>
 <table>
 <thead>
@@ -6163,10 +6163,10 @@
 </tbody>
 </table>
 <p>See <a href="../../../reference/patterns/python-env-vars/">Python Patterns Reference</a> for the full list.</p>
-<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<h2 id="next-steps">Next Steps</h2>
 <ul>
-<li><a href="../understanding-blast-radius/">:octicons-arrow-right-24: Understanding Blast Radius</a></li>
-<li><a href="../../intermediate/multi-stack-analysis/">:octicons-arrow-right-24: Add Terraform to your scan</a></li>
+<li><a href="../understanding-blast-radius/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Understanding Blast Radius</a></li>
+<li><a href="../../intermediate/multi-stack-analysis/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Add Terraform to your scan</a></li>
 </ul>
 
 
@@ -6227,6 +6227,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

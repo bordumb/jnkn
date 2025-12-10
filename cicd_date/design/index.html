@@ -6286,14 +6286,14 @@
   
 
 
-<h1 id="cicd-gate-design">CI/CD Gate Design<a class="headerlink" href="#cicd-gate-design" title="Permanent link">&para;</a></h1>
+<h1 id="cicd-gate-design">CI/CD Gate Design</h1>
 <blockquote>
 <p><strong>Version:</strong> 1.0.0<br />
 <strong>Last Updated:</strong> December 2024</p>
 </blockquote>
 <p>This document describes the design and implementation of Jnkn's CI/CD gate - a pre-merge enforcement layer that prevents breaking changes from reaching production.</p>
 <hr />
-<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
+<h2 id="table-of-contents">Table of Contents</h2>
 <ol>
 <li><a href="#value-proposition">Value Proposition</a></li>
 <li><a href="#the-problem-we-solve">The Problem We Solve</a></li>
@@ -6308,10 +6308,10 @@
 <li><a href="#deployment-guide">Deployment Guide</a></li>
 </ol>
 <hr />
-<h2 id="value-proposition">Value Proposition<a class="headerlink" href="#value-proposition" title="Permanent link">&para;</a></h2>
-<h3 id="the-one-liner">The One-Liner<a class="headerlink" href="#the-one-liner" title="Permanent link">&para;</a></h3>
+<h2 id="value-proposition">Value Proposition</h2>
+<h3 id="the-one-liner">The One-Liner</h3>
 <p><strong>Jnkn's CI/CD gate tells you "this PR will break the executive dashboard" before you merge, not after the CEO asks why the numbers are wrong.</strong></p>
-<h3 id="before-jnkn">Before Jnkn<a class="headerlink" href="#before-jnkn" title="Permanent link">&para;</a></h3>
+<h3 id="before-jnkn">Before Jnkn</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Developer → PR → Code Review → Merge → Deploy → Run → Silent Failure → Alert
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                      │                                       │
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                      │                                       ▼
@@ -6328,7 +6328,7 @@
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>              - Which dashboards depend on it
 <a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>              - Which ML models use it as input
 </code></pre></div>
-<h3 id="after-jnkn">After Jnkn<a class="headerlink" href="#after-jnkn" title="Permanent link">&para;</a></h3>
+<h3 id="after-jnkn">After Jnkn</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Developer → PR → Jnkn Check → Decision
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>                      │
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>                      ├─→ PASS: Safe to merge
@@ -6343,7 +6343,7 @@
 <a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>                      - Approvals requested
 <a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>                      - Impact documented
 </code></pre></div>
-<h3 id="quantified-value">Quantified Value<a class="headerlink" href="#quantified-value" title="Permanent link">&para;</a></h3>
+<h3 id="quantified-value">Quantified Value</h3>
 <table>
 <thead>
 <tr>
@@ -6381,8 +6381,8 @@
 </tbody>
 </table>
 <hr />
-<h2 id="the-problem-we-solve">The Problem We Solve<a class="headerlink" href="#the-problem-we-solve" title="Permanent link">&para;</a></h2>
-<h3 id="silent-data-pipeline-failures">Silent Data Pipeline Failures<a class="headerlink" href="#silent-data-pipeline-failures" title="Permanent link">&para;</a></h3>
+<h2 id="the-problem-we-solve">The Problem We Solve</h2>
+<h3 id="silent-data-pipeline-failures">Silent Data Pipeline Failures</h3>
 <p>Data pipelines don't crash - they produce wrong data. A schema change, a filter modification, a column rename - none of these throw errors. They silently propagate incorrect data downstream.</p>
 <pre class="mermaid"><code>graph LR
     subgraph "The Silent Failure Chain"
@@ -6395,7 +6395,7 @@
 
     style CHANGE fill:#4dabf7,stroke:#1971c2,color:#fff
     style CEO fill:#ff6b6b,stroke:#c92a2a,color:#fff</code></pre>
-<h3 id="the-knowledge-gap">The Knowledge Gap<a class="headerlink" href="#the-knowledge-gap" title="Permanent link">&para;</a></h3>
+<h3 id="the-knowledge-gap">The Knowledge Gap</h3>
 <p>The developer making a change often doesn't know:</p>
 <ol>
 <li><strong>Who consumes their output</strong> - "I didn't know the ML team uses this table"</li>
@@ -6407,8 +6407,8 @@
 - <strong>Tribal knowledge</strong>: Who owns what, what's critical</p>
 <p>Jnkn bridges both gaps.</p>
 <hr />
-<h2 id="solution-overview">Solution Overview<a class="headerlink" href="#solution-overview" title="Permanent link">&para;</a></h2>
-<h3 id="core-concept">Core Concept<a class="headerlink" href="#core-concept" title="Permanent link">&para;</a></h3>
+<h2 id="solution-overview">Solution Overview</h2>
+<h3 id="core-concept">Core Concept</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>┌─────────────────────────────────────────────────────────────────────┐
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>│                         jnkn check                                │
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>├─────────────────────────────────────────────────────────────────────┤
@@ -6440,7 +6440,7 @@
 <a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>│                                                                     │
 <a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>└─────────────────────────────────────────────────────────────────────┘
 </code></pre></div>
-<h3 id="key-design-principles">Key Design Principles<a class="headerlink" href="#key-design-principles" title="Permanent link">&para;</a></h3>
+<h3 id="key-design-principles">Key Design Principles</h3>
 <ol>
 <li><strong>Fail-safe defaults</strong>: Unknown assets are flagged, not ignored</li>
 <li><strong>Configurable severity</strong>: Business defines what's critical</li>
@@ -6449,8 +6449,8 @@
 <li><strong>CI-native</strong>: Exit codes, JSON output, environment variable support</li>
 </ol>
 <hr />
-<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
-<h3 id="component-diagram">Component Diagram<a class="headerlink" href="#component-diagram" title="Permanent link">&para;</a></h3>
+<h2 id="architecture">Architecture</h2>
+<h3 id="component-diagram">Component Diagram</h3>
 <pre class="mermaid"><code>graph TB
     subgraph "Input Sources"
         GIT[Git Diff]
@@ -6492,7 +6492,7 @@
     ENGINE --&gt; MARKDOWN
 
     style ENGINE fill:#4dabf7,stroke:#1971c2,color:#fff</code></pre>
-<h3 id="class-hierarchy">Class Hierarchy<a class="headerlink" href="#class-hierarchy" title="Permanent link">&para;</a></h3>
+<h3 id="class-hierarchy">Class Hierarchy</h3>
 <pre class="mermaid"><code>classDiagram
     class CheckEngine {
         -Policy policy
@@ -6554,8 +6554,8 @@
     CheckReport --&gt; ChangedFile
     CheckReport --&gt; AffectedAsset</code></pre>
 <hr />
-<h2 id="data-flow">Data Flow<a class="headerlink" href="#data-flow" title="Permanent link">&para;</a></h2>
-<h3 id="sequence-diagram">Sequence Diagram<a class="headerlink" href="#sequence-diagram" title="Permanent link">&para;</a></h3>
+<h2 id="data-flow">Data Flow</h2>
+<h3 id="sequence-diagram">Sequence Diagram</h3>
 <pre class="mermaid"><code>sequenceDiagram
     participant CI as CI Pipeline
     participant Check as jnkn check
@@ -6601,7 +6601,7 @@
     else Exit Code 0 (PASS)
         CI-&gt;&gt;CI: Pass
     end</code></pre>
-<h3 id="blast-radius-expansion">Blast Radius Expansion<a class="headerlink" href="#blast-radius-expansion" title="Permanent link">&para;</a></h3>
+<h3 id="blast-radius-expansion">Blast Radius Expansion</h3>
 <pre class="mermaid"><code>graph TB
     subgraph "Direct Impact (from code)"
         FILE[daily_user_etl.py]
@@ -6643,8 +6643,8 @@
     style FILE fill:#4dabf7,stroke:#1971c2,color:#fff
     style CRITICAL fill:#ff6b6b,stroke:#c92a2a,color:#fff</code></pre>
 <hr />
-<h2 id="policy-engine">Policy Engine<a class="headerlink" href="#policy-engine" title="Permanent link">&para;</a></h2>
-<h3 id="policy-configuration">Policy Configuration<a class="headerlink" href="#policy-configuration" title="Permanent link">&para;</a></h3>
+<h2 id="policy-engine">Policy Engine</h2>
+<h3 id="policy-configuration">Policy Configuration</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># policy.yaml</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Global settings</span>
@@ -6685,7 +6685,7 @@
 <a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;@data-engineering&quot;</span>
 <a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a><span class="w">    </span><span class="nt">require_approval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div>
-<h3 id="pattern-matching">Pattern Matching<a class="headerlink" href="#pattern-matching" title="Permanent link">&para;</a></h3>
+<h3 id="pattern-matching">Pattern Matching</h3>
 <pre class="mermaid"><code>graph TB
     subgraph "Asset ID"
         ASSET["data:redshift/analytics.exec_dashboard"]
@@ -6711,7 +6711,7 @@
 
     style MATCH fill:#40c057,stroke:#2f9e44,color:#fff
     style RESULT fill:#ff6b6b,stroke:#c92a2a,color:#fff</code></pre>
-<h3 id="severity-levels">Severity Levels<a class="headerlink" href="#severity-levels" title="Permanent link">&para;</a></h3>
+<h3 id="severity-levels">Severity Levels</h3>
 <table>
 <thead>
 <tr>
@@ -6749,8 +6749,8 @@
 </tbody>
 </table>
 <hr />
-<h2 id="exit-codes-and-gate-logic">Exit Codes and Gate Logic<a class="headerlink" href="#exit-codes-and-gate-logic" title="Permanent link">&para;</a></h2>
-<h3 id="decision-tree">Decision Tree<a class="headerlink" href="#decision-tree" title="Permanent link">&para;</a></h3>
+<h2 id="exit-codes-and-gate-logic">Exit Codes and Gate Logic</h2>
+<h3 id="decision-tree">Decision Tree</h3>
 <pre class="mermaid"><code>flowchart TB
     START[Start Check] --&gt; ANALYZE[Analyze Changed Files]
     ANALYZE --&gt; EXPAND[Expand Blast Radius]
@@ -6776,7 +6776,7 @@
     style BLOCKED fill:#ff6b6b,stroke:#c92a2a,color:#fff
     style WARN fill:#fab005,stroke:#f59f00,color:#000
     style PASS fill:#40c057,stroke:#2f9e44,color:#fff</code></pre>
-<h3 id="exit-code-semantics">Exit Code Semantics<a class="headerlink" href="#exit-code-semantics" title="Permanent link">&para;</a></h3>
+<h3 id="exit-code-semantics">Exit Code Semantics</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Exit 0 (PASS)
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>─────────────
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>- No policy violations
@@ -6798,8 +6798,8 @@
 <a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>- Approval recommended but not required
 </code></pre></div>
 <hr />
-<h2 id="integration-points">Integration Points<a class="headerlink" href="#integration-points" title="Permanent link">&para;</a></h2>
-<h3 id="github-actions">GitHub Actions<a class="headerlink" href="#github-actions" title="Permanent link">&para;</a></h3>
+<h2 id="integration-points">Integration Points</h2>
+<h3 id="github-actions">GitHub Actions</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Jnkn Impact Analysis</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nt">on</span><span class="p">:</span>
@@ -6839,7 +6839,7 @@
 <a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a><span class="w">        </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steps.jnkn.outcome == &#39;failure&#39;</span>
 <a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">exit 1</span>
 </code></pre></div>
-<h3 id="gitlab-ci">GitLab CI<a class="headerlink" href="#gitlab-ci" title="Permanent link">&para;</a></h3>
+<h3 id="gitlab-ci">GitLab CI</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">jnkn-check</span><span class="p">:</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">stage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">validate</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">script</span><span class="p">:</span>
@@ -6856,7 +6856,7 @@
 <a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="nt">exit_codes</span><span class="p">:</span>
 <a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">  </span><span class="c1"># Allow WARN to pass</span>
 </code></pre></div>
-<h3 id="jenkins">Jenkins<a class="headerlink" href="#jenkins" title="Permanent link">&para;</a></h3>
+<h3 id="jenkins">Jenkins</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">pipeline</span><span class="w"> </span><span class="o">{</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="n">stages</span><span class="w"> </span><span class="o">{</span>
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">        </span><span class="n">stage</span><span class="o">(</span><span class="s1">&#39;Impact Analysis&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span>
@@ -6881,8 +6881,8 @@
 <a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="o">}</span>
 </code></pre></div>
 <hr />
-<h2 id="technical-implementation">Technical Implementation<a class="headerlink" href="#technical-implementation" title="Permanent link">&para;</a></h2>
-<h3 id="command-interface">Command Interface<a class="headerlink" href="#command-interface" title="Permanent link">&para;</a></h3>
+<h2 id="technical-implementation">Technical Implementation</h2>
+<h3 id="command-interface">Command Interface</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;--diff&quot;</span><span class="p">,</span> <span class="s2">&quot;diff_file&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>              <span class="n">help</span><span class="o">=</span><span class="s2">&quot;File containing list of changed files&quot;</span><span class="p">)</span>
@@ -6905,7 +6905,7 @@
 <a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="k">def</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
 <a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Run pre-merge impact analysis.&quot;&quot;&quot;</span>
 </code></pre></div>
-<h3 id="core-algorithm">Core Algorithm<a class="headerlink" href="#core-algorithm" title="Permanent link">&para;</a></h3>
+<h3 id="core-algorithm">Core Algorithm</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">CheckEngine</span><span class="p">:</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">changed_files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ChangedFile</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">CheckReport</span><span class="p">:</span>
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>        <span class="c1"># Step 1: Load runtime lineage (if configured)</span>
@@ -6935,7 +6935,7 @@
 <a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a>            <span class="n">violations</span><span class="o">=</span><span class="n">violations</span><span class="p">,</span>
 <a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a>        <span class="p">)</span>
 </code></pre></div>
-<h3 id="output-formats">Output Formats<a class="headerlink" href="#output-formats" title="Permanent link">&para;</a></h3>
+<h3 id="output-formats">Output Formats</h3>
 <p><strong>Text (Terminal)</strong>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>╔════════════════════════════════════════╗
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>║  ❌ BLOCKED - Critical Impact Detected ║
@@ -6984,8 +6984,8 @@
 <a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="k">-</span><span class="w"> </span><span class="gs">**exec_dashboard**</span> (owners: <span class="ni">@data</span>-platform-team)
 </code></pre></div></p>
 <hr />
-<h2 id="usage-examples">Usage Examples<a class="headerlink" href="#usage-examples" title="Permanent link">&para;</a></h2>
-<h3 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h3>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="basic-usage">Basic Usage</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Diff against main branch</span>
 <a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>jnkn<span class="w"> </span>check<span class="w"> </span>--git-diff<span class="w"> </span>main<span class="w"> </span>HEAD
 <a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
@@ -6995,19 +6995,19 @@
 <a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1"># From GitHub PR</span>
 <a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>jnkn<span class="w"> </span>check<span class="w"> </span>--github-pr<span class="w"> </span><span class="m">123</span><span class="w"> </span>--repo<span class="w"> </span>myorg/myrepo
 </code></pre></div>
-<h3 id="with-openlineage">With OpenLineage<a class="headerlink" href="#with-openlineage" title="Permanent link">&para;</a></h3>
+<h3 id="with-openlineage">With OpenLineage</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Enrich with runtime lineage</span>
 <a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>jnkn<span class="w"> </span>check<span class="w"> </span>--git-diff<span class="w"> </span>main<span class="w"> </span>HEAD<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span>--openlineage-url<span class="w"> </span>http://marquez:5000<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span>--openlineage-namespace<span class="w"> </span>spark-production
 </code></pre></div>
-<h3 id="with-policy">With Policy<a class="headerlink" href="#with-policy" title="Permanent link">&para;</a></h3>
+<h3 id="with-policy">With Policy</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Apply business rules</span>
 <a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>jnkn<span class="w"> </span>check<span class="w"> </span>--git-diff<span class="w"> </span>main<span class="w"> </span>HEAD<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span>--policy<span class="w"> </span>policy.yaml<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span>--fail-if-critical
 </code></pre></div>
-<h3 id="full-ci-integration">Full CI Integration<a class="headerlink" href="#full-ci-integration" title="Permanent link">&para;</a></h3>
+<h3 id="full-ci-integration">Full CI Integration</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Complete example for CI</span>
 <a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>jnkn<span class="w"> </span>check<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span>--git-diff<span class="w"> </span>origin/main<span class="w"> </span>HEAD<span class="w"> </span><span class="se">\</span>
@@ -7026,15 +7026,15 @@
 <a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="k">fi</span>
 </code></pre></div>
 <hr />
-<h2 id="deployment-guide">Deployment Guide<a class="headerlink" href="#deployment-guide" title="Permanent link">&para;</a></h2>
-<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<h2 id="deployment-guide">Deployment Guide</h2>
+<h3 id="prerequisites">Prerequisites</h3>
 <ol>
 <li><strong>Jnkn installed</strong>: <code>pip install jnkn</code></li>
 <li><strong>Git available</strong>: For diff parsing</li>
 <li><strong>OpenLineage/Marquez</strong> (optional): For runtime enrichment</li>
 <li><strong>Policy file</strong>: Define your critical assets</li>
 </ol>
-<h3 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h3>
+<h3 id="quick-start">Quick Start</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># 1. Create policy file</span>
 <a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>cat<span class="w"> </span>&gt;<span class="w"> </span>policy.yaml<span class="w"> </span><span class="s">&lt;&lt; &#39;EOF&#39;</span>
 <a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="s">block_on_critical: true</span>
@@ -7052,7 +7052,7 @@
 <a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="c1"># 3. Add to CI pipeline</span>
 <a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a><span class="c1"># (see GitHub Actions example above)</span>
 </code></pre></div>
-<h3 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h3>
+<h3 id="environment-variables">Environment Variables</h3>
 <table>
 <thead>
 <tr>
@@ -7084,7 +7084,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="rollout-strategy">Rollout Strategy<a class="headerlink" href="#rollout-strategy" title="Permanent link">&para;</a></h3>
+<h3 id="rollout-strategy">Rollout Strategy</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>Phase 1: Shadow Mode (Week 1-2)
 <a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>───────────────────────────────
 <a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>- Run check but don&#39;t block
@@ -7104,8 +7104,8 @@
 <a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a>- Full enforcement active
 </code></pre></div>
 <hr />
-<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
-<h3 id="what-we-built">What We Built<a class="headerlink" href="#what-we-built" title="Permanent link">&para;</a></h3>
+<h2 id="summary">Summary</h2>
+<h3 id="what-we-built">What We Built</h3>
 <table>
 <thead>
 <tr>
@@ -7132,14 +7132,14 @@
 </tr>
 </tbody>
 </table>
-<h3 id="key-differentiators">Key Differentiators<a class="headerlink" href="#key-differentiators" title="Permanent link">&para;</a></h3>
+<h3 id="key-differentiators">Key Differentiators</h3>
 <ol>
 <li><strong>Pre-merge, not post-facto</strong> - Catch issues before they cause damage</li>
 <li><strong>OpenLineage integration</strong> - Real production dependencies, not guesses</li>
 <li><strong>Policy-driven</strong> - Business defines what's critical</li>
 <li><strong>CI-native</strong> - Exit codes, artifacts, PR comments</li>
 </ol>
-<h3 id="whats-next">What's Next<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h3>
+<h3 id="whats-next">What's Next</h3>
 <ol>
 <li><strong>Diff-aware analysis</strong> - "Column X removed" vs "file changed"</li>
 <li><strong>Approval workflows</strong> - Native GitHub/GitLab approval integration</li>
@@ -7205,6 +7205,8 @@
     
     
       <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

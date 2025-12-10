@@ -5915,9 +5915,9 @@
   
 
 
-<h1 id="release-process">Release Process<a class="headerlink" href="#release-process" title="Permanent link">&para;</a></h1>
+<h1 id="release-process">Release Process</h1>
 <p>This document outlines the steps required to publish a new version of <code>jnkn</code> to PyPI and update the documentation site.</p>
-<h2 id="versioning-strategy">Versioning Strategy<a class="headerlink" href="#versioning-strategy" title="Permanent link">&para;</a></h2>
+<h2 id="versioning-strategy">Versioning Strategy</h2>
 <p><code>jnkn</code> follows <a href="https://semver.org/">Semantic Versioning 2.0.0</a>:</p>
 <ul>
 <li><strong>MAJOR</strong> version when you make incompatible API changes.</li>
@@ -5927,14 +5927,14 @@
 <p><strong>Pre-releases:</strong>
 For beta or release candidates, append a suffix like <code>-beta.1</code> or <code>-rc.1</code>.
 * Example: <code>0.5.0-rc.1</code></p>
-<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<h2 id="prerequisites">Prerequisites</h2>
 <p>To perform a release, you must have:</p>
 <ol>
 <li><strong>Write access</strong> to the <a href="https://github.com/jnkn-io/jnkn">GitHub repository</a>.</li>
 <li><strong>Admin access</strong> on <a href="https://pypi.org/project/jnkn/">PyPI</a> (or be part of the trusted publisher workflow).</li>
 </ol>
-<h2 id="step-by-step-guide">Step-by-Step Guide<a class="headerlink" href="#step-by-step-guide" title="Permanent link">&para;</a></h2>
-<h3 id="1-prepare-the-release">1. Prepare the Release<a class="headerlink" href="#1-prepare-the-release" title="Permanent link">&para;</a></h3>
+<h2 id="step-by-step-guide">Step-by-Step Guide</h2>
+<h3 id="1-prepare-the-release">1. Prepare the Release</h3>
 <p>Before tagging, ensure the codebase is ready.</p>
 <ol>
 <li>
@@ -5956,15 +5956,15 @@ For beta or release candidates, append a suffix like <code>-beta.1</code> or <co
 </code></pre></div></p>
 </li>
 </ol>
-<h3 id="2-tag-and-push">2. Tag and Push<a class="headerlink" href="#2-tag-and-push" title="Permanent link">&para;</a></h3>
+<h3 id="2-tag-and-push">2. Tag and Push</h3>
 <p>Create a git tag for the version. The tag <strong>must</strong> match the version in <code>pyproject.toml</code>.</p>
 <p>```bash</p>
-<h1 id="create-an-annotated-tag">Create an annotated tag<a class="headerlink" href="#create-an-annotated-tag" title="Permanent link">&para;</a></h1>
+<h1 id="create-an-annotated-tag">Create an annotated tag</h1>
 <p>git tag -a v0.6.0 -m "Release v0.6.0"</p>
-<h1 id="push-the-commit-and-the-tag">Push the commit and the tag<a class="headerlink" href="#push-the-commit-and-the-tag" title="Permanent link">&para;</a></h1>
+<h1 id="push-the-commit-and-the-tag">Push the commit and the tag</h1>
 <p>git push origin main --follow-tags
 ````</p>
-<h3 id="3-create-github-release">3. Create GitHub Release<a class="headerlink" href="#3-create-github-release" title="Permanent link">&para;</a></h3>
+<h3 id="3-create-github-release">3. Create GitHub Release</h3>
 <p>This is the trigger for our deployment pipeline.</p>
 <ol>
 <li>Go to the <a href="https://github.com/bordumb/jnkn/releases">Releases page</a> on GitHub.</li>
@@ -5975,9 +5975,9 @@ For beta or release candidates, append a suffix like <code>-beta.1</code> or <co
 <li>Click <strong>Publish release</strong>.</li>
 </ol>
 <hr />
-<h2 id="automated-pipeline">Automated Pipeline<a class="headerlink" href="#automated-pipeline" title="Permanent link">&para;</a></h2>
+<h2 id="automated-pipeline">Automated Pipeline</h2>
 <p>Once you click "Publish release", GitHub Actions takes over.</p>
-<h3 id="1-pypi-publication">1. PyPI Publication<a class="headerlink" href="#1-pypi-publication" title="Permanent link">&para;</a></h3>
+<h3 id="1-pypi-publication">1. PyPI Publication</h3>
 <ul>
 <li><strong>Workflow:</strong> <code>.github/workflows/pypi-publish.yml</code></li>
 <li><strong>Trigger:</strong> Release published.</li>
@@ -5988,7 +5988,7 @@ For beta or release candidates, append a suffix like <code>-beta.1</code> or <co
 </ul>
 </li>
 </ul>
-<h3 id="2-documentation-deployment">2. Documentation Deployment<a class="headerlink" href="#2-documentation-deployment" title="Permanent link">&para;</a></h3>
+<h3 id="2-documentation-deployment">2. Documentation Deployment</h3>
 <ul>
 <li><strong>Workflow:</strong> <code>.github/workflows/docs-deploy.yml</code></li>
 <li><strong>Trigger:</strong> Push to <code>main</code> (which happened in Step 2) or Release.</li>
@@ -6001,7 +6001,7 @@ For beta or release candidates, append a suffix like <code>-beta.1</code> or <co
 </li>
 </ul>
 <hr />
-<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<h2 id="verification">Verification</h2>
 <p>After the pipelines complete (usually \~2-3 minutes), verify the release:</p>
 <ol>
 <li><strong>PyPI:</strong> Check <a href="https://pypi.org/project/jnkn/">pypi.org/project/jnkn/</a> to see the new version.</li>
@@ -6067,6 +6067,8 @@ For beta or release candidates, append a suffix like <code>-beta.1</code> or <co
     
     
       <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

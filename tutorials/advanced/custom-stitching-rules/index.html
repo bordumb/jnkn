@@ -6074,16 +6074,16 @@
   
 
 
-<h1 id="custom-stitching-rules">Custom Stitching Rules<a class="headerlink" href="#custom-stitching-rules" title="Permanent link">&para;</a></h1>
+<h1 id="custom-stitching-rules">Custom Stitching Rules</h1>
 <p>Create domain-specific rules for linking artifacts across your stack.</p>
 <p><strong>Time:</strong> 30 minutes</p>
-<h2 id="when-to-create-custom-rules">When to Create Custom Rules<a class="headerlink" href="#when-to-create-custom-rules" title="Permanent link">&para;</a></h2>
+<h2 id="when-to-create-custom-rules">When to Create Custom Rules</h2>
 <ul>
 <li>Your organization has naming conventions Jnkn doesn't know</li>
 <li>You need to link artifact types in specific ways</li>
 <li>Default token matching produces too many false positives</li>
 </ul>
-<h2 id="how-stitching-works">How Stitching Works<a class="headerlink" href="#how-stitching-works" title="Permanent link">&para;</a></h2>
+<h2 id="how-stitching-works">How Stitching Works</h2>
 <pre class="mermaid"><code>graph LR
     N1[Node A] --&gt; R{Rule Engine}
     N2[Node B] --&gt; R
@@ -6091,8 +6091,8 @@
     M --&gt; C[Confidence&lt;br/&gt;Calculator]
     C --&gt; E[Edge]</code></pre>
 <p>Rules filter which node pairs to consider. Matchers compute similarity. Confidence scores determine if a link is created.</p>
-<h2 id="creating-a-custom-rule">Creating a Custom Rule<a class="headerlink" href="#creating-a-custom-rule" title="Permanent link">&para;</a></h2>
-<h3 id="example-link-python-services-to-their-terraform-modules">Example: Link Python Services to Their Terraform Modules<a class="headerlink" href="#example-link-python-services-to-their-terraform-modules" title="Permanent link">&para;</a></h3>
+<h2 id="creating-a-custom-rule">Creating a Custom Rule</h2>
+<h3 id="example-link-python-services-to-their-terraform-modules">Example: Link Python Services to Their Terraform Modules</h3>
 <p>Convention: Python service <code>payment_service</code> should link to Terraform module <code>modules/payment</code>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># my_rules/service_to_module.py</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">jnkn.stitching.rules</span><span class="w"> </span><span class="kn">import</span> <span class="n">StitchingRule</span>
@@ -6161,7 +6161,7 @@
 <a id="__codelineno-0-65" name="__codelineno-0-65" href="#__codelineno-0-65"></a>
 <a id="__codelineno-0-66" name="__codelineno-0-66" href="#__codelineno-0-66"></a>        <span class="k">return</span> <span class="mf">0.0</span>
 </code></pre></div>
-<h3 id="register-the-rule">Register the Rule<a class="headerlink" href="#register-the-rule" title="Permanent link">&para;</a></h3>
+<h3 id="register-the-rule">Register the Rule</h3>
 <p>In <code>.jnkn/config.yaml</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">stitching</span><span class="p">:</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">extra_rules</span><span class="p">:</span>
@@ -6174,7 +6174,7 @@
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">engine</span> <span class="o">=</span> <span class="n">StitchingEngine</span><span class="p">()</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">engine</span><span class="o">.</span><span class="n">register_rule</span><span class="p">(</span><span class="n">ServiceToModuleRule</span><span class="p">())</span>
 </code></pre></div>
-<h2 id="rule-interface">Rule Interface<a class="headerlink" href="#rule-interface" title="Permanent link">&para;</a></h2>
+<h2 id="rule-interface">Rule Interface</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">StitchingRule</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="nd">@property</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="nd">@abstractmethod</span>
@@ -6203,7 +6203,7 @@
 <a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Optional: Add metadata to the created edge.&quot;&quot;&quot;</span>
 <a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;rule&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
 </code></pre></div>
-<h2 id="advanced-context-aware-rules">Advanced: Context-Aware Rules<a class="headerlink" href="#advanced-context-aware-rules" title="Permanent link">&para;</a></h2>
+<h2 id="advanced-context-aware-rules">Advanced: Context-Aware Rules</h2>
 <p>Rules can access the full graph for context:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">TransitiveDependencyRule</span><span class="p">(</span><span class="n">StitchingRule</span><span class="p">):</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Link nodes that share a common dependency.&quot;&quot;&quot;</span>
@@ -6225,7 +6225,7 @@
 <a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>        <span class="n">overlap</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">common</span><span class="p">)</span> <span class="o">/</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">source_deps</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_deps</span><span class="p">))</span>
 <a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">overlap</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="testing-rules">Testing Rules<a class="headerlink" href="#testing-rules" title="Permanent link">&para;</a></h2>
+<h2 id="testing-rules">Testing Rules</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">my_rules</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceToModuleRule</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">jnkn.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Node</span><span class="p">,</span> <span class="n">NodeType</span>
@@ -6266,7 +6266,7 @@
 <a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a>
 <a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a>        <span class="k">assert</span> <span class="n">rule</span><span class="o">.</span><span class="n">should_evaluate</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span>
 </code></pre></div>
-<h2 id="built-in-rules">Built-in Rules<a class="headerlink" href="#built-in-rules" title="Permanent link">&para;</a></h2>
+<h2 id="built-in-rules">Built-in Rules</h2>
 <p>Jnkn ships with these rules:</p>
 <table>
 <thead>
@@ -6299,15 +6299,15 @@
 </tr>
 </tbody>
 </table>
-<h2 id="disabling-built-in-rules">Disabling Built-in Rules<a class="headerlink" href="#disabling-built-in-rules" title="Permanent link">&para;</a></h2>
+<h2 id="disabling-built-in-rules">Disabling Built-in Rules</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">stitching</span><span class="p">:</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">disabled_rules</span><span class="p">:</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">EnvVarToInfraRule</span><span class="w">  </span><span class="c1"># Too many false positives for us</span>
 </code></pre></div>
-<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<h2 id="next-steps">Next Steps</h2>
 <ul>
-<li><a href="../../../explanation/architecture/confidence-model/">:octicons-arrow-right-24: Confidence model explanation</a></li>
-<li><a href="../../../explanation/architecture/stitching-engine/">:octicons-arrow-right-24: Stitching engine architecture</a></li>
+<li><a href="../../../explanation/architecture/confidence-model/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Confidence model explanation</a></li>
+<li><a href="../../../explanation/architecture/stitching-engine/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.22 19.03a.75.75 0 0 1 0-1.06L18.19 13H3.75a.75.75 0 0 1 0-1.5h14.44l-4.97-4.97a.749.749 0 0 1 .326-1.275.75.75 0 0 1 .734.215l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0"/></svg></span> Stitching engine architecture</a></li>
 </ul>
 
 
@@ -6368,6 +6368,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>

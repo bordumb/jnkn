@@ -6133,9 +6133,9 @@
   
 
 
-<h1 id="blast-radius">Blast Radius<a class="headerlink" href="#blast-radius" title="Permanent link">&para;</a></h1>
+<h1 id="blast-radius">Blast Radius</h1>
 <p>Understanding impact analysis.</p>
-<h2 id="definition">Definition<a class="headerlink" href="#definition" title="Permanent link">&para;</a></h2>
+<h2 id="definition">Definition</h2>
 <p><strong>Blast radius</strong> is the set of artifacts affected by a change.</p>
 <p>If you modify <code>env:DATABASE_URL</code>, what else might break?</p>
 <pre class="mermaid"><code>graph TD
@@ -6146,7 +6146,7 @@
 
     classDef source fill:#ff6b6b,stroke:#c92a2a</code></pre>
 <p><strong>Blast radius of <code>env:DATABASE_URL</code>:</strong> 4 artifacts</p>
-<h2 id="how-its-calculated">How It's Calculated<a class="headerlink" href="#how-its-calculated" title="Permanent link">&para;</a></h2>
+<h2 id="how-its-calculated">How It's Calculated</h2>
 <p>Jnkn uses <strong>Breadth-First Search (BFS)</strong> from the source node:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>1. Start at source node
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>2. Find all nodes with edges FROM source
@@ -6154,21 +6154,21 @@
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>4. Repeat from each impacted node
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>5. Stop at max_depth (if set)
 </code></pre></div>
-<h2 id="direct-vs-transitive">Direct vs. Transitive<a class="headerlink" href="#direct-vs-transitive" title="Permanent link">&para;</a></h2>
+<h2 id="direct-vs-transitive">Direct vs. Transitive</h2>
 <p><strong>Direct impact (depth 1):</strong>
 - <code>connection.py</code> — directly reads <code>DATABASE_URL</code>
 - <code>users.py</code> — directly reads <code>DATABASE_URL</code>
 - <code>aws_rds.main</code> — directly provides <code>DATABASE_URL</code></p>
 <p><strong>Transitive impact (depth 2+):</strong>
 - <code>api.py</code> — imports <code>connection.py</code>, which reads <code>DATABASE_URL</code></p>
-<h2 id="interpreting-results">Interpreting Results<a class="headerlink" href="#interpreting-results" title="Permanent link">&para;</a></h2>
+<h2 id="interpreting-results">Interpreting Results</h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;source_artifacts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;env:DATABASE_URL&quot;</span><span class="p">],</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;total_impacted_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;max_depth_reached&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="by-impact-size">By Impact Size<a class="headerlink" href="#by-impact-size" title="Permanent link">&para;</a></h3>
+<h3 id="by-impact-size">By Impact Size</h3>
 <table>
 <thead>
 <tr>
@@ -6195,7 +6195,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="by-artifact-type">By Artifact Type<a class="headerlink" href="#by-artifact-type" title="Permanent link">&para;</a></h3>
+<h3 id="by-artifact-type">By Artifact Type</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;breakdown&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;connection.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;users.py&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;api.py&quot;</span><span class="p">],</span>
@@ -6206,7 +6206,7 @@
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">}</span>
 </code></pre></div>
 <p>Infrastructure impact often needs more scrutiny than code impact.</p>
-<h2 id="limiting-depth">Limiting Depth<a class="headerlink" href="#limiting-depth" title="Permanent link">&para;</a></h2>
+<h2 id="limiting-depth">Limiting Depth</h2>
 <p>For large graphs, limit traversal:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Only direct dependencies</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--max-depth<span class="w"> </span><span class="m">1</span>
@@ -6214,25 +6214,25 @@
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Up to 3 levels</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:X<span class="w"> </span>--max-depth<span class="w"> </span><span class="m">3</span>
 </code></pre></div>
-<h2 id="multiple-sources">Multiple Sources<a class="headerlink" href="#multiple-sources" title="Permanent link">&para;</a></h2>
+<h2 id="multiple-sources">Multiple Sources</h2>
 <p>Analyze combined impact:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:DATABASE_URL<span class="w"> </span>env:REDIS_URL
 </code></pre></div>
 <p>Returns the <strong>union</strong> of all impacted artifacts.</p>
-<h2 id="use-cases">Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
-<h3 id="pre-merge-review">Pre-Merge Review<a class="headerlink" href="#pre-merge-review" title="Permanent link">&para;</a></h3>
+<h2 id="use-cases">Use Cases</h2>
+<h3 id="pre-merge-review">Pre-Merge Review</h3>
 <p>"What does this PR affect?"</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>file://terraform/rds.tf
 </code></pre></div>
-<h3 id="incident-response">Incident Response<a class="headerlink" href="#incident-response" title="Permanent link">&para;</a></h3>
+<h3 id="incident-response">Incident Response</h3>
 <p>"What could have caused this failure?"</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>infra:aws_rds.main<span class="w"> </span>--reverse
 </code></pre></div>
-<h3 id="change-planning">Change Planning<a class="headerlink" href="#change-planning" title="Permanent link">&para;</a></h3>
+<h3 id="change-planning">Change Planning</h3>
 <p>"If we deprecate this env var, what needs updating?"</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>jnkn<span class="w"> </span>blast<span class="w"> </span>env:LEGACY_API_KEY
 </code></pre></div>
-<h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
+<h2 id="limitations">Limitations</h2>
 <p>Blast radius shows <strong>potential</strong> impact, not guaranteed breakage:</p>
 <ul>
 <li>A code file might read an env var but handle missing values gracefully</li>
@@ -6299,6 +6299,8 @@
     
     
       <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
       
     
   </body>
