@@ -18,11 +18,23 @@ Usage:
     nodes, edges, stats = engine.scan_all()
 """
 
-__version__ = "0.4.0"
+import importlib.metadata
+
+# Fetch version from pyproject.toml (installed package metadata)
+try:
+    __version__ = importlib.metadata.version("jnkn")
+except importlib.metadata.PackageNotFoundError:
+    # Package is not installed (e.g. running from raw source without pip install -e .)
+    __version__ = "0.0.0"
 
 from .core.types import (
-    Node, Edge, NodeType, RelationshipType,
-    MatchStrategy, MatchResult, ScanMetadata,
+    Edge,
+    MatchResult,
+    MatchStrategy,
+    Node,
+    NodeType,
+    RelationshipType,
+    ScanMetadata,
 )
 
 __all__ = [

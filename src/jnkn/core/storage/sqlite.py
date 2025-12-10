@@ -9,17 +9,16 @@ Production-ready implementation featuring:
 - Proper index creation for query performance
 """
 
-import sqlite3
 import json
-from pathlib import Path
-from typing import List, Optional, Dict, Any
-from datetime import datetime
+import sqlite3
 from contextlib import contextmanager
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-from .base import StorageAdapter
-from ..types import Node, Edge, ScanMetadata, NodeType, RelationshipType, MatchStrategy
 from ..graph import DependencyGraph
-
+from ..types import Edge, MatchStrategy, Node, NodeType, RelationshipType, ScanMetadata
+from .base import StorageAdapter
 
 SCHEMA_VERSION = 2
 
@@ -34,11 +33,11 @@ class SQLiteStorage(StorageAdapter):
     - Recursive CTEs for efficient traversal queries
     - Proper indexing for common query patterns
     """
-    
+
     def __init__(self, db_path: Path):
         self.db_path = db_path
         self._init_db()
-    
+
     @contextmanager
     def _connection(self):
         """Context manager for database connections."""
@@ -58,11 +57,11 @@ class SQLiteStorage(StorageAdapter):
             raise
         finally:
             conn.close()
-    
+
     def _init_db(self) -> None:
         """Initialize database schema with versioning."""
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         with self._connection() as conn:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS schema_version (
@@ -71,22 +70,22 @@ class SQLiteStorage(StorageAdapter):
                     description TEXT
                 )
             """)
-            
+
             current_version = self._get_schema_version_internal(conn)
-            
+
             if current_version < SCHEMA_VERSION:
                 self._migrate(conn, current_version)
-    
+
     def _get_schema_version_internal(self, conn: sqlite3.Connection) -> int:
         """Get schema version using existing connection."""
         row = conn.execute(
             "SELECT MAX(version) as v FROM schema_version"
         ).fetchone()
         return row["v"] if row and row["v"] else 0
-    
+
     def _migrate(self, conn: sqlite3.Connection, from_version: int) -> None:
         """Run schema migrations."""
-        
+
         if from_version < 1:
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS nodes (
@@ -101,7 +100,7 @@ class SQLiteStorage(StorageAdapter):
                     created_at TEXT NOT NULL
                 )
             """)
-            
+
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS edges (
                     source_id TEXT NOT NULL,
@@ -114,7 +113,7 @@ class SQLiteStorage(StorageAdapter):
                     PRIMARY KEY (source_id, target_id, type)
                 )
             """)
-            
+
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS scan_metadata (
                     file_path TEXT PRIMARY KEY,
@@ -124,17 +123,17 @@ class SQLiteStorage(StorageAdapter):
                     edge_count INTEGER DEFAULT 0
                 )
             """)
-            
+
             conn.execute("CREATE INDEX IF NOT EXISTS idx_nodes_type ON nodes(type)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_nodes_path ON nodes(path)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_edges_source ON edges(source_id)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_edges_target ON edges(target_id)")
-            
+
             conn.execute("""
                 INSERT INTO schema_version (version, applied_at, description)
                 VALUES (1, ?, 'Initial schema')
             """, (datetime.utcnow().isoformat(),))
-        
+
         if from_version < 2:
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_edges_confidence ON edges(confidence)"
@@ -143,12 +142,12 @@ class SQLiteStorage(StorageAdapter):
                 INSERT INTO schema_version (version, applied_at, description)
                 VALUES (2, ?, 'Added confidence index')
             """, (datetime.utcnow().isoformat(),))
-    
+
     def get_schema_version(self) -> int:
         """Get the current schema version."""
         with self._connection() as conn:
             return self._get_schema_version_internal(conn)
-    
+
     def save_node(self, node: Node) -> None:
         """Persist a single node."""
         with self._connection() as conn:
@@ -161,12 +160,12 @@ class SQLiteStorage(StorageAdapter):
                 node.language, node.file_hash, json.dumps(node.tokens),
                 json.dumps(node.metadata), node.created_at.isoformat(),
             ))
-    
+
     def save_nodes_batch(self, nodes: List[Node]) -> int:
         """Persist multiple nodes in a single transaction."""
         if not nodes:
             return 0
-        
+
         with self._connection() as conn:
             conn.executemany("""
                 INSERT OR REPLACE INTO nodes 
@@ -178,7 +177,7 @@ class SQLiteStorage(StorageAdapter):
                 for n in nodes
             ])
         return len(nodes)
-    
+
     def load_node(self, node_id: str) -> Optional[Node]:
         """Load a node by ID."""
         with self._connection() as conn:
@@ -186,7 +185,7 @@ class SQLiteStorage(StorageAdapter):
                 "SELECT * FROM nodes WHERE id = ?", (node_id,)
             ).fetchone()
             return self._row_to_node(row) if row else None
-    
+
     def load_all_nodes(self) -> List[Node]:
         """Load all nodes from storage."""
         nodes = []
@@ -197,7 +196,7 @@ class SQLiteStorage(StorageAdapter):
                 except Exception:
                     pass
         return nodes
-    
+
     def _row_to_node(self, row: sqlite3.Row) -> Node:
         """Convert a database row to a Node object."""
         return Node(
@@ -211,7 +210,7 @@ class SQLiteStorage(StorageAdapter):
             metadata=json.loads(row["metadata"]) if row["metadata"] else {},
             created_at=datetime.fromisoformat(row["created_at"]),
         )
-    
+
     def delete_node(self, node_id: str) -> bool:
         """Delete a node and its associated edges."""
         with self._connection() as conn:
@@ -221,29 +220,29 @@ class SQLiteStorage(StorageAdapter):
             )
             cursor = conn.execute("DELETE FROM nodes WHERE id = ?", (node_id,))
             return cursor.rowcount > 0
-    
+
     def delete_nodes_by_file(self, file_path: str) -> int:
         """Delete all nodes originating from a file."""
         with self._connection() as conn:
             rows = conn.execute(
                 "SELECT id FROM nodes WHERE path = ?", (file_path,)
             ).fetchall()
-            
+
             node_ids = [row["id"] for row in rows]
             if not node_ids:
                 return 0
-            
+
             placeholders = ",".join("?" * len(node_ids))
             conn.execute(f"""
                 DELETE FROM edges 
                 WHERE source_id IN ({placeholders}) OR target_id IN ({placeholders})
             """, node_ids + node_ids)
-            
+
             cursor = conn.execute(
                 f"DELETE FROM nodes WHERE id IN ({placeholders})", node_ids
             )
             return cursor.rowcount
-    
+
     def save_edge(self, edge: Edge) -> None:
         """Persist a single edge."""
         with self._connection() as conn:
@@ -256,12 +255,12 @@ class SQLiteStorage(StorageAdapter):
                 edge.match_strategy.value if edge.match_strategy else None,
                 json.dumps(edge.metadata), edge.created_at.isoformat(),
             ))
-    
+
     def save_edges_batch(self, edges: List[Edge]) -> int:
         """Persist multiple edges in a single transaction."""
         if not edges:
             return 0
-        
+
         with self._connection() as conn:
             conn.executemany("""
                 INSERT OR REPLACE INTO edges 
@@ -274,7 +273,7 @@ class SQLiteStorage(StorageAdapter):
                 for e in edges
             ])
         return len(edges)
-    
+
     def load_all_edges(self) -> List[Edge]:
         """Load all edges from storage."""
         edges = []
@@ -285,7 +284,7 @@ class SQLiteStorage(StorageAdapter):
                 except Exception:
                     pass
         return edges
-    
+
     def _row_to_edge(self, row: sqlite3.Row) -> Edge:
         """Convert a database row to an Edge object."""
         return Edge(
@@ -297,7 +296,7 @@ class SQLiteStorage(StorageAdapter):
             metadata=json.loads(row["metadata"]) if row["metadata"] else {},
             created_at=datetime.fromisoformat(row["created_at"]),
         )
-    
+
     def delete_edges_by_source(self, source_id: str) -> int:
         """Delete all edges from a source node."""
         with self._connection() as conn:
@@ -305,7 +304,7 @@ class SQLiteStorage(StorageAdapter):
                 "DELETE FROM edges WHERE source_id = ?", (source_id,)
             )
             return cursor.rowcount
-    
+
     def load_graph(self) -> DependencyGraph:
         """Hydrate a full DependencyGraph from storage."""
         graph = DependencyGraph()
@@ -314,7 +313,7 @@ class SQLiteStorage(StorageAdapter):
         for edge in self.load_all_edges():
             graph.add_edge(edge)
         return graph
-    
+
     def query_descendants(self, node_id: str, max_depth: int = -1) -> List[str]:
         """Query all descendants using recursive CTE."""
         with self._connection() as conn:
@@ -342,7 +341,7 @@ class SQLiteStorage(StorageAdapter):
                     SELECT DISTINCT id FROM descendants
                 """, (node_id, max_depth)).fetchall()
             return [row["id"] for row in rows]
-    
+
     def query_ancestors(self, node_id: str, max_depth: int = -1) -> List[str]:
         """Query all ancestors using recursive CTE."""
         with self._connection() as conn:
@@ -370,7 +369,7 @@ class SQLiteStorage(StorageAdapter):
                     SELECT DISTINCT id FROM ancestors
                 """, (node_id, max_depth)).fetchall()
             return [row["id"] for row in rows]
-    
+
     def save_scan_metadata(self, metadata: ScanMetadata) -> None:
         """Save file scan metadata."""
         with self._connection() as conn:
@@ -383,17 +382,17 @@ class SQLiteStorage(StorageAdapter):
                 metadata.last_scanned.isoformat(),
                 metadata.node_count, metadata.edge_count,
             ))
-    
+
     def get_scan_metadata(self, file_path: str) -> Optional[ScanMetadata]:
         """Get scan metadata for a file."""
         with self._connection() as conn:
             row = conn.execute(
                 "SELECT * FROM scan_metadata WHERE file_path = ?", (file_path,)
             ).fetchone()
-            
+
             if not row:
                 return None
-            
+
             return ScanMetadata(
                 file_path=row["file_path"],
                 file_hash=row["file_hash"],
@@ -401,7 +400,7 @@ class SQLiteStorage(StorageAdapter):
                 node_count=row["node_count"],
                 edge_count=row["edge_count"],
             )
-    
+
     def get_all_scan_metadata(self) -> List[ScanMetadata]:
         """Get scan metadata for all files."""
         with self._connection() as conn:
@@ -416,7 +415,7 @@ class SQLiteStorage(StorageAdapter):
                 )
                 for row in rows
             ]
-    
+
     def delete_scan_metadata(self, file_path: str) -> bool:
         """Delete scan metadata for a file."""
         with self._connection() as conn:
@@ -424,22 +423,22 @@ class SQLiteStorage(StorageAdapter):
                 "DELETE FROM scan_metadata WHERE file_path = ?", (file_path,)
             )
             return cursor.rowcount > 0
-    
+
     def get_stats(self) -> Dict[str, Any]:
         """Get storage statistics."""
         with self._connection() as conn:
             node_count = conn.execute("SELECT COUNT(*) as c FROM nodes").fetchone()["c"]
             edge_count = conn.execute("SELECT COUNT(*) as c FROM edges").fetchone()["c"]
             file_count = conn.execute("SELECT COUNT(*) as c FROM scan_metadata").fetchone()["c"]
-            
+
             type_rows = conn.execute(
                 "SELECT type, COUNT(*) as c FROM nodes GROUP BY type"
             ).fetchall()
-            
+
             edge_type_rows = conn.execute(
                 "SELECT type, COUNT(*) as c FROM edges GROUP BY type"
             ).fetchall()
-            
+
             return {
                 "schema_version": self._get_schema_version_internal(conn),
                 "total_nodes": node_count,
@@ -449,14 +448,14 @@ class SQLiteStorage(StorageAdapter):
                 "edges_by_type": {row["type"]: row["c"] for row in edge_type_rows},
                 "db_size_bytes": self.db_path.stat().st_size if self.db_path.exists() else 0,
             }
-    
+
     def clear(self) -> None:
         """Clear all data from storage."""
         with self._connection() as conn:
             conn.execute("DELETE FROM edges")
             conn.execute("DELETE FROM nodes")
             conn.execute("DELETE FROM scan_metadata")
-    
+
     def close(self) -> None:
         """Close any open connections."""
         pass

@@ -20,25 +20,24 @@ Supported Environment Variable Patterns:
 - process.env.NEXT_PUBLIC_VAR
 """
 
-from pathlib import Path
-from typing import Generator, List, Optional, Dict, Any, Set, Union
-from dataclasses import dataclass
-import re
 import logging
+import re
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Generator, List, Optional, Set, Union
 
+from ...core.types import Edge, Node, NodeType, RelationshipType
 from ..base import (
     LanguageParser,
     ParserCapability,
     ParserContext,
-    ParseError,
 )
-from ...core.types import Node, Edge, NodeType, RelationshipType
 
 logger = logging.getLogger(__name__)
 
 # Check if tree-sitter is available
 try:
-    from tree_sitter_languages import get_parser, get_language
+    from tree_sitter_languages import get_language, get_parser
     TREE_SITTER_AVAILABLE = True
 except ImportError:
     TREE_SITTER_AVAILABLE = False
@@ -171,7 +170,7 @@ class JSEnvVar:
     column: int
     is_public: bool = False  # For NEXT_PUBLIC_ or VITE_ prefixes
     framework: Optional[str] = None  # nextjs, vite, etc.
-    
+
     def to_node_id(self) -> str:
         return f"env:{self.name}"
 
@@ -183,15 +182,15 @@ class JSImport:
     is_dynamic: bool
     is_commonjs: bool
     line: int
-    
+
     def to_file_path(self) -> str:
         """Convert import to a probable file path."""
         source = self.source.strip("'\"")
-        
+
         # Handle relative imports
         if source.startswith("."):
             return source
-        
+
         # Handle package imports
         return f"node_modules/{source}"
 
@@ -207,7 +206,7 @@ class JavaScriptParser(LanguageParser):
     - Framework-specific patterns (Next.js, Vite)
     - TypeScript support
     """
-    
+
     # Regex patterns for fallback parsing
     ENV_VAR_PATTERNS = [
         # process.env.VAR_NAME
@@ -227,7 +226,7 @@ class JavaScriptParser(LanguageParser):
         # process.env.VAR ?? "default"
         (r'process\.env\.([A-Z][A-Z0-9_]*)\s*\?\?', "process.env_nullish"),
     ]
-    
+
     IMPORT_PATTERNS = [
         # import x from "module"
         re.compile(r'import\s+.*\s+from\s+["\']([^"\']+)["\']', re.MULTILINE),
@@ -238,55 +237,55 @@ class JavaScriptParser(LanguageParser):
         # export * from "module"
         re.compile(r'export\s+.*\s+from\s+["\']([^"\']+)["\']', re.MULTILINE),
     ]
-    
+
     DEF_PATTERN = re.compile(
         r'^(?:export\s+)?(?:async\s+)?(?:function|class)\s+(\w+)',
         re.MULTILINE
     )
-    
+
     ARROW_PATTERN = re.compile(
         r'^(?:export\s+)?const\s+(\w+)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>',
         re.MULTILINE
     )
-    
+
     def __init__(self, context: Optional[ParserContext] = None):
         super().__init__(context)
         self._logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self._tree_sitter_initialized = False
         self._ts_parser = None
         self._ts_language = None
-    
+
     @property
     def name(self) -> str:
         return "javascript"
-    
+
     @property
     def extensions(self) -> List[str]:
         return [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"]
-    
+
     @property
     def description(self) -> str:
         return "JavaScript/TypeScript parser with comprehensive env var detection"
-    
+
     def get_capabilities(self) -> List[ParserCapability]:
         return [
             ParserCapability.IMPORTS,
             ParserCapability.ENV_VARS,
             ParserCapability.DEFINITIONS,
         ]
-    
+
     def _init_tree_sitter(self, file_path: Path) -> bool:
         """Initialize tree-sitter parser lazily."""
         if not TREE_SITTER_AVAILABLE:
             return False
-        
+
         # Determine language based on extension
         ext = file_path.suffix.lower()
         if ext in (".ts", ".tsx"):
             lang_name = "typescript"
         else:
             lang_name = "javascript"
-        
+
         try:
             self._ts_parser = get_parser(lang_name)
             self._ts_language = get_language(lang_name)
@@ -294,7 +293,7 @@ class JavaScriptParser(LanguageParser):
         except Exception as e:
             self._logger.warning(f"Failed to initialize tree-sitter for {lang_name}: {e}")
             return False
-    
+
     def parse(
         self,
         file_path: Path,
@@ -304,20 +303,20 @@ class JavaScriptParser(LanguageParser):
         Parse a JavaScript/TypeScript file and yield nodes and edges.
         """
         from ...core.types import ScanMetadata
-        
+
         # Determine language
         ext = file_path.suffix.lower()
         if ext in (".ts", ".tsx"):
             language = "typescript"
         else:
             language = "javascript"
-        
+
         # Create file node
         try:
             file_hash = ScanMetadata.compute_hash(str(file_path))
         except Exception:
             file_hash = ""
-        
+
         file_id = f"file://{file_path}"
         yield Node(
             id=file_id,
@@ -327,7 +326,7 @@ class JavaScriptParser(LanguageParser):
             language=language,
             file_hash=file_hash,
         )
-        
+
         # Decode content
         try:
             text = content.decode(self._context.encoding)
@@ -337,13 +336,13 @@ class JavaScriptParser(LanguageParser):
             except Exception as e:
                 self._logger.error(f"Failed to decode {file_path}: {e}")
                 return
-        
+
         # Try tree-sitter parsing first
         if self._init_tree_sitter(file_path):
             yield from self._parse_with_tree_sitter(file_path, file_id, content, text)
         else:
             yield from self._parse_with_regex(file_path, file_id, text)
-    
+
     def _parse_with_tree_sitter(
         self,
         file_path: Path,
@@ -353,16 +352,16 @@ class JavaScriptParser(LanguageParser):
     ) -> Generator[Union[Node, Edge], None, None]:
         """Parse using tree-sitter queries."""
         tree = self._ts_parser.parse(content)
-        
+
         # Parse env vars
         yield from self._extract_env_vars_ts(file_path, file_id, tree, text)
-        
+
         # Parse imports
         yield from self._extract_imports_ts(file_path, file_id, tree, text)
-        
+
         # Parse definitions
         yield from self._extract_definitions_ts(file_path, file_id, tree, text)
-    
+
     def _extract_env_vars_ts(
         self,
         file_path: Path,
@@ -379,9 +378,9 @@ class JavaScriptParser(LanguageParser):
             # Fall back to regex
             yield from self._extract_env_vars_regex(file_path, file_id, text)
             return
-        
+
         seen_vars: Set[str] = set()
-        
+
         for node, capture_name in captures:
             # Filter to actual env var captures
             if capture_name not in (
@@ -389,19 +388,19 @@ class JavaScriptParser(LanguageParser):
                 "renamed_var", "vite_env_var",
             ):
                 continue
-            
+
             var_name = node.text.decode("utf-8").strip('"\'')
-            
+
             if var_name in seen_vars:
                 continue
             seen_vars.add(var_name)
-            
+
             # Determine framework
             framework = self._detect_framework(var_name)
             is_public = var_name.startswith(("NEXT_PUBLIC_", "VITE_", "REACT_APP_"))
-            
+
             env_id = f"env:{var_name}"
-            
+
             yield Node(
                 id=env_id,
                 name=var_name,
@@ -415,14 +414,14 @@ class JavaScriptParser(LanguageParser):
                     "is_public": is_public,
                 },
             )
-            
+
             yield Edge(
                 source_id=file_id,
                 target_id=env_id,
                 type=RelationshipType.READS,
                 metadata={"pattern": capture_name},
             )
-    
+
     def _extract_imports_ts(
         self,
         file_path: Path,
@@ -439,33 +438,33 @@ class JavaScriptParser(LanguageParser):
             # Fall back to regex
             yield from self._extract_imports_regex(file_path, file_id, text)
             return
-        
+
         seen_imports: Set[str] = set()
-        
+
         for node, capture_name in captures:
             if capture_name not in (
                 "import_source", "dynamic_import", "require_source", "export_source"
             ):
                 continue
-            
+
             module_name = node.text.decode("utf-8").strip('"\'')
-            
+
             if module_name in seen_imports:
                 continue
             seen_imports.add(module_name)
-            
+
             # Determine import type
             is_commonjs = capture_name == "require_source"
             is_dynamic = capture_name == "dynamic_import"
-            
+
             # Resolve to probable file path
             if module_name.startswith("."):
                 target_path = module_name
             else:
                 target_path = f"node_modules/{module_name}"
-            
+
             target_id = f"file://{target_path}"
-            
+
             yield Node(
                 id=target_id,
                 name=module_name,
@@ -477,7 +476,7 @@ class JavaScriptParser(LanguageParser):
                     "is_dynamic": is_dynamic,
                 },
             )
-            
+
             yield Edge(
                 source_id=file_id,
                 target_id=target_id,
@@ -488,7 +487,7 @@ class JavaScriptParser(LanguageParser):
                     "is_dynamic": is_dynamic,
                 },
             )
-    
+
     def _extract_definitions_ts(
         self,
         file_path: Path,
@@ -505,16 +504,16 @@ class JavaScriptParser(LanguageParser):
             # Fall back to regex
             yield from self._extract_definitions_regex(file_path, file_id, text)
             return
-        
+
         seen_defs: Set[str] = set()
-        
+
         for node, capture_name in captures:
             def_name = node.text.decode("utf-8")
-            
+
             if def_name in seen_defs:
                 continue
             seen_defs.add(def_name)
-            
+
             # Determine type
             if capture_name in ("function_def", "arrow_function_def", "exported_function"):
                 entity_type = "function"
@@ -524,9 +523,9 @@ class JavaScriptParser(LanguageParser):
                 entity_type = "method"
             else:
                 entity_type = "unknown"
-            
+
             entity_id = f"entity:{file_path}:{def_name}"
-            
+
             yield Node(
                 id=entity_id,
                 name=def_name,
@@ -539,13 +538,13 @@ class JavaScriptParser(LanguageParser):
                     "is_exported": capture_name.startswith("exported_"),
                 },
             )
-            
+
             yield Edge(
                 source_id=file_id,
                 target_id=entity_id,
                 type=RelationshipType.CONTAINS,
             )
-    
+
     def _parse_with_regex(
         self,
         file_path: Path,
@@ -556,7 +555,7 @@ class JavaScriptParser(LanguageParser):
         yield from self._extract_env_vars_regex(file_path, file_id, text)
         yield from self._extract_imports_regex(file_path, file_id, text)
         yield from self._extract_definitions_regex(file_path, file_id, text)
-    
+
     def _extract_env_vars_regex(
         self,
         file_path: Path,
@@ -565,30 +564,30 @@ class JavaScriptParser(LanguageParser):
     ) -> Generator[Union[Node, Edge], None, None]:
         """Extract env vars using regex patterns."""
         seen_vars: Set[str] = set()
-        
+
         for pattern, pattern_name in self.ENV_VAR_PATTERNS:
             regex = re.compile(pattern)
-            
+
             for match in regex.finditer(text):
                 var_names = match.group(1)
-                
+
                 # Handle destructuring (comma-separated)
                 if "," in var_names:
                     names = [n.strip() for n in var_names.split(",")]
                 else:
                     names = [var_names]
-                
+
                 for var_name in names:
                     if var_name in seen_vars:
                         continue
                     seen_vars.add(var_name)
-                    
+
                     line = text[:match.start()].count('\n') + 1
                     framework = self._detect_framework(var_name)
                     is_public = var_name.startswith(("NEXT_PUBLIC_", "VITE_", "REACT_APP_"))
-                    
+
                     env_id = f"env:{var_name}"
-                    
+
                     yield Node(
                         id=env_id,
                         name=var_name,
@@ -601,14 +600,14 @@ class JavaScriptParser(LanguageParser):
                             "is_public": is_public,
                         },
                     )
-                    
+
                     yield Edge(
                         source_id=file_id,
                         target_id=env_id,
                         type=RelationshipType.READS,
                         metadata={"pattern": pattern_name},
                     )
-    
+
     def _extract_imports_regex(
         self,
         file_path: Path,
@@ -617,26 +616,26 @@ class JavaScriptParser(LanguageParser):
     ) -> Generator[Union[Node, Edge], None, None]:
         """Extract imports using regex patterns."""
         seen_imports: Set[str] = set()
-        
+
         for pattern in self.IMPORT_PATTERNS:
             for match in pattern.finditer(text):
                 module_name = match.group(1)
-                
+
                 if module_name in seen_imports:
                     continue
                 seen_imports.add(module_name)
-                
+
                 # Determine import type
                 is_commonjs = "require" in match.group(0)
-                
+
                 # Resolve to probable file path
                 if module_name.startswith("."):
                     target_path = module_name
                 else:
                     target_path = f"node_modules/{module_name}"
-                
+
                 target_id = f"file://{target_path}"
-                
+
                 yield Node(
                     id=target_id,
                     name=module_name,
@@ -646,13 +645,13 @@ class JavaScriptParser(LanguageParser):
                         "is_commonjs": is_commonjs,
                     },
                 )
-                
+
                 yield Edge(
                     source_id=file_id,
                     target_id=target_id,
                     type=RelationshipType.IMPORTS,
                 )
-    
+
     def _extract_definitions_regex(
         self,
         file_path: Path,
@@ -661,17 +660,17 @@ class JavaScriptParser(LanguageParser):
     ) -> Generator[Union[Node, Edge], None, None]:
         """Extract definitions using regex patterns."""
         seen_defs: Set[str] = set()
-        
+
         # Function and class definitions
         for match in self.DEF_PATTERN.finditer(text):
             def_name = match.group(1)
-            
+
             if def_name in seen_defs:
                 continue
             seen_defs.add(def_name)
-            
+
             entity_id = f"entity:{file_path}:{def_name}"
-            
+
             yield Node(
                 id=entity_id,
                 name=def_name,
@@ -680,23 +679,23 @@ class JavaScriptParser(LanguageParser):
                 language="javascript",
                 metadata={"entity_type": "function_or_class"},
             )
-            
+
             yield Edge(
                 source_id=file_id,
                 target_id=entity_id,
                 type=RelationshipType.CONTAINS,
             )
-        
+
         # Arrow functions
         for match in self.ARROW_PATTERN.finditer(text):
             def_name = match.group(1)
-            
+
             if def_name in seen_defs:
                 continue
             seen_defs.add(def_name)
-            
+
             entity_id = f"entity:{file_path}:{def_name}"
-            
+
             yield Node(
                 id=entity_id,
                 name=def_name,
@@ -705,13 +704,13 @@ class JavaScriptParser(LanguageParser):
                 language="javascript",
                 metadata={"entity_type": "arrow_function"},
             )
-            
+
             yield Edge(
                 source_id=file_id,
                 target_id=entity_id,
                 type=RelationshipType.CONTAINS,
             )
-    
+
     @staticmethod
     def _detect_framework(var_name: str) -> Optional[str]:
         """Detect framework from env var naming convention."""

@@ -6,8 +6,11 @@ This package contains analysis and explanation capabilities:
 """
 
 from .explain import (
-    ExplanationGenerator, MatchExplanation, NodeInfo, AlternativeMatch,
-    create_explanation_generator
+    AlternativeMatch,
+    ExplanationGenerator,
+    MatchExplanation,
+    NodeInfo,
+    create_explanation_generator,
 )
 
 __all__ = [

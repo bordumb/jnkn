@@ -19,8 +19,7 @@ from pathlib import Path
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from jnkn.analysis.diff_analyzer import diff_code, DiffReport, ChangeType
-
+from jnkn.analysis.diff_analyzer import ChangeType, DiffReport, diff_code
 
 # =============================================================================
 # Demo Scenarios
@@ -36,7 +35,7 @@ def scenario_1_column_removed():
     print("=" * 70)
     print("SCENARIO 1: Column Removed (BREAKING)")
     print("=" * 70)
-    
+
     base_code = '''
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
@@ -77,10 +76,10 @@ result.write.saveAsTable("warehouse.processed_events")
 
     report = diff_code(base_code, head_code, "events_processor.py")
     _print_scenario_report(report)
-    
+
     print("\n💡 Impact: Any downstream job selecting 'created_at' will fail!")
     print("   jnkn would flag this as a BREAKING CHANGE.")
-    
+
     return report
 
 
@@ -93,7 +92,7 @@ def scenario_2_column_added():
     print("\n" + "=" * 70)
     print("SCENARIO 2: Column Added (SAFE)")
     print("=" * 70)
-    
+
     base_code = '''
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, sum
@@ -128,10 +127,10 @@ summary.write.saveAsTable("warehouse.customer_summary")
 
     report = diff_code(base_code, head_code, "customer_summary.py")
     _print_scenario_report(report)
-    
+
     print("\n💡 Impact: Safe change - new columns don't break existing consumers.")
     print("   Downstream jobs can optionally start using the new columns.")
-    
+
     return report
 
 
@@ -144,7 +143,7 @@ def scenario_3_transform_changed():
     print("\n" + "=" * 70)
     print("SCENARIO 3: Transform Logic Changed (POTENTIALLY BREAKING)")
     print("=" * 70)
-    
+
     base_code = '''
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, sum
@@ -179,11 +178,11 @@ result.write.saveAsTable("warehouse.product_revenue")
 
     report = diff_code(base_code, head_code, "product_revenue.py")
     _print_scenario_report(report)
-    
+
     print("\n💡 Impact: The 'revenue' column now has different semantics!")
     print("   Downstream dashboards may show different numbers.")
     print("   This is a data quality risk, not a schema break.")
-    
+
     return report
 
 
@@ -196,7 +195,7 @@ def scenario_4_filter_changed():
     print("\n" + "=" * 70)
     print("SCENARIO 4: Filter Criteria Changed (DATA CHANGE)")
     print("=" * 70)
-    
+
     base_code = '''
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
@@ -235,11 +234,11 @@ active_users.select(
 
     report = diff_code(base_code, head_code, "active_users.py")
     _print_scenario_report(report)
-    
+
     print("\n💡 Impact: Output now only includes US users!")
     print("   Row count will drop significantly.")
     print("   Downstream jobs expecting global users will have missing data.")
-    
+
     return report
 
 
@@ -252,7 +251,7 @@ def scenario_5_table_source_changed():
     print("\n" + "=" * 70)
     print("SCENARIO 5: Source Table Changed (LINEAGE BREAK)")
     print("=" * 70)
-    
+
     base_code = '''
 from pyspark.sql import SparkSession
 
@@ -279,11 +278,11 @@ result.write.saveAsTable("warehouse.orders_snapshot")
 
     report = diff_code(base_code, head_code, "orders_snapshot.py")
     _print_scenario_report(report)
-    
+
     print("\n💡 Impact: Data source completely changed!")
     print("   Production → Staging means test data in prod tables.")
     print("   This should definitely be caught in code review.")
-    
+
     return report
 
 
@@ -296,7 +295,7 @@ def scenario_6_multiple_changes():
     print("\n" + "=" * 70)
     print("SCENARIO 6: Multiple Changes (REAL-WORLD PR)")
     print("=" * 70)
-    
+
     base_code = '''
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, sum, concat, lit
@@ -359,21 +358,21 @@ result.write.saveAsTable("warehouse.user_purchases")
 
     report = diff_code(base_code, head_code, "user_purchases.py")
     _print_scenario_report(report)
-    
+
     print("\n💡 This PR has multiple changes:")
     print("   - BREAKING: 'old_metric' column removed")
     print("   - SAFE: 'region_name' column added")
     print("   - SAFE: 'avg_purchase' aggregation added")
     print("   - DATA CHANGE: New filter on 'is_valid'")
     print("   - LINEAGE: New source table 'dim_regions'")
-    
+
     return report
 
 
 def _print_scenario_report(report: DiffReport):
     """Print a formatted scenario report."""
     print()
-    
+
     # Summary
     s = report.summary
     print("📊 Analysis Results:")
@@ -381,7 +380,7 @@ def _print_scenario_report(report: DiffReport):
     print(f"   Columns Removed:    {s['columns_removed']}")
     print(f"   Lineage Changed:    {s['lineage_mappings_changed']}")
     print(f"   Transforms Changed: {s['transforms_changed']}")
-    
+
     # Breaking changes
     if report.has_breaking_changes:
         print()
@@ -389,7 +388,7 @@ def _print_scenario_report(report: DiffReport):
         for c in report.column_changes:
             if c.change_type == ChangeType.REMOVED:
                 print(f"   🗑️  Column removed: {c.column} ({c.context})")
-    
+
     # Column changes
     if report.column_changes:
         print()
@@ -397,14 +396,14 @@ def _print_scenario_report(report: DiffReport):
         for c in report.column_changes:
             icon = {"added": "➕", "removed": "🗑️", "modified": "✏️"}.get(c.change_type.value, "?")
             print(f"   {icon} {c.change_type.value.upper()}: {c.column} ({c.context})")
-    
+
     # Lineage changes
     if report.lineage_changes:
         print()
         print("Lineage Changes:")
         for lc in report.lineage_changes:
             print(f"   {lc}")
-    
+
     # Transform changes
     if report.transform_changes:
         print()
@@ -422,7 +421,7 @@ def show_cli_usage():
     print("\n" + "=" * 70)
     print("CLI USAGE")
     print("=" * 70)
-    
+
     print("""
     # Basic diff against main
     jnkn diff main HEAD
@@ -449,7 +448,7 @@ def show_github_actions():
     print("\n" + "=" * 70)
     print("GITHUB ACTIONS INTEGRATION")
     print("=" * 70)
-    
+
     workflow = '''
 name: Schema Change Analysis
 
@@ -488,7 +487,7 @@ jobs:
               body += 'The following columns were **removed**:\\n';
               for (const col of report.column_changes) {
                 if (col.type === 'removed') {
-                  body += `- \`${col.column}\` (${col.context})\\n`;
+                  body += `- \\`${col.column}\\` (${col.context})\\n`;
                 }
               }
             } else {
@@ -534,7 +533,7 @@ def main():
     jnkn diff:       "Column 'user_id' was removed from SELECT"
     
     """)
-    
+
     # Run all scenarios
     scenario_1_column_removed()
     scenario_2_column_added()
@@ -542,11 +541,11 @@ def main():
     scenario_4_filter_changed()
     scenario_5_table_source_changed()
     scenario_6_multiple_changes()
-    
+
     # Show integration examples
     show_cli_usage()
     show_github_actions()
-    
+
     print("\n" + "=" * 70)
     print("DEMO COMPLETE")
     print("=" * 70)

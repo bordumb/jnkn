@@ -2,11 +2,14 @@
 CLI Utilities - Shared helpers for CLI commands.
 """
 
-import click
 import json
 from pathlib import Path
-from typing import Set, Optional
+from typing import TYPE_CHECKING, Optional, Set
 
+import click
+
+if TYPE_CHECKING:
+    from ..graph.lineage import LineageGraph
 
 # Directories to skip when scanning
 SKIP_DIRS: Set[str] = {
@@ -44,14 +47,14 @@ def load_graph(graph_file: str) -> Optional["LineageGraph"]:
     Returns None if file doesn't exist or can't be loaded.
     """
     from ..graph.lineage import LineageGraph
-    
+
     graph_path = Path(graph_file)
-    
+
     if not graph_path.exists():
         echo_error(f"Graph file not found: {graph_file}")
         click.echo("Run 'jnkn scan <directory>' first to create it.")
         return None
-    
+
     try:
         data = json.loads(graph_path.read_text())
         graph = LineageGraph()

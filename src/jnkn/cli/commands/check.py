@@ -22,7 +22,6 @@ Usage:
     jnkn check --github-pr 123 --repo owner/repo
 """
 
-import click
 import json
 import os
 import subprocess
@@ -32,6 +31,8 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
+
+import click
 
 try:
     import yaml
@@ -112,16 +113,16 @@ class CheckReport:
     column_changes: List[ColumnChange]
     affected_assets: List[AffectedAsset]
     violations: List[PolicyViolation]
-    
+
     # Stats
     total_downstream: int = 0
     critical_count: int = 0
     high_count: int = 0
-    
+
     # Metadata
     timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
     openlineage_enriched: bool = False
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "result": self.result.name,
@@ -135,7 +136,7 @@ class CheckReport:
                 "high_count": self.high_count,
             },
             "changed_files": [
-                {"path": f.path, "type": f.change_type} 
+                {"path": f.path, "type": f.change_type}
                 for f in self.changed_files
             ],
             "column_changes": [
@@ -164,11 +165,11 @@ class CheckReport:
             ],
             "openlineage_enriched": self.openlineage_enriched,
         }
-    
+
     def to_markdown(self) -> str:
         """Generate markdown summary for PR comment."""
         lines = ["## 🔍 jnkn Impact Analysis", ""]
-        
+
         # Result banner
         if self.result == CheckResult.BLOCKED:
             lines.append("### ❌ BLOCKED - Critical Impact Detected")
@@ -177,7 +178,7 @@ class CheckReport:
         else:
             lines.append("### ✅ PASSED - Safe to Merge")
         lines.append("")
-        
+
         # Summary stats
         lines.append("| Metric | Count |")
         lines.append("|--------|-------|")
@@ -186,7 +187,7 @@ class CheckReport:
         lines.append(f"| Downstream Impact | {self.total_downstream} |")
         lines.append(f"| Critical Systems | {self.critical_count} |")
         lines.append("")
-        
+
         # Violations
         if self.violations:
             lines.append("### Policy Violations")
@@ -198,7 +199,7 @@ class CheckReport:
                     approvers = ", ".join(v.required_approvers)
                     lines.append(f"   - Required approvers: {approvers}")
             lines.append("")
-        
+
         # Critical assets
         critical = [a for a in self.affected_assets if a.severity == Severity.CRITICAL]
         if critical:
@@ -208,7 +209,7 @@ class CheckReport:
                 owners = f" (owners: {', '.join(a.owners)})" if a.owners else ""
                 lines.append(f"- **{a.name}**{owners}")
             lines.append("")
-        
+
         # Column changes
         if self.column_changes:
             lines.append("### Column Changes Detected")
@@ -222,12 +223,12 @@ class CheckReport:
                 elif c.change_type == "modified":
                     lines.append(f"- ✏️ MODIFIED: `{c.column}`{table}")
             lines.append("")
-        
+
         # OpenLineage status
         if self.openlineage_enriched:
             lines.append("---")
             lines.append("*📊 Enriched with OpenLineage production data*")
-        
+
         return "\n".join(lines)
 
 
@@ -259,15 +260,15 @@ def load_policy(path: str) -> Policy:
     """Load policy from YAML file."""
     if not HAS_YAML:
         raise ImportError("PyYAML required for policy files. pip install pyyaml")
-    
+
     with open(path) as f:
         data = yaml.safe_load(f)
-    
+
     rules = []
     for rule_data in data.get("critical", []) + data.get("rules", []):
         severity_str = rule_data.get("severity", "high")
         severity = Severity[severity_str.upper()]
-        
+
         rules.append(PolicyRule(
             name=rule_data.get("name", rule_data.get("pattern", "unnamed")),
             pattern=rule_data["pattern"],
@@ -276,7 +277,7 @@ def load_policy(path: str) -> Policy:
             require_approval=rule_data.get("require_approval", False),
             notify_always=rule_data.get("notify_always", False),
         ))
-    
+
     return Policy(
         rules=rules,
         block_on_critical=data.get("block_on_critical", True),
@@ -330,15 +331,15 @@ def parse_git_diff(base: str = "main", head: str = "HEAD") -> List[ChangedFile]:
         raise RuntimeError(f"git diff failed: {e.stderr}")
     except FileNotFoundError:
         raise RuntimeError("git not found in PATH")
-    
+
     files = []
     for line in result.stdout.strip().split("\n"):
         if not line:
             continue
-        
+
         parts = line.split("\t")
         status = parts[0]
-        
+
         if status.startswith("R"):  # Rename
             old_path, new_path = parts[1], parts[2]
             files.append(ChangedFile(
@@ -353,9 +354,9 @@ def parse_git_diff(base: str = "main", head: str = "HEAD") -> List[ChangedFile]:
                 "M": "modified",
                 "D": "deleted",
             }.get(status, "modified")
-            
+
             files.append(ChangedFile(path=path, change_type=change_type))
-    
+
     return files
 
 
@@ -367,7 +368,7 @@ def parse_diff_file(path: str) -> List[ChangedFile]:
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
-            
+
             # Support format: "M path/to/file" or just "path/to/file"
             parts = line.split(maxsplit=1)
             if len(parts) == 2 and len(parts[0]) == 1:
@@ -376,9 +377,9 @@ def parse_diff_file(path: str) -> List[ChangedFile]:
             else:
                 path = parts[0]
                 change_type = "modified"
-            
+
             files.append(ChangedFile(path=path, change_type=change_type))
-    
+
     return files
 
 
@@ -386,15 +387,15 @@ def parse_github_pr(repo: str, pr_number: int, token: Optional[str] = None) -> L
     """Fetch changed files from GitHub PR API."""
     if not HAS_REQUESTS:
         raise ImportError("requests required for GitHub integration. pip install requests")
-    
+
     url = f"https://api.github.com/repos/{repo}/pulls/{pr_number}/files"
     headers = {"Accept": "application/vnd.github.v3+json"}
     if token:
         headers["Authorization"] = f"token {token}"
-    
+
     resp = requests.get(url, headers=headers)
     resp.raise_for_status()
-    
+
     files = []
     for file_data in resp.json():
         status = file_data["status"]
@@ -404,13 +405,13 @@ def parse_github_pr(repo: str, pr_number: int, token: Optional[str] = None) -> L
             "modified": "modified",
             "renamed": "renamed",
         }.get(status, "modified")
-        
+
         files.append(ChangedFile(
             path=file_data["filename"],
             change_type=change_type,
             old_path=file_data.get("previous_filename"),
         ))
-    
+
     return files
 
 
@@ -427,7 +428,7 @@ class CheckEngine:
     - OpenLineage runtime data
     - Policy evaluation
     """
-    
+
     def __init__(
         self,
         policy: Optional[Policy] = None,
@@ -437,12 +438,12 @@ class CheckEngine:
         self.policy = policy or default_policy()
         self.openlineage_url = openlineage_url
         self.openlineage_namespace = openlineage_namespace
-        
+
         # Runtime lineage graph (populated from OpenLineage)
         self._runtime_graph: Dict[str, Set[str]] = {}  # asset -> downstream consumers
         self._runtime_jobs: Dict[str, Dict] = {}  # job_id -> metadata
         self._runtime_loaded = False
-    
+
     def run(self, changed_files: List[ChangedFile]) -> CheckReport:
         """
         Run the full check pipeline.
@@ -456,22 +457,22 @@ class CheckEngine:
         # Step 1: Load OpenLineage data if configured
         if self.openlineage_url and not self._runtime_loaded:
             self._load_openlineage_data()
-        
+
         # Step 2: Parse changed files for column/table changes
         column_changes = self._detect_column_changes(changed_files)
-        
+
         # Step 3: Identify affected tables/assets from code
         code_assets = self._identify_affected_assets(changed_files)
-        
+
         # Step 4: Expand blast radius using OpenLineage
         all_affected = self._expand_blast_radius(code_assets)
-        
+
         # Step 5: Apply policy rules
         violations = self._evaluate_policy(all_affected)
-        
+
         # Step 6: Determine result
         result = self._determine_result(violations)
-        
+
         # Build report
         report = CheckReport(
             result=result,
@@ -484,56 +485,56 @@ class CheckEngine:
             high_count=len([a for a in all_affected if a.severity == Severity.HIGH]),
             openlineage_enriched=self._runtime_loaded,
         )
-        
+
         return report
-    
+
     def _load_openlineage_data(self):
         """Load lineage data from OpenLineage/Marquez."""
         if not HAS_REQUESTS:
             return
-        
+
         try:
             # Fetch jobs
             url = f"{self.openlineage_url}/api/v1/namespaces"
             if self.openlineage_namespace:
                 url = f"{self.openlineage_url}/api/v1/namespaces/{self.openlineage_namespace}/jobs"
-            
+
             resp = requests.get(url, timeout=30)
             if not resp.ok:
                 return
-            
+
             data = resp.json()
-            
+
             # Build dependency graph
             for job in data.get("jobs", []):
                 job_id = f"job:{job.get('namespace', 'default')}/{job['name']}"
                 self._runtime_jobs[job_id] = job
-                
+
                 # Track what this job reads/writes
                 for output in job.get("outputs", []):
                     output_id = f"data:{output['namespace']}/{output['name']}"
-                    
+
                     # Find downstream consumers
                     for other_job in data.get("jobs", []):
                         for inp in other_job.get("inputs", []):
                             if inp["namespace"] == output["namespace"] and inp["name"] == output["name"]:
                                 other_id = f"job:{other_job.get('namespace', 'default')}/{other_job['name']}"
                                 self._runtime_graph.setdefault(output_id, set()).add(other_id)
-            
+
             self._runtime_loaded = True
-            
+
         except Exception:
             # Graceful degradation - continue without OpenLineage
             pass
-    
+
     def _detect_column_changes(self, files: List[ChangedFile]) -> List[ColumnChange]:
         """Detect column-level changes in PySpark/SQL files."""
         changes = []
-        
+
         for f in files:
             if not f.path.endswith(".py"):
                 continue
-            
+
             # For now, flag deleted files as potential column removals
             if f.change_type == "deleted":
                 changes.append(ColumnChange(
@@ -541,20 +542,20 @@ class CheckEngine:
                     table=None,
                     change_type="removed",
                 ))
-            
+
             # TODO: Full diff-based column detection
             # This would compare old vs new file AST
-        
+
         return changes
-    
+
     def _identify_affected_assets(self, files: List[ChangedFile]) -> List[AffectedAsset]:
         """Identify assets affected by file changes."""
         assets = []
-        
+
         for f in files:
             # Map file to potential assets
             # This is a simplified heuristic - real implementation would parse the file
-            
+
             if "etl" in f.path.lower() or "pipeline" in f.path.lower():
                 # Likely a data pipeline job
                 job_name = Path(f.path).stem
@@ -566,7 +567,7 @@ class CheckEngine:
                     confidence=0.8,
                     path=[f.path],
                 ))
-            
+
             if "model" in f.path.lower() or "feature" in f.path.lower():
                 # ML-related
                 model_name = Path(f.path).stem
@@ -578,29 +579,29 @@ class CheckEngine:
                     confidence=0.7,
                     path=[f.path],
                 ))
-        
+
         return assets
-    
+
     def _expand_blast_radius(self, assets: List[AffectedAsset]) -> List[AffectedAsset]:
         """Expand affected assets using OpenLineage data."""
         all_assets = list(assets)
         seen = {a.id for a in assets}
-        
+
         if not self._runtime_loaded:
             return all_assets
-        
+
         # BFS to find downstream
         queue = [a.id for a in assets]
-        
+
         while queue:
             current = queue.pop(0)
-            
+
             # Find downstream consumers from runtime graph
             for downstream_id in self._runtime_graph.get(current, []):
                 if downstream_id in seen:
                     continue
                 seen.add(downstream_id)
-                
+
                 # Create affected asset
                 name = downstream_id.split("/")[-1] if "/" in downstream_id else downstream_id
                 all_assets.append(AffectedAsset(
@@ -611,30 +612,30 @@ class CheckEngine:
                     confidence=1.0,  # From OpenLineage = observed
                     path=[current, downstream_id],
                 ))
-                
+
                 queue.append(downstream_id)
-        
+
         return all_assets
-    
+
     def _evaluate_policy(self, assets: List[AffectedAsset]) -> List[PolicyViolation]:
         """Evaluate policy rules against affected assets."""
         import re
         violations = []
-        
+
         for rule in self.policy.rules:
             pattern = re.compile(rule.pattern, re.IGNORECASE)
-            
+
             matching_assets = [
                 a for a in assets
                 if pattern.search(a.id) or pattern.search(a.name)
             ]
-            
+
             if matching_assets:
                 # Update severity on matching assets
                 for a in matching_assets:
                     a.severity = rule.severity
                     a.owners = rule.owners
-                
+
                 if rule.require_approval:
                     violations.append(PolicyViolation(
                         rule_name=rule.name,
@@ -643,22 +644,22 @@ class CheckEngine:
                         affected_assets=[a.id for a in matching_assets],
                         required_approvers=rule.owners,
                     ))
-        
+
         return violations
-    
+
     def _determine_result(self, violations: List[PolicyViolation]) -> CheckResult:
         """Determine final check result."""
         if any(v.severity == Severity.CRITICAL for v in violations):
             if self.policy.block_on_critical:
                 return CheckResult.BLOCKED
-        
+
         if any(v.severity == Severity.HIGH for v in violations):
             if self.policy.warn_on_high:
                 return CheckResult.WARN
-        
+
         if violations:
             return CheckResult.WARN
-        
+
         return CheckResult.PASS
 
 
@@ -746,12 +747,12 @@ def check(
     except Exception as e:
         click.echo(click.style(f"Error getting changed files: {e}", fg="red"), err=True)
         sys.exit(1)
-    
+
     if not changed_files:
         if not quiet:
             click.echo(click.style("No changed files detected", fg="yellow"))
         sys.exit(0)
-    
+
     # Load policy
     policy = None
     if policy_file:
@@ -760,25 +761,25 @@ def check(
         except Exception as e:
             click.echo(click.style(f"Error loading policy: {e}", fg="red"), err=True)
             sys.exit(1)
-    
+
     # Run check
     engine = CheckEngine(
         policy=policy,
         openlineage_url=openlineage_url,
         openlineage_namespace=openlineage_namespace,
     )
-    
+
     report = engine.run(changed_files)
-    
+
     # Override result if --fail-if-critical
     if fail_if_critical and report.critical_count > 0:
         report.result = CheckResult.BLOCKED
-    
+
     # Output
     if output:
         with open(output, "w") as f:
             json.dump(report.to_dict(), f, indent=2)
-    
+
     if not quiet:
         if output_format == "json":
             click.echo(json.dumps(report.to_dict(), indent=2))
@@ -786,7 +787,7 @@ def check(
             click.echo(report.to_markdown())
         else:
             _print_report(report)
-    
+
     # Exit with appropriate code
     sys.exit(report.result.value)
 
@@ -794,7 +795,7 @@ def check(
 def _print_report(report: CheckReport):
     """Print formatted report to terminal."""
     click.echo()
-    
+
     # Result banner
     if report.result == CheckResult.BLOCKED:
         click.echo(click.style("╔════════════════════════════════════════╗", fg="red"))
@@ -808,9 +809,9 @@ def _print_report(report: CheckReport):
         click.echo(click.style("╔════════════════════════════════════════╗", fg="green"))
         click.echo(click.style("║  ✅ PASSED - Safe to Merge             ║", fg="green", bold=True))
         click.echo(click.style("╚════════════════════════════════════════╝", fg="green"))
-    
+
     click.echo()
-    
+
     # Summary
     click.echo(click.style("Summary:", bold=True))
     click.echo(f"  Changed files:     {len(report.changed_files)}")
@@ -818,10 +819,10 @@ def _print_report(report: CheckReport):
     click.echo(f"  Downstream impact: {report.total_downstream}")
     click.echo(f"  Critical systems:  {report.critical_count}")
     click.echo(f"  High severity:     {report.high_count}")
-    
+
     if report.openlineage_enriched:
         click.echo(click.style("  📊 Enriched with OpenLineage", fg="cyan"))
-    
+
     # Violations
     if report.violations:
         click.echo()
@@ -832,7 +833,7 @@ def _print_report(report: CheckReport):
             if v.required_approvers:
                 approvers = ", ".join(v.required_approvers)
                 click.echo(click.style(f"     Required approvers: {approvers}", dim=True))
-    
+
     # Critical assets
     critical = [a for a in report.affected_assets if a.severity == Severity.CRITICAL]
     if critical:
@@ -841,7 +842,7 @@ def _print_report(report: CheckReport):
         for a in critical:
             owners = f" (owners: {', '.join(a.owners)})" if a.owners else ""
             click.echo(f"  • {a.name}{owners}")
-    
+
     # Changed files
     if report.changed_files:
         click.echo()
@@ -851,7 +852,7 @@ def _print_report(report: CheckReport):
             click.echo(f"  {icon} {f.path}")
         if len(report.changed_files) > 10:
             click.echo(f"  ... and {len(report.changed_files) - 10} more")
-    
+
     click.echo()
 
 

@@ -7,7 +7,7 @@ from pathlib import Path
 # ------------------------------------------------------------
 
 # Skip files larger than this (e.g., 500KB) to save context window
-MAX_FILE_SIZE_BYTES = 500 * 1024  
+MAX_FILE_SIZE_BYTES = 500 * 1024
 
 DEFAULT_IGNORE_FILES = {
     # Lock files (noisy context)
@@ -19,11 +19,11 @@ DEFAULT_IGNORE_FILES = {
     "uv.lock",
     "Gemfile.lock",
     "go.sum",
-    
+
     # System / IDE
     ".DS_Store",
     "Thumbs.db",
-    
+
     # Binary / Data artifacts
     ".coverage",  # <--- This was your likely binary culprit
     "db.sqlite3",
@@ -38,7 +38,7 @@ DEFAULT_IGNORE_DIRS = {
     "env",
     "target", # Rust
     "vendor", # Go/PHP
-    
+
     # Build Artifacts
     "dist",
     "build",
@@ -50,13 +50,13 @@ DEFAULT_IGNORE_DIRS = {
     ".ruff_cache",
     "__pycache__",
     "htmlcov",
-    
+
     # VCS
     ".git",
     ".github", # Optional: keep if you want CI workflows
     ".idea",
     ".vscode",
-    
+
     # Tests
     "scripts",
     "src",
@@ -68,10 +68,10 @@ DEFAULT_IGNORE_EXTENSIONS = {
     ".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".webp",
     ".mp4", ".mov", ".avi", ".webm", ".mp3", ".wav",
     ".pdf", ".zip", ".tar", ".gz", ".7z", ".rar",
-    
+
     # Fonts
     ".ttf", ".otf", ".woff", ".woff2", ".eot",
-    
+
     # Compiled/Binary
     ".pyc", ".pyo", ".pyd",
     ".exe", ".bin", ".dll", ".so", ".dylib", ".class", ".jar",
@@ -97,10 +97,10 @@ def is_binary(file_path: Path) -> bool:
 
 def concat_all(output_file="all_repos.txt"):
     """Recursively scans and concatenates text files."""
-    
+
     root = Path(".").resolve()
     output_lines = []
-    
+
     # Sets for fast O(1) lookups
     ignore_files = DEFAULT_IGNORE_FILES
     ignore_dirs = DEFAULT_IGNORE_DIRS
@@ -111,7 +111,7 @@ def concat_all(output_file="all_repos.txt"):
 
     # Use os.walk for better control over directory pruning
     for dirpath, dirnames, filenames in os.walk(root):
-        
+
         # 1. Prune ignored directories in-place
         # We must modify 'dirnames' list to stop os.walk from entering them
         dirnames[:] = [d for d in dirnames if d not in ignore_dirs and not d.startswith(".")]
@@ -150,7 +150,7 @@ def concat_all(output_file="all_repos.txt"):
             # 7. Read and Append
             try:
                 text = file_path.read_text(encoding="utf-8", errors="ignore")
-                
+
                 # Optional: Skip empty files
                 if not text.strip():
                     continue
@@ -160,14 +160,14 @@ def concat_all(output_file="all_repos.txt"):
                 output_lines.append(f"{'='*40}\n")
                 output_lines.append(text)
                 output_lines.append("\n")
-                
+
             except Exception as e:
                 print(f"❌ Error reading {rel_path}: {e}")
 
     # Write output
     out_path = root / output_file
     out_path.write_text("".join(output_lines), encoding="utf-8")
-    
+
     print(f"\n✅ Done! Scanned {len(output_lines)//5} files.")
     print(f"📄 Output written to: {out_path}")
 

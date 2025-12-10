@@ -13,11 +13,11 @@ Features:
 """
 
 from .parser import (
+    ResourceChange,
+    TerraformOutput,
     TerraformParser,
     TerraformPlanParser,
     TerraformResource,
-    TerraformOutput,
-    ResourceChange,
     create_terraform_parser,
     create_terraform_plan_parser,
 )

@@ -14,15 +14,19 @@ The key insight:
 - Together they provide complete coverage
 """
 
-import json
-from dataclasses import dataclass, field
-from typing import Dict, List, Set, Any, Tuple
 from collections import defaultdict
+from typing import Any, Dict, List, Tuple
+
+from jnkn.parsing.openlineage.parser import (
+    Edge,
+    Node,
+    NodeType,
+    OpenLineageParser,
+    RelationshipType,
+)
 
 # Import our parsers
-from jnkn.parsing.pyspark.column_lineage import extract_column_lineage, ColumnLineageExtractor, ColumnLineageResult
-from jnkn.parsing.openlineage.parser import OpenLineageParser, Node, Edge, NodeType, RelationshipType
-
+from jnkn.parsing.pyspark.column_lineage import extract_column_lineage
 
 # =============================================================================
 # Unified Graph
@@ -37,13 +41,13 @@ class UnifiedLineageGraph:
     - Tracks confidence levels (runtime=1.0, static=0.7-0.95)
     - Enables cross-source impact analysis
     """
-    
+
     def __init__(self):
         self.nodes: Dict[str, Node] = {}
         self.edges: List[Edge] = []
         self._outgoing: Dict[str, List[Edge]] = defaultdict(list)
         self._incoming: Dict[str, List[Edge]] = defaultdict(list)
-    
+
     def add_node(self, node: Node, source: str = "unknown") -> None:
         """Add a node, merging if it already exists."""
         if node.id in self.nodes:
@@ -53,13 +57,13 @@ class UnifiedLineageGraph:
         else:
             node.metadata.setdefault("sources", []).append(source)
             self.nodes[node.id] = node
-    
+
     def add_edge(self, edge: Edge) -> None:
         """Add an edge."""
         self.edges.append(edge)
         self._outgoing[edge.source_id].append(edge)
         self._incoming[edge.target_id].append(edge)
-    
+
     def get_downstream(self, node_id: str, max_depth: int = 10) -> List[Tuple[str, float, List[str]]]:
         """
         Get all downstream nodes with confidence and path.
@@ -70,68 +74,68 @@ class UnifiedLineageGraph:
         visited = set()
         results = []
         queue = [(node_id, 1.0, [node_id])]
-        
+
         while queue:
             current, confidence, path = queue.pop(0)
-            
+
             if current in visited or len(path) > max_depth:
                 continue
             visited.add(current)
-            
+
             if current != node_id:
                 results.append((current, confidence, path))
-            
+
             # Follow outgoing edges
             for edge in self._outgoing.get(current, []):
                 if edge.type in (RelationshipType.WRITES, RelationshipType.TRANSFORMS):
                     new_conf = min(confidence, edge.confidence)
                     queue.append((edge.target_id, new_conf, path + [edge.target_id]))
-            
+
             # Follow incoming READS edges (the reader is downstream of the data)
             for edge in self._incoming.get(current, []):
                 if edge.type == RelationshipType.READS:
                     new_conf = min(confidence, edge.confidence)
                     queue.append((edge.source_id, new_conf, path + [edge.source_id]))
-        
+
         return results
-    
+
     def get_upstream(self, node_id: str, max_depth: int = 10) -> List[Tuple[str, float, List[str]]]:
         """Get all upstream nodes with confidence and path."""
         visited = set()
         results = []
         queue = [(node_id, 1.0, [node_id])]
-        
+
         while queue:
             current, confidence, path = queue.pop(0)
-            
+
             if current in visited or len(path) > max_depth:
                 continue
             visited.add(current)
-            
+
             if current != node_id:
                 results.append((current, confidence, path))
-            
+
             # Follow incoming WRITES edges
             for edge in self._incoming.get(current, []):
                 if edge.type in (RelationshipType.WRITES, RelationshipType.TRANSFORMS):
                     new_conf = min(confidence, edge.confidence)
                     queue.append((edge.source_id, new_conf, path + [edge.source_id]))
-            
+
             # Follow outgoing READS edges
             for edge in self._outgoing.get(current, []):
                 if edge.type == RelationshipType.READS:
                     new_conf = min(confidence, edge.confidence)
                     queue.append((edge.target_id, new_conf, path + [edge.target_id]))
-        
+
         return results
-    
+
     def stats(self) -> Dict[str, Any]:
         """Get graph statistics."""
         sources = defaultdict(int)
         for node in self.nodes.values():
             for src in node.metadata.get("sources", ["unknown"]):
                 sources[src] += 1
-        
+
         return {
             "total_nodes": len(self.nodes),
             "total_edges": len(self.edges),
@@ -156,11 +160,11 @@ def create_demo_scenario():
     - OpenLineage events from production showing actual execution
     - A proposed code change that modifies a column
     """
-    
+
     # -------------------------------------------------------------------------
     # 1. STATIC ANALYSIS: Parse the PySpark code
     # -------------------------------------------------------------------------
-    
+
     pyspark_code = '''
 """Daily User ETL Job - processes raw users into dim_users."""
 from pyspark.sql import SparkSession
@@ -194,11 +198,11 @@ dim_users = active_users.join(event_counts, "user_id", "left") \\
 # Write output
 dim_users.write.mode("overwrite").saveAsTable("s3.warehouse.dim_users")
 '''
-    
+
     # -------------------------------------------------------------------------
     # 2. RUNTIME LINEAGE: OpenLineage events from production
     # -------------------------------------------------------------------------
-    
+
     openlineage_events = [
         {
             "eventType": "COMPLETE",
@@ -246,7 +250,7 @@ dim_users.write.mode("overwrite").saveAsTable("s3.warehouse.dim_users")
             ]
         }
     ]
-    
+
     return pyspark_code, openlineage_events
 
 
@@ -254,76 +258,76 @@ def main():
     print("=" * 70)
     print("END-TO-END DEMO: Static Analysis + OpenLineage Integration")
     print("=" * 70)
-    
+
     pyspark_code, openlineage_events = create_demo_scenario()
-    
+
     # =========================================================================
     # Step 1: Extract static lineage from code
     # =========================================================================
-    
+
     print("\n" + "─" * 70)
     print("STEP 1: Static Analysis (PySpark Code)")
     print("─" * 70)
-    
+
     static_result = extract_column_lineage(pyspark_code, "daily_user_etl.py")
-    
+
     print(f"\n📖 Columns Read: {len(static_result.columns_read)}")
     for col in static_result.columns_read:
         print(f"   {col.column:20} [{col.context.value:8}] confidence={col.confidence.label}")
-    
+
     print(f"\n✏️  Columns Written: {len(static_result.columns_written)}")
     for col in static_result.columns_written:
         print(f"   {col.column:20} transform={col.transform or 'direct'}")
-    
+
     # =========================================================================
     # Step 2: Parse OpenLineage events
     # =========================================================================
-    
+
     print("\n" + "─" * 70)
     print("STEP 2: Runtime Lineage (OpenLineage)")
     print("─" * 70)
-    
+
     ol_parser = OpenLineageParser()
     runtime_nodes = []
     runtime_edges = []
-    
+
     for item in ol_parser.parse_events(openlineage_events):
         if isinstance(item, Node):
             runtime_nodes.append(item)
         elif isinstance(item, Edge):
             runtime_edges.append(item)
-    
+
     print(f"\n📊 From {len(openlineage_events)} production events:")
     print(f"   Jobs discovered: {len([n for n in runtime_nodes if n.type == NodeType.JOB])}")
     print(f"   Datasets discovered: {len([n for n in runtime_nodes if n.type == NodeType.DATA_ASSET])}")
     print(f"   Relationships: {len(runtime_edges)}")
-    
+
     print("\n   Jobs:")
     for node in runtime_nodes:
         if node.type == NodeType.JOB:
             print(f"      • {node.name}")
-    
+
     print("\n   Datasets:")
     for node in runtime_nodes:
         if node.type == NodeType.DATA_ASSET and not node.id.startswith("column:"):
             print(f"      • {node.id.replace('data:', '')}")
-    
+
     # =========================================================================
     # Step 3: Build unified graph
     # =========================================================================
-    
+
     print("\n" + "─" * 70)
     print("STEP 3: Build Unified Graph")
     print("─" * 70)
-    
+
     graph = UnifiedLineageGraph()
-    
+
     # Add runtime nodes/edges (confidence=1.0)
     for node in runtime_nodes:
         graph.add_node(node, source="openlineage")
     for edge in runtime_edges:
         graph.add_edge(edge)
-    
+
     # Add static analysis as code file node
     code_node = Node(
         id="file:daily_user_etl.py",
@@ -332,7 +336,7 @@ def main():
         metadata={"columns_read": len(static_result.columns_read)}
     )
     graph.add_node(code_node, source="static")
-    
+
     # Link code file to job (stitching!)
     graph.add_edge(Edge(
         source_id="file:daily_user_etl.py",
@@ -341,47 +345,47 @@ def main():
         confidence=0.95,  # High confidence name match
         metadata={"match_type": "name_similarity"}
     ))
-    
+
     stats = graph.stats()
-    print(f"\n📈 Unified Graph Stats:")
+    print("\n📈 Unified Graph Stats:")
     print(f"   Total nodes: {stats['total_nodes']}")
     print(f"   Total edges: {stats['total_edges']}")
     print(f"   Nodes by source: {stats['nodes_by_source']}")
-    
+
     # =========================================================================
     # Step 4: Impact Analysis
     # =========================================================================
-    
+
     print("\n" + "─" * 70)
     print("STEP 4: Impact Analysis")
     print("─" * 70)
-    
+
     # Scenario: What if we change the dim_users table?
     target = "data:s3/warehouse/dim_users"
-    
+
     print(f"\n🎯 Analyzing impact of changes to: {target}")
-    
+
     downstream = graph.get_downstream(target)
     upstream = graph.get_upstream(target)
-    
+
     print(f"\n⬆️  UPSTREAM ({len(upstream)} nodes):")
     for node_id, confidence, path in sorted(upstream, key=lambda x: -x[1]):
         print(f"   [{confidence:.0%}] {node_id}")
-    
+
     print(f"\n⬇️  DOWNSTREAM ({len(downstream)} nodes) - WILL BE AFFECTED:")
     for node_id, confidence, path in sorted(downstream, key=lambda x: -x[1]):
         print(f"   [{confidence:.0%}] {node_id}")
         if len(path) > 2:
             print(f"            via: {' → '.join(path[1:-1])}")
-    
+
     # =========================================================================
     # Step 5: Pre-Merge Check Simulation
     # =========================================================================
-    
+
     print("\n" + "─" * 70)
     print("STEP 5: Pre-Merge Check (CI/CD Integration)")
     print("─" * 70)
-    
+
     print("""
     Simulating: PR #1234 modifies daily_user_etl.py
     
@@ -390,36 +394,36 @@ def main():
     - Added column: 'is_power_user' (new)
     - Removed column: 'last_event_at'
     """)
-    
+
     # Simulate the check
     print("🔍 Running jnkn pre-merge check...")
     print()
-    
+
     critical_tables = ["redshift/analytics.exec_dashboard"]
     ml_tables = ["s3/ml-features/churn_features"]
-    
+
     affected_critical = [
         (node_id, conf) for node_id, conf, _ in downstream
         if any(t in node_id for t in critical_tables)
     ]
-    
+
     affected_ml = [
         (node_id, conf) for node_id, conf, _ in downstream
         if any(t in node_id for t in ml_tables)
     ]
-    
+
     if affected_critical:
         print("🚨 CRITICAL: This change affects executive dashboards!")
         for node_id, conf in affected_critical:
             print(f"   • {node_id} (confidence: {conf:.0%})")
         print()
-    
+
     if affected_ml:
         print("⚠️  WARNING: This change affects ML feature pipelines!")
         for node_id, conf in affected_ml:
             print(f"   • {node_id} (confidence: {conf:.0%})")
         print()
-    
+
     print("""
     ┌─────────────────────────────────────────────────────────────────────┐
     │                         PR CHECK RESULT                             │
@@ -438,11 +442,11 @@ def main():
     │                                                                     │
     └─────────────────────────────────────────────────────────────────────┘
     """)
-    
+
     # =========================================================================
     # Summary
     # =========================================================================
-    
+
     print("=" * 70)
     print("SUMMARY: Why This Matters")
     print("=" * 70)

@@ -16,12 +16,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from pathlib import Path
-from typing import (
-    Dict, Generator, List, Optional, Set, Tuple,
-    Union, Any, Iterator, Callable
-)
+from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Union
 
-from ..core.types import Node, Edge, NodeType, RelationshipType
+from ..core.types import Edge, Node, NodeType, RelationshipType
 
 
 class ParserCapability(Enum):
@@ -58,7 +55,7 @@ class ParserContext:
     config: Dict[str, Any] = field(default_factory=dict)
     seen_files: Set[Path] = field(default_factory=set)
     encoding: str = "utf-8"
-    
+
     def relative_path(self, path: Path) -> Path:
         """Get path relative to root_dir."""
         try:
@@ -84,20 +81,20 @@ class ParseResult:
     edges: List[Edge] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     @property
     def success(self) -> bool:
         """Return True if parsing succeeded without errors."""
         return len(self.errors) == 0
-    
+
     def add_node(self, node: Node) -> None:
         """Add a node to the result."""
         self.nodes.append(node)
-    
+
     def add_edge(self, edge: Edge) -> None:
         """Add an edge to the result."""
         self.edges.append(edge)
-    
+
     def add_error(self, error: str) -> None:
         """Add an error message."""
         self.errors.append(error)
@@ -124,7 +121,7 @@ class ParseError(Exception):
         self.file_path = file_path
         self.line = line
         self.column = column
-        
+
         location = ""
         if file_path:
             location = f" in {file_path}"
@@ -132,7 +129,7 @@ class ParseError(Exception):
                 location += f":{line}"
                 if column is not None:
                     location += f":{column}"
-        
+
         super().__init__(f"{message}{location}")
 
 
@@ -160,7 +157,7 @@ class LanguageParser(ABC):
                 # Parse implementation
                 yield Node(...)
     """
-    
+
     def __init__(self, context: Optional[ParserContext] = None):
         """
         Initialize the parser with optional context.
@@ -169,12 +166,12 @@ class LanguageParser(ABC):
             context: Optional parsing context with root directory and config
         """
         self._context = context or ParserContext()
-    
+
     @property
     def context(self) -> ParserContext:
         """Get the parser's context."""
         return self._context
-    
+
     @property
     @abstractmethod
     def name(self) -> str:
@@ -184,7 +181,7 @@ class LanguageParser(ABC):
         This name is used for registration and logging.
         """
         pass
-    
+
     @property
     @abstractmethod
     def extensions(self) -> Set[str]:
@@ -194,7 +191,7 @@ class LanguageParser(ABC):
         Extensions should include the leading dot (e.g., ".py").
         """
         pass
-    
+
     @abstractmethod
     def parse(
         self,
@@ -217,7 +214,7 @@ class LanguageParser(ABC):
             ParseError: If parsing fails
         """
         pass
-    
+
     def get_capabilities(self) -> Set[ParserCapability]:
         """
         Return the capabilities this parser supports.
@@ -226,11 +223,11 @@ class LanguageParser(ABC):
         Subclasses should override to declare capabilities.
         """
         return set()
-    
+
     def supports_capability(self, capability: ParserCapability) -> bool:
         """Check if this parser supports a specific capability."""
         return capability in self.get_capabilities()
-    
+
     def parse_file(
         self,
         file_path: Path,
@@ -249,21 +246,21 @@ class LanguageParser(ABC):
             ParseResult with nodes, edges, and any errors
         """
         result = ParseResult(file_path=file_path)
-        
+
         try:
             content = file_path.read_bytes()
-            
+
             for item in self.parse(file_path, content, context):
                 if isinstance(item, Node):
                     result.add_node(item)
                 elif isinstance(item, Edge):
                     result.add_edge(item)
-                    
+
         except ParseError as e:
             result.add_error(str(e))
         except Exception as e:
             result.add_error(f"Unexpected error: {e}")
-        
+
         return result
 
 
@@ -281,7 +278,7 @@ class CompositeParser(LanguageParser):
             parsers=[TreeSitterPythonParser(), RegexPythonParser()],
         )
     """
-    
+
     def __init__(
         self,
         name: str,
@@ -293,15 +290,15 @@ class CompositeParser(LanguageParser):
         self._name = name
         self._extensions = extensions
         self._parsers = parsers
-    
+
     @property
     def name(self) -> str:
         return self._name
-    
+
     @property
     def extensions(self) -> Set[str]:
         return self._extensions
-    
+
     def parse(
         self,
         file_path: Path,
@@ -314,7 +311,7 @@ class CompositeParser(LanguageParser):
         Each parser is tried in order. Results from all parsers are combined.
         """
         seen_ids: Set[str] = set()
-        
+
         for parser in self._parsers:
             try:
                 for item in parser.parse(file_path, content, context):
@@ -329,7 +326,7 @@ class CompositeParser(LanguageParser):
             except Exception:
                 # Try next parser on unexpected errors
                 continue
-    
+
     def get_capabilities(self) -> Set[ParserCapability]:
         """Return union of all sub-parser capabilities."""
         capabilities: Set[ParserCapability] = set()
@@ -367,7 +364,7 @@ def create_file_node(
             rel_path = file_path
     else:
         rel_path = file_path
-    
+
     return Node(
         id=f"file://{rel_path}",
         name=file_path.name,
@@ -402,7 +399,7 @@ def create_env_var_node(
         for t in name.replace("_", " ").replace("-", " ").split()
         if len(t) >= 2
     )
-    
+
     metadata: Dict[str, Any] = {}
     if source_file:
         metadata["source_file"] = str(source_file)
@@ -410,7 +407,7 @@ def create_env_var_node(
         metadata["line"] = line
     if pattern:
         metadata["pattern"] = pattern
-    
+
     return Node(
         id=f"env:{name}",
         name=name,

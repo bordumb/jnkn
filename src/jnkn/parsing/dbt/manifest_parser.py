@@ -19,19 +19,18 @@ Features:
 - Test relationships
 """
 
-from pathlib import Path
-from typing import Generator, List, Optional, Dict, Any, Set, Union
-from dataclasses import dataclass, field
 import json
 import logging
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, Generator, List, Optional, Union
 
+from ...core.types import Edge, Node, NodeType, RelationshipType
 from ..base import (
     LanguageParser,
     ParserCapability,
     ParserContext,
-    ParseError,
 )
-from ...core.types import Node, Edge, NodeType, RelationshipType
 
 logger = logging.getLogger(__name__)
 
@@ -66,13 +65,13 @@ class DbtNode:
     description: Optional[str] = None
     tags: List[str] = field(default_factory=list)
     meta: Dict[str, Any] = field(default_factory=dict)
-    
+
     @property
     def fully_qualified_name(self) -> str:
         """Get the fully qualified table name."""
         parts = [self.database, self.schema_name, self.name]
         return ".".join(p for p in parts if p)
-    
+
     @property
     def node_id(self) -> str:
         """Generate the jnkn node ID."""
@@ -98,7 +97,7 @@ class DbtExposure:
     description: Optional[str] = None
     depends_on: List[str] = field(default_factory=list)
     url: Optional[str] = None
-    
+
     @property
     def node_id(self) -> str:
         return f"data:exposure:{self.name}"
@@ -123,35 +122,35 @@ class DbtManifestParser(LanguageParser):
         nodes = parser.extract_nodes(manifest_path)
         lineage = parser.extract_lineage(manifest_path)
     """
-    
+
     # Node types we care about
     NODE_TYPES = {"model", "source", "seed", "snapshot", "analysis"}
-    
+
     def __init__(self, context: Optional[ParserContext] = None):
         super().__init__(context)
-    
+
     @property
     def name(self) -> str:
         return "dbt_manifest"
-    
+
     @property
     def extensions(self) -> List[str]:
         return [".json"]
-    
+
     @property
     def description(self) -> str:
         return "dbt manifest.json parser for data lineage"
-    
+
     def get_capabilities(self) -> List[ParserCapability]:
         return [
             ParserCapability.DEPENDENCIES,
             ParserCapability.OUTPUTS,
         ]
-    
+
     def supports_file(self, file_path: Path) -> bool:
         """Check if this is a dbt manifest file."""
         name = file_path.name.lower()
-        
+
         # Standard manifest location
         if name == "manifest.json":
             # Check if it's in a target directory
@@ -159,13 +158,13 @@ class DbtManifestParser(LanguageParser):
                 return True
             # Or explicitly named
             return True
-        
+
         # Also support explicit naming
         if name in ("dbt_manifest.json", "manifest.dbt.json"):
             return True
-        
+
         return False
-    
+
     def parse(
         self,
         file_path: Path,
@@ -188,12 +187,12 @@ class DbtManifestParser(LanguageParser):
         except (UnicodeDecodeError, json.JSONDecodeError) as e:
             self._logger.error(f"Failed to parse manifest {file_path}: {e}")
             return
-        
+
         # Validate this is a dbt manifest
         if not self._is_dbt_manifest(manifest):
             self._logger.debug(f"Not a dbt manifest: {file_path}")
             return
-        
+
         # Create file node
         file_id = f"file://{file_path}"
         yield Node(
@@ -207,32 +206,32 @@ class DbtManifestParser(LanguageParser):
                 "dbt_schema_version": manifest.get("metadata", {}).get("dbt_schema_version"),
             },
         )
-        
+
         # Extract nodes (models, sources, seeds, snapshots)
         yield from self._extract_nodes(file_path, file_id, manifest)
-        
+
         # Extract sources
         yield from self._extract_sources(file_path, file_id, manifest)
-        
+
         # Extract exposures
         yield from self._extract_exposures(file_path, file_id, manifest)
-        
+
         # Extract tests
         yield from self._extract_tests(file_path, file_id, manifest)
-    
+
     def _is_dbt_manifest(self, data: Dict[str, Any]) -> bool:
         """Check if this JSON is a dbt manifest."""
         # dbt manifests have a metadata section with dbt_schema_version
         metadata = data.get("metadata", {})
         if "dbt_schema_version" in metadata:
             return True
-        
+
         # Also check for standard dbt manifest sections
         if "nodes" in data and "sources" in data:
             return True
-        
+
         return False
-    
+
     def _extract_nodes(
         self,
         file_path: Path,
@@ -241,19 +240,19 @@ class DbtManifestParser(LanguageParser):
     ) -> Generator[Union[Node, Edge], None, None]:
         """Extract model, seed, snapshot nodes."""
         nodes = manifest.get("nodes", {})
-        
+
         for unique_id, node_data in nodes.items():
             resource_type = node_data.get("resource_type", "")
-            
+
             # Filter to node types we care about
             if resource_type not in self.NODE_TYPES:
                 continue
-            
+
             node_name = node_data.get("name", "")
             schema_name = node_data.get("schema", "")
             database = node_data.get("database")
             package_name = node_data.get("package_name", "")
-            
+
             # Create node ID based on type
             if resource_type == "model":
                 data_id = f"data:model:{schema_name}.{node_name}"
@@ -263,10 +262,10 @@ class DbtManifestParser(LanguageParser):
                 data_id = f"data:snapshot:{schema_name}.{node_name}"
             else:
                 data_id = f"data:{resource_type}:{node_name}"
-            
+
             # Extract columns
             columns = self._extract_columns(node_data.get("columns", {}))
-            
+
             yield Node(
                 id=data_id,
                 name=node_name,
@@ -284,14 +283,14 @@ class DbtManifestParser(LanguageParser):
                     "materialized": node_data.get("config", {}).get("materialized"),
                 },
             )
-            
+
             # Create edge from manifest to this node
             yield Edge(
                 source_id=file_id,
                 target_id=data_id,
                 type=RelationshipType.CONTAINS,
             )
-            
+
             # Extract dependencies (ref() calls)
             depends_on = node_data.get("depends_on", {}).get("nodes", [])
             for dep_id in depends_on:
@@ -303,7 +302,7 @@ class DbtManifestParser(LanguageParser):
                         rel_type = RelationshipType.READS
                     else:
                         rel_type = RelationshipType.DEPENDS_ON
-                    
+
                     yield Edge(
                         source_id=data_id,
                         target_id=dep_node_id,
@@ -312,7 +311,7 @@ class DbtManifestParser(LanguageParser):
                             "dbt_dependency": True,
                         },
                     )
-    
+
     def _extract_sources(
         self,
         file_path: Path,
@@ -321,19 +320,19 @@ class DbtManifestParser(LanguageParser):
     ) -> Generator[Union[Node, Edge], None, None]:
         """Extract source definitions."""
         sources = manifest.get("sources", {})
-        
+
         for unique_id, source_data in sources.items():
             source_name = source_data.get("name", "")
             schema_name = source_data.get("schema", "")
             database = source_data.get("database")
             source_definition = source_data.get("source_name", "")
-            
+
             # Create source node ID
             data_id = f"data:source:{source_definition}.{source_name}"
-            
+
             # Extract columns
             columns = self._extract_columns(source_data.get("columns", {}))
-            
+
             yield Node(
                 id=data_id,
                 name=source_name,
@@ -350,13 +349,13 @@ class DbtManifestParser(LanguageParser):
                     "freshness": source_data.get("freshness"),
                 },
             )
-            
+
             yield Edge(
                 source_id=file_id,
                 target_id=data_id,
                 type=RelationshipType.CONTAINS,
             )
-    
+
     def _extract_exposures(
         self,
         file_path: Path,
@@ -365,13 +364,13 @@ class DbtManifestParser(LanguageParser):
     ) -> Generator[Union[Node, Edge], None, None]:
         """Extract exposure definitions."""
         exposures = manifest.get("exposures", {})
-        
+
         for unique_id, exposure_data in exposures.items():
             exposure_name = exposure_data.get("name", "")
             exposure_type = exposure_data.get("type", "")
-            
+
             data_id = f"data:exposure:{exposure_name}"
-            
+
             yield Node(
                 id=data_id,
                 name=exposure_name,
@@ -386,7 +385,7 @@ class DbtManifestParser(LanguageParser):
                     "maturity": exposure_data.get("maturity"),
                 },
             )
-            
+
             # Create edges from exposure to its dependencies
             depends_on = exposure_data.get("depends_on", {}).get("nodes", [])
             for dep_id in depends_on:
@@ -400,7 +399,7 @@ class DbtManifestParser(LanguageParser):
                             "exposure_type": exposure_type,
                         },
                     )
-    
+
     def _extract_tests(
         self,
         file_path: Path,
@@ -410,33 +409,33 @@ class DbtManifestParser(LanguageParser):
         """Extract test definitions and their relationships."""
         return  # Early return - tests don't generate nodes currently
         yield   # Makes this a generator (never reached but needed for type)
-        
+
         nodes = manifest.get("nodes", {})
-        
+
         for unique_id, node_data in nodes.items():
             resource_type = node_data.get("resource_type", "")
-            
+
             if resource_type != "test":
                 continue
-            
+
             test_name = node_data.get("name", "")
             test_type = node_data.get("test_metadata", {}).get("name", "generic")
-            
+
             # Tests don't need their own nodes usually, but we create
             # edges from tests to the models they test
             depends_on = node_data.get("depends_on", {}).get("nodes", [])
-            
+
             for dep_id in depends_on:
                 dep_node_id = self._convert_dbt_id_to_node_id(dep_id, manifest)
                 if dep_node_id:
                     # We don't create test nodes, but we note that the
                     # model is tested - this goes in metadata
                     pass
-    
+
     def _extract_columns(self, columns_data: Dict[str, Any]) -> List[DbtColumn]:
         """Extract column definitions from node data."""
         columns = []
-        
+
         for col_name, col_data in columns_data.items():
             columns.append(DbtColumn(
                 name=col_name,
@@ -445,9 +444,9 @@ class DbtManifestParser(LanguageParser):
                 tags=col_data.get("tags", []),
                 meta=col_data.get("meta", {}),
             ))
-        
+
         return columns
-    
+
     def _convert_dbt_id_to_node_id(
         self,
         dbt_id: str,
@@ -459,12 +458,12 @@ class DbtManifestParser(LanguageParser):
         dbt IDs are like: model.project.name or source.project.schema.table
         """
         parts = dbt_id.split(".")
-        
+
         if len(parts) < 3:
             return None
-        
+
         resource_type = parts[0]
-        
+
         if resource_type == "model":
             # model.project.name
             # Need to look up schema from manifest
@@ -472,7 +471,7 @@ class DbtManifestParser(LanguageParser):
             schema_name = node_data.get("schema", "public")
             name = parts[-1]
             return f"data:model:{schema_name}.{name}"
-        
+
         elif resource_type == "source":
             # source.project.source_name.table_name
             if len(parts) >= 4:
@@ -480,21 +479,21 @@ class DbtManifestParser(LanguageParser):
                 table_name = parts[3]
                 return f"data:source:{source_name}.{table_name}"
             return None
-        
+
         elif resource_type == "seed":
             node_data = manifest.get("nodes", {}).get(dbt_id, {})
             schema_name = node_data.get("schema", "public")
             name = parts[-1]
             return f"data:seed:{schema_name}.{name}"
-        
+
         elif resource_type == "snapshot":
             node_data = manifest.get("nodes", {}).get(dbt_id, {})
             schema_name = node_data.get("schema", "public")
             name = parts[-1]
             return f"data:snapshot:{schema_name}.{name}"
-        
+
         return None
-    
+
     def extract_lineage(self, manifest_path: Path) -> Dict[str, List[str]]:
         """
         Extract a simple lineage dictionary from the manifest.
@@ -508,7 +507,7 @@ class DbtManifestParser(LanguageParser):
             Dict mapping model names to list of upstream model names
         """
         lineage: Dict[str, List[str]] = {}
-        
+
         try:
             content = manifest_path.read_bytes()
             text = content.decode("utf-8")
@@ -516,27 +515,27 @@ class DbtManifestParser(LanguageParser):
         except Exception as e:
             self._logger.error(f"Failed to parse manifest: {e}")
             return lineage
-        
+
         nodes = manifest.get("nodes", {})
-        
+
         for unique_id, node_data in nodes.items():
             if node_data.get("resource_type") != "model":
                 continue
-            
+
             model_name = node_data.get("name", "")
             depends_on = node_data.get("depends_on", {}).get("nodes", [])
-            
+
             upstream = []
             for dep_id in depends_on:
                 # Extract the name from the dbt ID
                 parts = dep_id.split(".")
                 if len(parts) >= 3:
                     upstream.append(parts[-1])
-            
+
             lineage[model_name] = upstream
-        
+
         return lineage
-    
+
     def extract_nodes_list(self, manifest_path: Path) -> List[DbtNode]:
         """
         Extract all dbt nodes as DbtNode objects.
@@ -550,7 +549,7 @@ class DbtManifestParser(LanguageParser):
             List of DbtNode objects
         """
         result: List[DbtNode] = []
-        
+
         try:
             content = manifest_path.read_bytes()
             text = content.decode("utf-8")
@@ -558,16 +557,16 @@ class DbtManifestParser(LanguageParser):
         except Exception as e:
             self._logger.error(f"Failed to parse manifest: {e}")
             return result
-        
+
         # Extract regular nodes
         for unique_id, node_data in manifest.get("nodes", {}).items():
             resource_type = node_data.get("resource_type", "")
             if resource_type not in self.NODE_TYPES:
                 continue
-            
+
             columns = self._extract_columns(node_data.get("columns", {}))
             depends_on = node_data.get("depends_on", {}).get("nodes", [])
-            
+
             result.append(DbtNode(
                 unique_id=unique_id,
                 name=node_data.get("name", ""),
@@ -583,11 +582,11 @@ class DbtManifestParser(LanguageParser):
                 tags=node_data.get("tags", []),
                 meta=node_data.get("meta", {}),
             ))
-        
+
         # Extract sources
         for unique_id, source_data in manifest.get("sources", {}).items():
             columns = self._extract_columns(source_data.get("columns", {}))
-            
+
             result.append(DbtNode(
                 unique_id=unique_id,
                 name=source_data.get("name", ""),
@@ -601,7 +600,7 @@ class DbtManifestParser(LanguageParser):
                 tags=source_data.get("tags", []),
                 meta=source_data.get("meta", {}),
             ))
-        
+
         return result
 
 

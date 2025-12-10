@@ -15,25 +15,20 @@ Design Principles:
 4. Batch processing support for performance
 """
 
-from pathlib import Path
-from typing import (
-    Dict, Generator, List, Optional, Set, Type, Union,
-    Iterator, Callable, Any
-)
-from dataclasses import dataclass, field
-from collections import defaultdict
 import logging
-import time
 import sys
+import time
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Callable, Dict, Generator, List, Optional, Set, Type, Union
 
+from ..core.types import Edge, Node, ScanMetadata
 from .base import (
     LanguageParser,
-    ParserContext,
-    ParserCapability,
-    ParseResult,
     ParseError,
+    ParserContext,
+    ParseResult,
 )
-from ..core.types import Node, Edge, ScanMetadata
 
 logger = logging.getLogger(__name__)
 
@@ -77,11 +72,11 @@ class ScanConfig:
     max_files: int = 0
     follow_symlinks: bool = False
     incremental: bool = True
-    
+
     def should_skip_dir(self, dir_name: str) -> bool:
         """Check if a directory should be skipped."""
         return dir_name in self.skip_dirs
-    
+
     def should_skip_file(self, file_path: Path) -> bool:
         """Check if a file should be skipped."""
         from fnmatch import fnmatch
@@ -103,7 +98,7 @@ class ScanStats:
     total_errors: int = 0
     scan_time_ms: float = 0.0
     parsers_used: Set[str] = field(default_factory=set)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -126,13 +121,13 @@ class ParserRegistry:
     Manages parser registration and lookup by extension.
     Supports both direct registration and entry point discovery.
     """
-    
+
     def __init__(self):
         self._parsers: Dict[str, LanguageParser] = {}
         self._extension_map: Dict[str, str] = {}
         self._parser_factories: Dict[str, Type[LanguageParser]] = {}
         self._logger = logging.getLogger(f"{__name__}.ParserRegistry")
-    
+
     def register(self, parser: LanguageParser) -> None:
         """
         Register a parser instance.
@@ -144,12 +139,12 @@ class ParserRegistry:
             ValueError: If parser name is already registered
         """
         name = parser.name
-        
+
         if name in self._parsers:
             self._logger.warning(f"Overwriting existing parser: {name}")
-        
+
         self._parsers[name] = parser
-        
+
         for ext in parser.extensions:
             ext_lower = ext.lower()
             if ext_lower in self._extension_map:
@@ -159,11 +154,11 @@ class ParserRegistry:
                     f"now mapping to {name}"
                 )
             self._extension_map[ext_lower] = name
-        
+
         self._logger.debug(
             f"Registered parser: {name} for extensions {parser.extensions}"
         )
-    
+
     def register_factory(
         self,
         name: str,
@@ -178,7 +173,7 @@ class ParserRegistry:
         """
         self._parser_factories[name] = factory
         self._logger.debug(f"Registered parser factory: {name}")
-    
+
     def unregister(self, name: str) -> bool:
         """
         Unregister a parser by name.
@@ -191,17 +186,17 @@ class ParserRegistry:
         """
         if name not in self._parsers:
             return False
-        
+
         parser = self._parsers.pop(name)
-        
+
         # Remove extension mappings
         for ext in parser.extensions:
             ext_lower = ext.lower()
             if self._extension_map.get(ext_lower) == name:
                 del self._extension_map[ext_lower]
-        
+
         return True
-    
+
     def get_parser(self, name: str) -> Optional[LanguageParser]:
         """
         Get a parser by name.
@@ -215,15 +210,15 @@ class ParserRegistry:
         # Try direct lookup first
         if name in self._parsers:
             return self._parsers[name]
-        
+
         # Try factory instantiation
         if name in self._parser_factories:
             parser = self._parser_factories[name]()
             self.register(parser)
             return parser
-        
+
         return None
-    
+
     def get_parser_for_extension(self, extension: str) -> Optional[LanguageParser]:
         """
         Get the parser registered for a file extension.
@@ -236,13 +231,13 @@ class ParserRegistry:
         """
         ext = extension if extension.startswith(".") else f".{extension}"
         ext_lower = ext.lower()
-        
+
         parser_name = self._extension_map.get(ext_lower)
         if parser_name:
             return self.get_parser(parser_name)
-        
+
         return None
-    
+
     def get_parser_for_file(self, file_path: Path) -> Optional[LanguageParser]:
         """
         Get the appropriate parser for a file.
@@ -254,17 +249,17 @@ class ParserRegistry:
             Parser instance or None if no parser handles this file
         """
         return self.get_parser_for_extension(file_path.suffix)
-    
+
     @property
     def registered_parsers(self) -> List[str]:
         """Get list of registered parser names."""
         return list(self._parsers.keys())
-    
+
     @property
     def supported_extensions(self) -> List[str]:
         """Get list of all supported file extensions."""
         return list(self._extension_map.keys())
-    
+
     def discover_parsers(self, entry_point_group: str = "jnkn.parsers") -> int:
         """
         Auto-discover parsers via entry points.
@@ -276,7 +271,7 @@ class ParserRegistry:
             Number of parsers discovered
         """
         discovered = 0
-        
+
         try:
             if sys.version_info >= (3, 10):
                 from importlib.metadata import entry_points
@@ -285,7 +280,7 @@ class ParserRegistry:
                 from importlib.metadata import entry_points
                 all_eps = entry_points()
                 eps = all_eps.get(entry_point_group, [])
-            
+
             for ep in eps:
                 try:
                     parser_class = ep.load()
@@ -295,12 +290,12 @@ class ParserRegistry:
                         self._logger.info(f"Discovered parser via entry point: {ep.name}")
                 except Exception as e:
                     self._logger.error(f"Failed to load parser entry point {ep.name}: {e}")
-        
+
         except Exception as e:
             self._logger.warning(f"Entry point discovery failed: {e}")
-        
+
         return discovered
-    
+
     def get_stats(self) -> Dict[str, Any]:
         """Get registry statistics."""
         return {
@@ -334,7 +329,7 @@ class ParserEngine:
         for result in engine.scan(Path("./src")):
             print(f"Parsed {result.file_path}: {len(result.nodes)} nodes")
     """
-    
+
     def __init__(self, context: Optional[ParserContext] = None):
         """
         Initialize the parser engine.
@@ -346,12 +341,12 @@ class ParserEngine:
         self._registry = ParserRegistry()
         self._file_hashes: Dict[str, str] = {}  # For incremental scanning
         self._logger = logging.getLogger(f"{__name__}.ParserEngine")
-    
+
     @property
     def context(self) -> ParserContext:
         """Get the engine's runtime context."""
         return self._context
-    
+
     @context.setter
     def context(self, value: ParserContext) -> None:
         """Set the engine's runtime context."""
@@ -359,12 +354,12 @@ class ParserEngine:
         # Update all registered parsers
         for parser in self._registry._parsers.values():
             parser.context = value
-    
+
     @property
     def registry(self) -> ParserRegistry:
         """Get the parser registry."""
         return self._registry
-    
+
     def register(self, parser: LanguageParser) -> None:
         """
         Register a parser.
@@ -374,7 +369,7 @@ class ParserEngine:
         """
         parser.context = self._context
         self._registry.register(parser)
-    
+
     def supports(self, file_path: Path) -> bool:
         """
         Check if a file type is supported.
@@ -386,7 +381,7 @@ class ParserEngine:
             True if a parser exists for this file type
         """
         return self._registry.get_parser_for_file(file_path) is not None
-    
+
     def get_parser(self, file_path: Path) -> Optional[LanguageParser]:
         """
         Get the parser for a file.
@@ -398,7 +393,7 @@ class ParserEngine:
             Parser instance or None
         """
         return self._registry.get_parser_for_file(file_path)
-    
+
     def parse_file(
         self,
         file_path: Path,
@@ -418,19 +413,19 @@ class ParserEngine:
         if not parser:
             self._logger.debug(f"No parser for file: {file_path}")
             return
-        
+
         if content is None:
             try:
                 content = file_path.read_bytes()
             except Exception as e:
                 self._logger.error(f"Failed to read file {file_path}: {e}")
                 return
-        
+
         try:
             yield from parser.parse(file_path, content)
-        except Exception as e:
+        except Exception:
             self._logger.exception(f"Parser error for {file_path}")
-    
+
     def parse_file_full(
         self,
         file_path: Path,
@@ -457,9 +452,9 @@ class ParserEngine:
                     recoverable=True,
                 )],
             )
-        
+
         return parser.parse_full(file_path, content)
-    
+
     def discover_files(
         self,
         config: ScanConfig,
@@ -475,20 +470,20 @@ class ParserEngine:
         """
         root = config.root_dir
         files_found = 0
-        
+
         def walk_dir(directory: Path) -> Generator[Path, None, None]:
             nonlocal files_found
-            
+
             try:
                 entries = list(directory.iterdir())
             except PermissionError:
                 self._logger.warning(f"Permission denied: {directory}")
                 return
-            
+
             for entry in sorted(entries):
                 if config.max_files > 0 and files_found >= config.max_files:
                     return
-                
+
                 if entry.is_dir():
                     if entry.name.startswith("."):
                         continue
@@ -497,25 +492,25 @@ class ParserEngine:
                     if entry.is_symlink() and not config.follow_symlinks:
                         continue
                     yield from walk_dir(entry)
-                
+
                 elif entry.is_file():
                     if config.should_skip_file(entry):
                         continue
-                    
+
                     # Check extension filter
                     if config.file_extensions:
                         if entry.suffix.lower() not in config.file_extensions:
                             continue
-                    
+
                     # Check if we have a parser
                     if not self.supports(entry):
                         continue
-                    
+
                     files_found += 1
                     yield entry
-        
+
         yield from walk_dir(root)
-    
+
     def scan(
         self,
         config: Optional[ScanConfig] = None,
@@ -533,21 +528,21 @@ class ParserEngine:
         """
         if config is None:
             config = ScanConfig()
-        
+
         # First, discover all files to get total count
         files = list(self.discover_files(config))
         total = len(files)
-        
+
         for i, file_path in enumerate(files):
             if progress_callback:
                 progress_callback(file_path, i + 1, total)
-            
+
             # Check for incremental skip
             if config.incremental:
                 try:
                     current_hash = ScanMetadata.compute_hash(str(file_path))
                     cached_hash = self._file_hashes.get(str(file_path))
-                    
+
                     if cached_hash == current_hash:
                         # File unchanged, skip
                         yield ParseResult(
@@ -556,15 +551,15 @@ class ParserEngine:
                             metadata={"skipped": "unchanged"},
                         )
                         continue
-                    
+
                     # Update hash cache
                     self._file_hashes[str(file_path)] = current_hash
                 except Exception:
                     pass  # Continue with parsing if hash fails
-            
+
             result = self.parse_file_full(file_path)
             yield result
-    
+
     def scan_all(
         self,
         config: Optional[ScanConfig] = None,
@@ -586,12 +581,12 @@ class ParserEngine:
         all_nodes: List[Node] = []
         all_edges: List[Edge] = []
         stats = ScanStats()
-        
+
         for result in self.scan(config, progress_callback):
             if result.metadata.get("skipped") == "unchanged":
                 stats.files_unchanged += 1
                 continue
-            
+
             if result.success:
                 all_nodes.extend(result.nodes)
                 all_edges.extend(result.edges)
@@ -600,21 +595,21 @@ class ParserEngine:
                 stats.total_edges += len(result.edges)
             else:
                 stats.files_failed += 1
-            
+
             stats.total_errors += len(result.errors)
-            
+
             # Track which parsers were used
             for cap in result.capabilities_used:
                 stats.parsers_used.add(cap.value)
-        
+
         stats.scan_time_ms = (time.perf_counter() - start_time) * 1000
-        
+
         return all_nodes, all_edges, stats
-    
+
     def clear_cache(self) -> None:
         """Clear the incremental scanning cache."""
         self._file_hashes.clear()
-    
+
     def get_stats(self) -> Dict[str, Any]:
         """Get engine statistics."""
         return {
@@ -634,41 +629,41 @@ def create_default_engine() -> ParserEngine:
         Configured ParserEngine
     """
     engine = ParserEngine()
-    
+
     # Try to register built-in parsers
     # These may fail if dependencies are missing
-    
+
     try:
         from .python.parser import PythonParser
         engine.register(PythonParser())
     except ImportError as e:
         logger.debug(f"Python parser not available: {e}")
-    
+
     try:
         from .terraform.parser import TerraformParser
         engine.register(TerraformParser())
     except ImportError as e:
         logger.debug(f"Terraform parser not available: {e}")
-    
+
     try:
         from .javascript.parser import JavaScriptParser
         engine.register(JavaScriptParser())
     except ImportError as e:
         logger.debug(f"JavaScript parser not available: {e}")
-    
+
     try:
         from .kubernetes.parser import KubernetesParser
         engine.register(KubernetesParser())
     except ImportError as e:
         logger.debug(f"Kubernetes parser not available: {e}")
-    
+
     try:
         from .dbt.manifest_parser import DbtManifestParser
         engine.register(DbtManifestParser())
     except ImportError as e:
         logger.debug(f"dbt parser not available: {e}")
-    
+
     # Try entry point discovery
     engine.registry.discover_parsers()
-    
+
     return engine

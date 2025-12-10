@@ -3,7 +3,7 @@
 > **Version:** 1.0.0  
 > **Last Updated:** December 2024
 
-This document describes the design and implementation of jnkn's CI/CD gate - a pre-merge enforcement layer that prevents breaking changes from reaching production.
+This document describes the design and implementation of Jnkn's CI/CD gate - a pre-merge enforcement layer that prevents breaking changes from reaching production.
 
 ---
 
@@ -27,9 +27,9 @@ This document describes the design and implementation of jnkn's CI/CD gate - a p
 
 ### The One-Liner
 
-**jnkn's CI/CD gate tells you "this PR will break the executive dashboard" before you merge, not after the CEO asks why the numbers are wrong.**
+**Jnkn's CI/CD gate tells you "this PR will break the executive dashboard" before you merge, not after the CEO asks why the numbers are wrong.**
 
-### Before jnkn
+### Before Jnkn
 
 ```
 Developer → PR → Code Review → Merge → Deploy → Run → Silent Failure → Alert
@@ -49,10 +49,10 @@ Developer → PR → Code Review → Merge → Deploy → Run → Silent Failure
               - Which ML models use it as input
 ```
 
-### After jnkn
+### After Jnkn
 
 ```
-Developer → PR → jnkn Check → Decision
+Developer → PR → Jnkn Check → Decision
                       │
                       ├─→ PASS: Safe to merge
                       │
@@ -69,7 +69,7 @@ Developer → PR → jnkn Check → Decision
 
 ### Quantified Value
 
-| Metric | Without jnkn | With jnkn |
+| Metric | Without Jnkn | With Jnkn |
 |--------|----------------|-------------|
 | Time to detect impact | Hours to days | Seconds (at PR time) |
 | Data incidents from code changes | Common | Preventable |
@@ -111,7 +111,7 @@ This knowledge exists in two places:
 - **OpenLineage**: Actual runtime dependencies
 - **Tribal knowledge**: Who owns what, what's critical
 
-jnkn bridges both gaps.
+Jnkn bridges both gaps.
 
 ---
 
@@ -174,7 +174,7 @@ graph TB
         FILE[Diff File]
     end
     
-    subgraph "jnkn Check Command"
+    subgraph "Jnkn Check Command"
         PARSER[Diff Parser]
         ENGINE[Check Engine]
         POLICY_ENGINE[Policy Engine]
@@ -526,7 +526,7 @@ Exit 2 (WARN)
 ### GitHub Actions
 
 ```yaml
-name: jnkn Impact Analysis
+name: Jnkn Impact Analysis
 
 on:
   pull_request:
@@ -542,7 +542,7 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Run jnkn Check
+      - name: Run Jnkn Check
         id: jnkn
         env:
           OPENLINEAGE_URL: ${{ secrets.MARQUEZ_URL }}
@@ -716,7 +716,7 @@ Policy Violations:
 
 **Markdown (PR Comments)**
 ```markdown
-## 🔍 jnkn Impact Analysis
+## 🔍 Jnkn Impact Analysis
 
 ### ❌ BLOCKED - Critical Impact Detected
 
@@ -793,7 +793,7 @@ fi
 
 ### Prerequisites
 
-1. **jnkn installed**: `pip install jnkn`
+1. **Jnkn installed**: `pip install jnkn`
 2. **Git available**: For diff parsing
 3. **OpenLineage/Marquez** (optional): For runtime enrichment
 4. **Policy file**: Define your critical assets
@@ -826,7 +826,7 @@ jnkn check --git-diff main HEAD --policy policy.yaml
 | `OPENLINEAGE_URL` | Marquez/DataHub API URL | None |
 | `OPENLINEAGE_NAMESPACE` | Namespace to query | All |
 | `GITHUB_TOKEN` | For GitHub PR API | None |
-| `jnkn_POLICY` | Default policy file | None |
+| `JUNKAN_POLICY` | Default policy file | None |
 
 ### Rollout Strategy
 

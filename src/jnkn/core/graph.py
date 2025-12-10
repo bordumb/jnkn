@@ -8,10 +8,12 @@ This module provides a type-safe wrapper around NetworkX that:
 - Provides graph statistics and export capabilities
 """
 
-import networkx as nx
-from typing import List, Set, Dict, Optional, Iterator, Tuple, Any
 from collections import defaultdict
-from .types import Node, Edge, NodeType, RelationshipType
+from typing import Any, Dict, Iterator, List, Optional, Set, Tuple
+
+import networkx as nx
+
+from .types import Edge, Node, NodeType
 
 
 class TokenIndex:
@@ -21,35 +23,35 @@ class TokenIndex:
     Enables O(1) lookup of nodes containing specific tokens,
     critical for efficient stitching operations (O(n) vs O(n*m)).
     """
-    
+
     def __init__(self):
         self._token_to_nodes: Dict[str, Set[str]] = defaultdict(set)
         self._node_to_tokens: Dict[str, Set[str]] = defaultdict(set)
-    
+
     def add(self, node_id: str, tokens: List[str]) -> None:
         """Index a node by its tokens."""
         for token in tokens:
             self._token_to_nodes[token].add(node_id)
             self._node_to_tokens[node_id].add(token)
-    
+
     def remove(self, node_id: str) -> None:
         """Remove a node from the index."""
         if node_id in self._node_to_tokens:
             for token in self._node_to_tokens[node_id]:
                 self._token_to_nodes[token].discard(node_id)
             del self._node_to_tokens[node_id]
-    
+
     def find_by_token(self, token: str) -> Set[str]:
         """Find all node IDs containing a specific token."""
         return self._token_to_nodes.get(token, set()).copy()
-    
+
     def find_by_any_token(self, tokens: List[str]) -> Set[str]:
         """Find all node IDs containing any of the given tokens."""
         result = set()
         for token in tokens:
             result.update(self._token_to_nodes.get(token, set()))
         return result
-    
+
     def find_by_all_tokens(self, tokens: List[str]) -> Set[str]:
         """Find all node IDs containing all of the given tokens."""
         if not tokens:
@@ -58,11 +60,11 @@ class TokenIndex:
         for token in tokens[1:]:
             result &= self._token_to_nodes.get(token, set())
         return result
-    
+
     def get_tokens(self, node_id: str) -> Set[str]:
         """Get all tokens for a node."""
         return self._node_to_tokens.get(node_id, set()).copy()
-    
+
     @property
     def token_count(self) -> int:
         """Number of unique tokens indexed."""
@@ -80,7 +82,7 @@ class DependencyGraph:
     - Graph traversal operations (descendants, ancestors)
     - Statistics and export capabilities
     """
-    
+
     def __init__(self):
         self._graph = nx.DiGraph()
         self._nodes_by_type: Dict[NodeType, Set[str]] = defaultdict(set)
@@ -105,11 +107,11 @@ class DependencyGraph:
         """
         if node_id not in self._graph:
             return
-        
+
         node_data = self._graph.nodes[node_id].get("data")
         if node_data:
             self._nodes_by_type[node_data.type].discard(node_id)
-        
+
         self._token_index.remove(node_id)
         self._graph.remove_node(node_id)
 
@@ -129,7 +131,7 @@ class DependencyGraph:
         """
         if source_id not in self._graph:
             return 0
-        
+
         edges_to_remove = list(self._graph.out_edges(source_id))
         self._graph.remove_edges_from(edges_to_remove)
         return len(edges_to_remove)
@@ -185,7 +187,7 @@ class DependencyGraph:
             node_ids = self._token_index.find_by_all_tokens(tokens)
         else:
             node_ids = self._token_index.find_by_any_token(tokens)
-        
+
         return [self.get_node(nid) for nid in node_ids if self.get_node(nid)]
 
     def get_descendants(self, node_id: str) -> Set[str]:
@@ -204,7 +206,7 @@ class DependencyGraph:
         """Get direct outgoing edges from a node."""
         if node_id not in self._graph:
             return []
-        
+
         result = []
         for _, target_id, data in self._graph.out_edges(node_id, data=True):
             edge = data.get("data")
@@ -216,7 +218,7 @@ class DependencyGraph:
         """Get direct incoming edges to a node."""
         if node_id not in self._graph:
             return []
-        
+
         result = []
         for source_id, _, data in self._graph.in_edges(node_id, data=True):
             edge = data.get("data")
@@ -254,11 +256,11 @@ class DependencyGraph:
             node_type.value: len(self._nodes_by_type.get(node_type, set()))
             for node_type in NodeType
         }
-        
+
         edge_counts: Dict[str, int] = defaultdict(int)
         for edge in self.iter_edges():
             edge_counts[edge.type.value] += 1
-        
+
         return {
             "total_nodes": self.node_count,
             "total_edges": self.edge_count,

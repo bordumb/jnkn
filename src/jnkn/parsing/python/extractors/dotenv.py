@@ -1,10 +1,11 @@
-from pathlib import Path
-from typing import Generator, Set, Union, Optional, Any
 import re
+from pathlib import Path
+from typing import Generator, Optional, Set, Union
 
-from ....core.types import Node, Edge, NodeType, RelationshipType
+from ....core.types import Edge, Node, NodeType, RelationshipType
 from ..validation import is_valid_env_var_name
-from .base import BaseExtractor, Tree, logger
+from .base import BaseExtractor, Tree
+
 
 class DotenvExtractor(BaseExtractor):
     @property
@@ -26,7 +27,7 @@ class DotenvExtractor(BaseExtractor):
         text: str,
         seen_vars: Set[str],
     ) -> Generator[Union[Node, Edge], None, None]:
-        
+
         # 1. Inline usage: dotenv_values(...)["VAR"]
         inline_pattern = r'dotenv_values\s*\([^)]*\)\s*\[\s*["\']([^"\']+)["\']'
         for match in re.finditer(inline_pattern, text):
@@ -40,13 +41,13 @@ class DotenvExtractor(BaseExtractor):
         config_vars = set()
         for match in re.finditer(assignment_pattern, text):
             config_vars.add(match.group(1))
-        
+
         # Step B: Find usages of those variables: my_conf["VAR"] or my_conf.get("VAR")
         if config_vars:
             # Create regex for: var["KEY"] or var.get("KEY")
             # (?:var1|var2) ...
             vars_regex = "|".join(re.escape(v) for v in config_vars)
-            
+
             # Match: config["VAR"]
             # FIX: Use raw f-string (rf) to handle backslashes correctly
             dict_access_pattern = rf'(?:{vars_regex})\s*\[\s*["\']([^"\']+)["\']'
@@ -61,13 +62,13 @@ class DotenvExtractor(BaseExtractor):
 
     def _yield_match(self, match, group_idx, text, file_path, file_id, pattern_name, seen_vars):
         var_name = match.group(group_idx)
-        
+
         if not is_valid_env_var_name(var_name):
             return
-            
+
         line = text[:match.start()].count('\n') + 1
         env_id = f"env:{var_name}"
-        
+
         yield Node(
             id=env_id,
             name=var_name,
@@ -78,7 +79,7 @@ class DotenvExtractor(BaseExtractor):
                 "line": line,
             },
         )
-        
+
         yield Edge(
             source_id=file_id,
             target_id=env_id,

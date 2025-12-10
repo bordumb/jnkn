@@ -2,11 +2,12 @@
 Stats and Clear Commands - Graph statistics and cleanup.
 """
 
-import click
 import json
 from pathlib import Path
 
-from ..utils import echo_success, echo_error, load_graph
+import click
+
+from ..utils import echo_error, echo_success, load_graph
 
 
 @click.command()
@@ -25,22 +26,22 @@ def stats(graph_file: str, as_json: bool):
         jnkn stats --json
     """
     graph_path = Path(graph_file)
-    
+
     if not graph_path.exists():
         echo_error(f"Graph not found: {graph_file}")
         click.echo("Run 'jnkn scan' first to create the graph.")
         return
-    
+
     graph = load_graph(graph_file)
     if graph is None:
         return
-    
+
     s = graph.stats()
-    
+
     if as_json:
         click.echo(json.dumps(s, indent=2))
         return
-    
+
     click.echo()
     click.echo(f"📊 {click.style('Graph Statistics', bold=True)}")
     click.echo("═" * 40)
@@ -50,23 +51,23 @@ def stats(graph_file: str, as_json: bool):
     click.echo()
     click.echo(f"Nodes: {s['total_nodes']}")
     click.echo(f"Edges: {s['total_edges']}")
-    
+
     if s.get("nodes_by_type"):
         click.echo()
         click.echo("Nodes by type:")
         for node_type, count in s["nodes_by_type"].items():
             click.echo(f"  {node_type}: {count}")
-    
+
     if s.get("edges_by_type"):
         click.echo()
         click.echo("Edges by type:")
         for edge_type, count in s["edges_by_type"].items():
             click.echo(f"  {edge_type}: {count}")
-    
+
     if "orphans" in s:
         click.echo()
         click.echo(f"Orphans: {s['orphans']}")
-    
+
     click.echo()
 
 
@@ -86,7 +87,7 @@ def clear(graph_file: str, clear_all: bool):
         jnkn clear --all
     """
     cleared = []
-    
+
     if clear_all:
         jnkn_dir = Path(".jnkn")
         if jnkn_dir.exists():
@@ -98,7 +99,7 @@ def clear(graph_file: str, clear_all: bool):
         if graph_path.exists():
             graph_path.unlink()
             cleared.append(graph_file)
-    
+
     if cleared:
         echo_success(f"Cleared: {', '.join(cleared)}")
     else:

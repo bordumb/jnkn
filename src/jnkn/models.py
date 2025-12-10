@@ -1,6 +1,8 @@
 from enum import StrEnum
-from typing import Dict, Any, Optional
+from typing import Any, Dict
+
 from pydantic import BaseModel, Field
+
 
 class RelationshipType(StrEnum):
     WRITES_TO = "writes_to"

@@ -9,13 +9,12 @@ Covers:
 4. Dynamic/unresolvable patterns
 """
 
-import json
-from jnkn.parsing.pyspark.column_lineage import extract_column_lineage, ColumnLineageExtractor
+from jnkn.parsing.pyspark.column_lineage import extract_column_lineage
 
 
 def test_sql_extraction():
     """Test extraction from spark.sql() calls."""
-    
+
     code = '''
 from pyspark.sql import SparkSession
 spark = SparkSession.builder.getOrCreate()
@@ -46,44 +45,44 @@ df3 = spark.sql("""
     WHERE a.active = true
 """)
 '''
-    
+
     result = extract_column_lineage(code, "test_sql.py")
-    
+
     print("=" * 60)
     print("TEST: SQL String Extraction")
     print("=" * 60)
     print(f"Columns read: {len(result.columns_read)}")
-    
+
     # Check specific columns were extracted
     col_names = {c.column for c in result.columns_read}
-    expected = {"column_a", "column_b", "user_id", "event_type", "amount", "status", 
+    expected = {"column_a", "column_b", "user_id", "event_type", "amount", "status",
                 "id", "name", "value", "category", "foreign_id", "active"}
-    
+
     found = expected & col_names
     missing = expected - col_names
-    
+
     print(f"Expected columns found: {len(found)}/{len(expected)}")
     if missing:
         print(f"Missing: {missing}")
-    
+
     # Check contexts
     select_cols = [c for c in result.columns_read if c.context.value == "select"]
     filter_cols = [c for c in result.columns_read if c.context.value == "filter"]
     groupby_cols = [c for c in result.columns_read if c.context.value == "groupby"]
     join_cols = [c for c in result.columns_read if c.context.value == "join"]
-    
+
     print(f"SELECT columns: {len(select_cols)}")
     print(f"FILTER columns: {len(filter_cols)}")
     print(f"GROUP BY columns: {len(groupby_cols)}")
     print(f"JOIN columns: {len(join_cols)}")
     print()
-    
+
     return result
 
 
 def test_dataframe_methods():
     """Test extraction from DataFrame method chains."""
-    
+
     code = '''
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
@@ -120,35 +119,35 @@ joined = result_df.join(
 # Order by
 sorted_df = summary.orderBy("total_amount", col("user_id").desc())
 '''
-    
+
     result = extract_column_lineage(code, "test_df.py")
-    
+
     print("=" * 60)
     print("TEST: DataFrame Method Extraction")
     print("=" * 60)
     print(f"Columns read: {len(result.columns_read)}")
     print(f"Columns written: {len(result.columns_written)}")
-    
+
     col_names = {c.column for c in result.columns_read}
-    expected = {"column_a", "column_b", "status", "user_id", "event_type", 
+    expected = {"column_a", "column_b", "status", "user_id", "event_type",
                 "amount", "quantity", "event_id", "date", "total_amount"}
-    
+
     found = expected & col_names
     print(f"Expected columns found: {len(found)}/{len(expected)}")
-    
+
     # Check written columns
     written_names = {c.column for c in result.columns_written}
     expected_written = {"amount_cents", "total_amount", "avg_quantity", "event_count"}
     found_written = expected_written & written_names
     print(f"Written columns found: {len(found_written)}/{len(expected_written)}")
-    
+
     print()
     return result
 
 
 def test_variable_resolution():
     """Test extraction with variable-based column references."""
-    
+
     code = '''
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
@@ -175,36 +174,36 @@ grouped = read_df.groupBy(grouping_fields).sum("amount")
 # Partial resolution - some static, some dynamic
 mixed_df = read_df.select("static_col", *base_cols)
 '''
-    
+
     result = extract_column_lineage(code, "test_vars.py")
-    
+
     print("=" * 60)
     print("TEST: Variable Resolution")
     print("=" * 60)
     print(f"Columns read: {len(result.columns_read)}")
     print(f"Dynamic refs: {len(result.dynamic_refs)}")
-    
+
     # Check resolved variables
     col_names = {c.column for c in result.columns_read}
     expected_resolved = {"column_a", "column_b", "id", "name", "date", "status", "amount", "static_col"}
-    
+
     found = expected_resolved & col_names
     print(f"Resolved columns: {len(found)}/{len(expected_resolved)}")
-    
+
     # Check confidence levels
     high_conf = [c for c in result.columns_read if c.confidence.label == "high"]
     medium_conf = [c for c in result.columns_read if c.confidence.label == "medium"]
-    
+
     print(f"High confidence: {len(high_conf)}")
     print(f"Medium confidence (from variables): {len(medium_conf)}")
-    
+
     print()
     return result
 
 
 def test_dynamic_patterns():
     """Test detection of unresolvable dynamic patterns."""
-    
+
     code = '''
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
@@ -234,25 +233,25 @@ else:
     cols = ["a"]
 df4 = df.select(cols)  # cols is resolved in this scope
 '''
-    
+
     result = extract_column_lineage(code, "test_dynamic.py")
-    
+
     print("=" * 60)
     print("TEST: Dynamic/Unresolvable Patterns")
     print("=" * 60)
     print(f"Columns read: {len(result.columns_read)}")
     print(f"Dynamic refs: {len(result.dynamic_refs)}")
-    
+
     for dyn in result.dynamic_refs:
         print(f"  - Line {dyn.line_number}: {dyn.note}")
-    
+
     print()
     return result
 
 
 def test_complex_transforms():
     """Test extraction of complex transformations."""
-    
+
     code = '''
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
@@ -292,29 +291,29 @@ df = df.withColumn("full_address",
     )
 )
 '''
-    
+
     result = extract_column_lineage(code, "test_transforms.py")
-    
+
     print("=" * 60)
     print("TEST: Complex Transformations")
     print("=" * 60)
     print(f"Columns read: {len(result.columns_read)}")
     print(f"Columns written: {len(result.columns_written)}")
     print(f"Lineage mappings: {len(result.lineage)}")
-    
+
     # Show lineage
     print("\nLineage mappings:")
     for mapping in result.lineage:
         sources = [s.column for s in mapping.source_columns]
         print(f"  {mapping.output_column} <- {sources}")
-    
+
     print()
     return result
 
 
 def test_your_examples():
     """Test the specific examples from your message."""
-    
+
     code = '''
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
@@ -337,22 +336,22 @@ read_df2 = spark.read.parquet("hdfs://group/data_eng/database/table/.../date={da
 filtered_df2 = read_df2.filter(col("column_a") == filter_value)
 selected_df2 = filtered_df2.select(grouping_fields)
 '''
-    
+
     result = extract_column_lineage(code, "your_examples.py")
-    
+
     print("=" * 60)
     print("TEST: Your Specific Examples")
     print("=" * 60)
-    
+
     print(f"Total columns read: {len(result.columns_read)}")
     print(f"Dynamic refs: {len(result.dynamic_refs)}")
-    
+
     print("\nColumns found:")
     for col_ref in result.columns_read:
         conf = col_ref.confidence.label
         ctx = col_ref.context.value
         print(f"  {col_ref.column:20} [{ctx:8}] (confidence: {conf})")
-    
+
     print()
     return result
 
@@ -361,14 +360,14 @@ def main():
     print("\n" + "=" * 60)
     print("COLUMN LINEAGE EXTRACTION TEST SUITE")
     print("=" * 60 + "\n")
-    
+
     test_sql_extraction()
     test_dataframe_methods()
     test_variable_resolution()
     test_dynamic_patterns()
     test_complex_transforms()
     test_your_examples()
-    
+
     print("=" * 60)
     print("ALL TESTS COMPLETE")
     print("=" * 60)

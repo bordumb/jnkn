@@ -16,7 +16,7 @@ import click
               help="Explain why match was NOT made")
 @click.option("--alternatives", is_flag=True,
               help="Show alternative matches that were considered")
-def explain(source_id: str, target_id: str, min_confidence: float, 
+def explain(source_id: str, target_id: str, min_confidence: float,
             why_not: bool, alternatives: bool):
     """
     Explain why a match was made (or not made).
@@ -32,9 +32,9 @@ def explain(source_id: str, target_id: str, min_confidence: float,
     """
     try:
         from ...analysis.explain import create_explanation_generator
-        
+
         generator = create_explanation_generator(min_confidence=min_confidence)
-        
+
         if why_not:
             output = generator.explain_why_not(source_id, target_id)
         else:
@@ -43,9 +43,9 @@ def explain(source_id: str, target_id: str, min_confidence: float,
                 find_alternatives=alternatives
             )
             output = generator.format(explanation)
-        
+
         click.echo(output)
-    
+
     except ImportError:
         # Fallback: basic explanation
         click.echo("=" * 60)

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
+
 @dataclass
 class PythonEnvVar:
     """Represents a detected environment variable usage."""
@@ -9,7 +10,7 @@ class PythonEnvVar:
     line: int
     column: int
     default_value: Optional[str] = None
-    
+
     def to_node_id(self) -> str:
         return f"env:{self.name}"
 
@@ -21,7 +22,7 @@ class PythonImport:
     is_relative: bool
     line: int
     names: List[str] = None  # For 'from x import a, b, c'
-    
+
     def to_file_path(self) -> str:
         """Convert import to a probable file path."""
         if self.is_relative:
@@ -35,6 +36,6 @@ class PythonDefinition:
     kind: str  # "function" or "class"
     line: int
     decorators: List[str] = None
-    
+
     def to_node_id(self, file_path: str) -> str:
         return f"entity:{file_path}:{self.name}"
