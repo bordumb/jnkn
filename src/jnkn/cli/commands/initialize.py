@@ -5,7 +5,6 @@ This module handles the `jnkn init` command, which bootstraps a project
 with a configuration file tailored to the detected technology stack.
 """
 
-import os
 import uuid
 from pathlib import Path
 from typing import Set

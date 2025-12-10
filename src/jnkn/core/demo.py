@@ -9,7 +9,6 @@ to ensure the user sees immediate value during their first scan.
 
 import logging
 from pathlib import Path
-from typing import Dict
 
 logger = logging.getLogger(__name__)
 
