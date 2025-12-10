@@ -4937,6 +4937,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Precision vs Recall
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -4953,6 +4971,252 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#current-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Current Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-false-positive-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The False Positive Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-threshold-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Threshold Decision
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adjustable-thresholds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adjustable Thresholds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penalty-system-as-precision-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Penalty System as Precision Tool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#suppression-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suppression System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explainability-for-triage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explainability for Triage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-why-not-explanation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The "Why Not" Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trade-off-philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trade-off Philosophy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trade-off Philosophy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-to-prioritize-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Prioritize Precision
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-prioritize-recall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Prioritize Recall
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Configurations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-ideas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Ideas
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Future Ideas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#short-term-confidence-bands-in-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short-term: Confidence Bands in Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#short-term-per-rule-thresholds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short-term: Per-Rule Thresholds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#medium-term-feedback-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medium-term: Feedback Loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#medium-term-anomaly-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medium-term: Anomaly Detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-ml-calibrated-thresholds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term: ML-Calibrated Thresholds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-context-aware-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term: Context-Aware Precision
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -5694,6 +5958,241 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#current-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Current Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-false-positive-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The False Positive Problem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-threshold-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Threshold Decision
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adjustable-thresholds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adjustable Thresholds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penalty-system-as-precision-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Penalty System as Precision Tool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#suppression-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Suppression System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explainability-for-triage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explainability for Triage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-why-not-explanation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The "Why Not" Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trade-off-philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trade-off Philosophy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Trade-off Philosophy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#when-to-prioritize-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Prioritize Precision
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-prioritize-recall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Prioritize Recall
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Configurations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-ideas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Ideas
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Future Ideas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#short-term-confidence-bands-in-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short-term: Confidence Bands in Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#short-term-per-rule-thresholds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short-term: Per-Rule Thresholds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#medium-term-feedback-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medium-term: Feedback Loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#medium-term-anomaly-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medium-term: Anomaly Detection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-ml-calibrated-thresholds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term: ML-Calibrated Thresholds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-context-aware-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term: Context-Aware Precision
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -5779,7 +6278,267 @@
 
 
 <h1 id="precision-vs-recall">Precision vs Recall</h1>
-<p>Philosophy on false positives.</p>
+<p>Philosophy on false positives and the trade-offs in dependency detection.</p>
+<h2 id="current-design">Current Design</h2>
+<p>jnkn deliberately prioritizes <strong>precision over recall</strong> in its default configuration. This means we would rather miss some real dependencies (false negatives) than flood users with spurious connections (false positives). The reasoning is grounded in how developers actually use static analysis tools.</p>
+<h3 id="the-false-positive-problem">The False Positive Problem</h3>
+<p>Industry research consistently shows that <strong>false positive rate is the single most important factor for developer adoption</strong> of static analysis tools. Google's Tricorder system found that developers ignore tools that "cry wolf"—once trust is lost, the tool becomes noise rather than signal.</p>
+<p>DeepSource targets a <strong>&lt;5% false positive rate</strong> through aggressive post-processing and filtering. ESLint's success comes partly from its granular suppression system. SonarQube struggled with adoption until they added "Quality Gates" that let teams define acceptable noise levels.</p>
+<p>jnkn's heuristic token matching is inherently probabilistic. A match between <code>DB_HOST</code> and <code>db_host</code> might be correct, but it might also be coincidental if both are unrelated database configurations in different services.</p>
+<h3 id="the-threshold-decision">The Threshold Decision</h3>
+<p>The default minimum confidence threshold of <strong>0.5</strong> represents our precision/recall trade-off:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MatchConfig</span><span class="p">:</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">min_confidence</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># Default threshold</span>
+</code></pre></div>
+<p>At this threshold:
+- <strong>Exact matches</strong> (confidence 1.0): Always included
+- <strong>Normalized matches</strong> (confidence 0.9): Always included<br />
+- <strong>High token overlap</strong> (confidence 0.8): Always included
+- <strong>Medium token overlap</strong> (confidence 0.6): Usually included
+- <strong>Single token matches</strong> (confidence 0.2): Filtered out
+- <strong>Penalized matches</strong>: May fall below threshold</p>
+<h3 id="adjustable-thresholds">Adjustable Thresholds</h3>
+<p>Users can tune the precision/recall trade-off in configuration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># .jnkn/config.yaml</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># High precision (fewer false positives, may miss some real deps)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nt">stitching</span><span class="p">:</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Balanced (default)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nt">stitching</span><span class="p">:</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1"># High recall (more dependencies found, more false positives)</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="nt">stitching</span><span class="p">:</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span>
+</code></pre></div>
+<h3 id="penalty-system-as-precision-tool">Penalty System as Precision Tool</h3>
+<p>The penalty system specifically targets common false positive patterns:</p>
+<p><strong>Short tokens</strong> (<code>db</code>, <code>id</code>, <code>key</code>) match too broadly:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">confidence</span> <span class="o">*=</span> <span class="mf">0.5</span>  <span class="c1"># 50% penalty</span>
+</code></pre></div></p>
+<p><strong>Common tokens</strong> are generic and unreliable:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">common_tokens</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">}</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">t</span> <span class="ow">in</span> <span class="n">common_tokens</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">matched_tokens</span><span class="p">):</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">confidence</span> <span class="o">*=</span> <span class="mf">0.7</span>  <span class="c1"># 30% penalty</span>
+</code></pre></div></p>
+<p><strong>Ambiguous matches</strong> where multiple targets exist:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">if</span> <span class="n">alternative_match_count</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">confidence</span> <span class="o">*=</span> <span class="mf">0.8</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">alternative_match_count</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.2</span><span class="p">)</span>
+</code></pre></div></p>
+<h3 id="suppression-system">Suppression System</h3>
+<p>When false positives do occur, the suppression system allows permanent exclusion:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># .jnkn/suppressions.yaml</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">suppressions</span><span class="p">:</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;env:*_ID&quot;</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">target_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;infra:*&quot;</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">reason</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Generic</span><span class="nv"> </span><span class="s">ID</span><span class="nv"> </span><span class="s">variables</span><span class="nv"> </span><span class="s">don&#39;t</span><span class="nv"> </span><span class="s">map</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">infrastructure&quot;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;env:LOG_LEVEL&quot;</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="nt">target_pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;infra:*&quot;</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="nt">reason</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Application</span><span class="nv"> </span><span class="s">config,</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">infrastructure&quot;</span>
+</code></pre></div>
+<p>The CLI provides commands for managing suppressions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Add a suppression</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>add<span class="w"> </span>--source<span class="w"> </span><span class="s2">&quot;env:API_KEY&quot;</span><span class="w"> </span>--target<span class="w"> </span><span class="s2">&quot;infra:legacy_*&quot;</span><span class="w"> </span>--reason<span class="w"> </span><span class="s2">&quot;Unrelated&quot;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># List active suppressions</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>list
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Remove a suppression</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>jnkn<span class="w"> </span>suppress<span class="w"> </span>remove<span class="w"> </span>--id<span class="w"> </span><span class="s2">&quot;supp_abc123&quot;</span>
+</code></pre></div>
+<h3 id="explainability-for-triage">Explainability for Triage</h3>
+<p>When users see unexpected matches, the <code>explain</code> command helps triage:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>jnkn<span class="w"> </span>explain<span class="w"> </span><span class="s2">&quot;env:PAYMENT_DB_HOST&quot;</span><span class="w"> </span><span class="s2">&quot;infra:payment_db_host&quot;</span>
+</code></pre></div>
+<p>Output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Match: PAYMENT_DB_HOST → payment_db_host
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Confidence: 0.90
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>Signals:
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>  ✓ normalized_match (0.90)
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    → &#39;paymentdbhost&#39; == &#39;paymentdbhost&#39;
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>Penalties: None
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>This is likely a TRUE POSITIVE - high confidence, no penalties.
+</code></pre></div></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>jnkn<span class="w"> </span>explain<span class="w"> </span><span class="s2">&quot;env:DB_URL&quot;</span><span class="w"> </span><span class="s2">&quot;infra:cache_url&quot;</span>
+</code></pre></div>
+<p>Output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>Match: DB_URL → cache_url
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>Confidence: 0.35
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>Signals:
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>  ✓ single_token (0.20)
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    → Single token match: [&#39;url&#39;]
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>Penalties:
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>  - common_token (×0.70)
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>    → All matched tokens are common: [&#39;url&#39;]
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>  - ambiguity (×0.64)
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    → Source has 4 potential matches
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>This is likely a FALSE POSITIVE - low confidence, multiple penalties.
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>Consider suppressing this match.
+</code></pre></div></p>
+<h3 id="the-why-not-explanation">The "Why Not" Explanation</h3>
+<p>For debugging missing connections, <code>explain-why-not</code> shows why a match wasn't made:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>jnkn<span class="w"> </span>explain-why-not<span class="w"> </span><span class="s2">&quot;env:CUSTOM_VAR&quot;</span><span class="w"> </span><span class="s2">&quot;infra:my_custom_variable&quot;</span>
+</code></pre></div>
+<p>Output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>WHY NO MATCH?
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>✗ Score (0.42) is below threshold (0.50)
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>Details:
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>  Source: env:CUSTOM_VAR
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>  Target: infra:my_custom_variable
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>  Source tokens: [&#39;custom&#39;, &#39;var&#39;]
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>  Target tokens: [&#39;my&#39;, &#39;custom&#39;, &#39;variable&#39;]
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>  Common tokens: [&#39;custom&#39;]
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>  ! Only 1 significant token overlap
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>  To reach threshold, need +0.08 confidence
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>Options:
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>  1. Lower min_confidence to 0.4
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a>  2. Add explicit edge in config
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a>  3. Rename to improve token alignment
+</code></pre></div></p>
+<h2 id="trade-off-philosophy">Trade-off Philosophy</h2>
+<h3 id="when-to-prioritize-precision">When to Prioritize Precision</h3>
+<ul>
+<li><strong>CI/CD gates</strong>: False positives block deployments, creating friction</li>
+<li><strong>Large codebases</strong>: High node counts amplify false positive noise</li>
+<li><strong>Compliance reporting</strong>: False positives create audit overhead</li>
+<li><strong>Developer trust</strong>: Initial adoption requires low noise</li>
+</ul>
+<h3 id="when-to-prioritize-recall">When to Prioritize Recall</h3>
+<ul>
+<li><strong>Security audits</strong>: Missing a real dependency could be costly</li>
+<li><strong>Migration planning</strong>: Need comprehensive impact understanding</li>
+<li><strong>Exploration</strong>: Understanding unfamiliar codebases</li>
+<li><strong>Small projects</strong>: Lower base rate makes false positives manageable</li>
+</ul>
+<h3 id="recommended-configurations">Recommended Configurations</h3>
+<p><strong>Conservative (CI/CD)</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">stitching</span><span class="p">:</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nt">min_token_overlap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+</code></pre></div></p>
+<p><strong>Balanced (General use)</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">stitching</span><span class="p">:</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="nt">min_token_overlap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+</code></pre></div></p>
+<p><strong>Exploratory (Audits)</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">stitching</span><span class="p">:</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nt">min_token_overlap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</code></pre></div></p>
+<h2 id="future-ideas">Future Ideas</h2>
+<h3 id="short-term-confidence-bands-in-output">Short-term: Confidence Bands in Output</h3>
+<p>Show confidence tiers in CLI output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>Blast Radius for infra:payment_db_host:
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>HIGH CONFIDENCE (0.8+):
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>  → env:PAYMENT_DB_HOST (0.90)
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>  → file://services/payment/config.py (0.85)
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>MEDIUM CONFIDENCE (0.5-0.8):
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>  → env:DB_HOST (0.62)
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>  → file://services/shared/database.py (0.55)
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>LOW CONFIDENCE (hidden by default):
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>  → env:HOST (0.35) [use --show-low to display]
+</code></pre></div>
+<h3 id="short-term-per-rule-thresholds">Short-term: Per-Rule Thresholds</h3>
+<p>Different rules might warrant different thresholds:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nt">stitching</span><span class="p">:</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="nt">rules</span><span class="p">:</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="nt">EnvVarToInfraRule</span><span class="p">:</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">      </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.6</span><span class="w">  </span><span class="c1"># Higher bar for env-to-infra</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span><span class="nt">InfraToInfraRule</span><span class="p">:</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">      </span><span class="nt">min_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.4</span><span class="w">  </span><span class="c1"># Lower bar for infra-to-infra</span>
+</code></pre></div>
+<h3 id="medium-term-feedback-loop">Medium-term: Feedback Loop</h3>
+<p>Track accuracy over time based on user actions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">FeedbackTracker</span><span class="p">:</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">record_suppression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">:</span> <span class="n">Edge</span><span class="p">):</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;User suppressed = likely false positive.&quot;&quot;&quot;</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_false_positives</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">record_confirmation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">:</span> <span class="n">Edge</span><span class="p">):</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;User confirmed = true positive.&quot;&quot;&quot;</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_true_positives</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_precision</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>        <span class="n">tp</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_true_positives</span><span class="p">)</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>        <span class="n">fp</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_false_positives</span><span class="p">)</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>        <span class="k">return</span> <span class="n">tp</span> <span class="o">/</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">1.0</span>
+</code></pre></div>
+<h3 id="medium-term-anomaly-detection">Medium-term: Anomaly Detection</h3>
+<p>Flag matches that deviate from project patterns:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">detect_anomalous_match</span><span class="p">(</span><span class="n">edge</span><span class="p">:</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">DependencyGraph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Flag if match is unusual compared to similar matches.&quot;&quot;&quot;</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>    <span class="c1"># If most env vars from services/payment/ link to infra:payment_*</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="c1"># but this one links to infra:orders_*, it&#39;s anomalous</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>    <span class="n">similar_sources</span> <span class="o">=</span> <span class="n">get_similar_sources</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">source_id</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="n">typical_targets</span> <span class="o">=</span> <span class="n">get_typical_targets</span><span class="p">(</span><span class="n">similar_sources</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>    <span class="k">return</span> <span class="n">edge</span><span class="o">.</span><span class="n">target_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">typical_targets</span>
+</code></pre></div>
+<h3 id="long-term-ml-calibrated-thresholds">Long-term: ML-Calibrated Thresholds</h3>
+<p>Train on labeled data to optimize threshold:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">optimize_threshold</span><span class="p">(</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="n">labeled_edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]],</span>  <span class="c1"># (edge, is_correct)</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="n">target_precision</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.95</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Find threshold that achieves target precision.&quot;&quot;&quot;</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>    <span class="c1"># Sort edges by confidence</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>    <span class="n">sorted_edges</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">labeled_edges</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">confidence</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>    <span class="c1"># Find threshold where precision drops below target</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>    <span class="n">tp</span><span class="p">,</span> <span class="n">fp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>    <span class="k">for</span> <span class="n">edge</span><span class="p">,</span> <span class="n">is_correct</span> <span class="ow">in</span> <span class="n">sorted_edges</span><span class="p">:</span>
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>        <span class="k">if</span> <span class="n">is_correct</span><span class="p">:</span>
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>            <span class="n">tp</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>            <span class="n">fp</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a>        <span class="n">precision</span> <span class="o">=</span> <span class="n">tp</span> <span class="o">/</span> <span class="p">(</span><span class="n">tp</span> <span class="o">+</span> <span class="n">fp</span><span class="p">)</span>
+<a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a>        <span class="k">if</span> <span class="n">precision</span> <span class="o">&lt;</span> <span class="n">target_precision</span><span class="p">:</span>
+<a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a>            <span class="k">return</span> <span class="n">edge</span><span class="o">.</span><span class="n">confidence</span>
+<a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a>
+<a id="__codelineno-20-20" name="__codelineno-20-20" href="#__codelineno-20-20"></a>    <span class="k">return</span> <span class="mf">0.0</span>  <span class="c1"># Include all if target met</span>
+</code></pre></div>
+<h3 id="long-term-context-aware-precision">Long-term: Context-Aware Precision</h3>
+<p>Adjust precision dynamically based on context:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">context_adjusted_threshold</span><span class="p">(</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">base_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="n">graph</span><span class="p">:</span> <span class="n">DependencyGraph</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Adjust threshold based on file/project context.&quot;&quot;&quot;</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>    <span class="c1"># Critical paths need higher precision</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>    <span class="k">if</span> <span class="s2">&quot;payment&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;auth&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>        <span class="k">return</span> <span class="n">base_threshold</span> <span class="o">+</span> <span class="mf">0.1</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>    <span class="c1"># Test files can tolerate lower precision</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>    <span class="k">if</span> <span class="s2">&quot;test&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>        <span class="k">return</span> <span class="n">base_threshold</span> <span class="o">-</span> <span class="mf">0.1</span>
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>
+<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>    <span class="c1"># High-connectivity nodes need higher precision</span>
+<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a>    <span class="n">node_degree</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">get_direct_dependents</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;file://</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>    <span class="k">if</span> <span class="n">node_degree</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+<a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a>        <span class="k">return</span> <span class="n">base_threshold</span> <span class="o">+</span> <span class="mf">0.05</span>
+<a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a>
+<a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a>    <span class="k">return</span> <span class="n">base_threshold</span>
+</code></pre></div>
 
 
 

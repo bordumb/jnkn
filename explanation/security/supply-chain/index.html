@@ -5094,6 +5094,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supply Chain
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -5110,6 +5128,335 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#current-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Current Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jnkns-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        jnkn's Dependencies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependency-selection-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Selection Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minimal-attack-surface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal Attack Surface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-native-code-in-core" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No Native Code in Core
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pinned-versions-in-lockfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pinned Versions in Lockfile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vulnerability-scanning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vulnerability Scanning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sbom-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SBOM Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-jnkn-analyzes-your-codebase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What jnkn Analyzes (Your Codebase)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What jnkn Analyzes (Your Codebase)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastructure-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastructure References
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kubernetes-secrets-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kubernetes Secrets References
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-jnkn-does-not-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What jnkn Does NOT Access
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-ignore-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default Ignore Patterns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#secure-usage-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secure Usage Recommendations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Secure Usage Recommendations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cicd-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CI/CD Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#air-gapped-environments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Air-Gapped Environments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#least-privilege" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Least Privilege
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-ideas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Ideas
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Future Ideas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#short-term-dependency-hash-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short-term: Dependency Hash Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#short-term-signed-releases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short-term: Signed Releases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#medium-term-sbom-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medium-term: SBOM Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#medium-term-vulnerability-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medium-term: Vulnerability Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-supply-chain-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term: Supply Chain Graph
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-policy-enforcement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term: Policy Enforcement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-reproducible-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term: Reproducible Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -5694,6 +6041,324 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#current-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Design
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Current Design">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jnkns-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        jnkn's Dependencies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependency-selection-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Selection Criteria
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minimal-attack-surface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal Attack Surface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-native-code-in-core" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No Native Code in Core
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pinned-versions-in-lockfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pinned Versions in Lockfile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vulnerability-scanning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vulnerability Scanning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sbom-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SBOM Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-jnkn-analyzes-your-codebase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What jnkn Analyzes (Your Codebase)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What jnkn Analyzes (Your Codebase)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastructure-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastructure References
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kubernetes-secrets-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kubernetes Secrets References
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-jnkn-does-not-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What jnkn Does NOT Access
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-ignore-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default Ignore Patterns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#secure-usage-recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Secure Usage Recommendations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Secure Usage Recommendations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cicd-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CI/CD Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#air-gapped-environments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Air-Gapped Environments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#least-privilege" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Least Privilege
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-ideas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Ideas
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Future Ideas">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#short-term-dependency-hash-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short-term: Dependency Hash Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#short-term-signed-releases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short-term: Signed Releases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#medium-term-sbom-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medium-term: SBOM Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#medium-term-vulnerability-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Medium-term: Vulnerability Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-supply-chain-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term: Supply Chain Graph
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-policy-enforcement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term: Policy Enforcement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#long-term-reproducible-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Long-term: Reproducible Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -5779,7 +6444,353 @@
 
 
 <h1 id="supply-chain">Supply Chain</h1>
-<p>Dependency security.</p>
+<p>Dependency security for jnkn itself and the codebases it analyzes.</p>
+<h2 id="current-design">Current Design</h2>
+<p>jnkn takes a minimal-dependency approach to reduce supply chain attack surface. The tool analyzes your codebase's cross-domain dependencies but is itself intentionally lightweight in its third-party dependencies.</p>
+<h3 id="jnkns-dependencies">jnkn's Dependencies</h3>
+<p><strong>Core dependencies</strong> (required for basic functionality):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># pyproject.toml</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="s2">&quot;click&gt;=8.1.7&quot;</span><span class="p">,</span><span class="w">           </span><span class="c1"># CLI framework</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="s2">&quot;networkx&gt;=3.2.1&quot;</span><span class="p">,</span><span class="w">        </span><span class="c1"># Graph operations</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="s2">&quot;openlineage-python&gt;=1.40.1&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1"># Runtime lineage (optional integration)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="s2">&quot;pydantic&gt;=2.5.0&quot;</span><span class="p">,</span><span class="w">        </span><span class="c1"># Data validation</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="s2">&quot;pyyaml&gt;=6.0.0&quot;</span><span class="p">,</span><span class="w">          </span><span class="c1"># Configuration parsing</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="s2">&quot;rich&gt;=13.7.0&quot;</span><span class="p">,</span><span class="w">           </span><span class="c1"># CLI output formatting</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">]</span>
+</code></pre></div>
+<p><strong>Optional dependencies</strong> (for advanced features):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">[project.optional-dependencies]</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">full</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="s2">&quot;sqlglot&gt;=20.0.0&quot;</span><span class="p">,</span><span class="w">        </span><span class="c1"># SQL parsing for dbt</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="s2">&quot;tree-sitter==0.21.3&quot;</span><span class="p">,</span><span class="w">    </span><span class="c1"># AST parsing</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="s2">&quot;tree-sitter-languages&gt;=1.10.2&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1"># Language grammars</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="s2">&quot;httpx&gt;=0.27.0&quot;</span><span class="p">,</span><span class="w">          </span><span class="c1"># HTTP client</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="s2">&quot;xxhash&gt;=3.4.1&quot;</span><span class="p">,</span><span class="w">          </span><span class="c1"># Fast hashing</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">]</span>
+</code></pre></div>
+<h3 id="dependency-selection-criteria">Dependency Selection Criteria</h3>
+<p>Each dependency was chosen based on:</p>
+<table>
+<thead>
+<tr>
+<th>Dependency</th>
+<th>Justification</th>
+<th>Alternatives Considered</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>click</code></td>
+<td>Industry standard CLI, extensive testing</td>
+<td><code>argparse</code> (stdlib but verbose), <code>typer</code> (newer)</td>
+</tr>
+<tr>
+<td><code>networkx</code></td>
+<td>Mature graph library, rich algorithms</td>
+<td><code>igraph</code> (C-based, harder install), <code>graph-tool</code></td>
+</tr>
+<tr>
+<td><code>pydantic</code></td>
+<td>Type validation, serialization</td>
+<td><code>dataclasses</code> (less validation), <code>attrs</code></td>
+</tr>
+<tr>
+<td><code>pyyaml</code></td>
+<td>YAML parsing standard</td>
+<td><code>ruamel.yaml</code> (heavier), stdlib <code>json</code></td>
+</tr>
+<tr>
+<td><code>rich</code></td>
+<td>Beautiful CLI output</td>
+<td><code>colorama</code> (less features), plain text</td>
+</tr>
+<tr>
+<td><code>tree-sitter</code></td>
+<td>Fast, accurate AST parsing</td>
+<td><code>ast</code> (Python only), regex (error-prone)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="minimal-attack-surface">Minimal Attack Surface</h3>
+<p>The core install has only <strong>6 direct dependencies</strong>. Compare to similar tools:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Direct Dependencies</th>
+<th>Transitive Dependencies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jnkn (core)</td>
+<td>6</td>
+<td>~20</td>
+</tr>
+<tr>
+<td>jnkn (full)</td>
+<td>11</td>
+<td>~45</td>
+</tr>
+<tr>
+<td>Checkov</td>
+<td>25+</td>
+<td>150+</td>
+</tr>
+<tr>
+<td>Snyk CLI</td>
+<td>N/A (Node.js)</td>
+<td>300+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="no-native-code-in-core">No Native Code in Core</h3>
+<p>The core installation avoids native/compiled dependencies:
+- No C extensions in required dependencies
+- Works on any Python 3.12+ platform
+- No compilation step during install</p>
+<p>The <code>[full]</code> extras add Tree-sitter (which includes C bindings) for advanced parsing, but this is optional.</p>
+<h3 id="pinned-versions-in-lockfile">Pinned Versions in Lockfile</h3>
+<p>For reproducible builds, we recommend using a lockfile:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Generate locked dependencies</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pip-compile<span class="w"> </span>pyproject.toml<span class="w"> </span>-o<span class="w"> </span>requirements.lock
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Install from lockfile</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.lock
+</code></pre></div>
+<h3 id="vulnerability-scanning">Vulnerability Scanning</h3>
+<p>jnkn's CI pipeline includes dependency scanning:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># .github/workflows/security.yml</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check for vulnerabilities</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="no">pip install safety pip-audit</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="no">safety check</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="no">pip-audit</span>
+</code></pre></div>
+<h3 id="sbom-generation">SBOM Generation</h3>
+<p>Generate a Software Bill of Materials for compliance:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Install SBOM generator</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>pip<span class="w"> </span>install<span class="w"> </span>cyclonedx-bom
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Generate SBOM</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>cyclonedx-py<span class="w"> </span>environment<span class="w"> </span>-o<span class="w"> </span>sbom.json
+</code></pre></div>
+<h2 id="what-jnkn-analyzes-your-codebase">What jnkn Analyzes (Your Codebase)</h2>
+<p>jnkn's dependency graph focuses on <strong>cross-domain implicit dependencies</strong>, not package dependencies. However, the analysis does touch security-relevant areas.</p>
+<h3 id="environment-variables">Environment Variables</h3>
+<p>jnkn extracts environment variable references:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Detected: env:DATABASE_URL</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">db_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DATABASE_URL&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Detected: env:API_SECRET</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">secret</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;API_SECRET&quot;</span><span class="p">]</span>
+</code></pre></div>
+<p><strong>Security note</strong>: jnkn records the <em>name</em> of environment variables, never their values. The graph stores <code>env:DATABASE_URL</code>, not <code>postgres://user:password@host/db</code>.</p>
+<h3 id="infrastructure-references">Infrastructure References</h3>
+<p>jnkn parses Terraform outputs and resources:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Detected: infra:db_connection_string</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kr">output</span><span class="w"> </span><span class="nv">&quot;db_connection_string&quot;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="na">value</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="nv">aws_db_instance.main.endpoint</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="na">sensitive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="no">true</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>Security note</strong>: jnkn parses HCL structure, not state files. Sensitive values in <code>terraform.tfstate</code> are never accessed.</p>
+<h3 id="kubernetes-secrets-references">Kubernetes Secrets References</h3>
+<p>jnkn detects references to secrets, not their contents:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Detected: config:db-credentials (reference only)</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DB_PASSWORD</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">valueFrom</span><span class="p">:</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">      </span><span class="nt">secretKeyRef</span><span class="p">:</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">db-credentials</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">        </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">password</span>
+</code></pre></div>
+<h3 id="what-jnkn-does-not-access">What jnkn Does NOT Access</h3>
+<ul>
+<li><strong>Secret values</strong>: Only names/references, never actual secrets</li>
+<li><strong>State files</strong>: <code>terraform.tfstate</code>, <code>.terraform/</code> ignored</li>
+<li><strong>Credentials</strong>: <code>.env</code>, <code>*.pem</code>, <code>*_key</code> files ignored by default</li>
+<li><strong>Git history</strong>: Only current working tree, not commit history</li>
+<li><strong>Network resources</strong>: No HTTP calls to resolve references</li>
+</ul>
+<h3 id="default-ignore-patterns">Default Ignore Patterns</h3>
+<p>jnkn's default <code>.jnknignore</code> excludes sensitive paths:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a># Secrets and credentials
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>.env
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>.env.*
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>*.pem
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>*.key
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>**/secrets/
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>**/credentials/
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a># State files
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>terraform.tfstate
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>terraform.tfstate.*
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>.terraform/
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a># Dependencies (not our focus)
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>node_modules/
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>venv/
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>.venv/
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>__pycache__/
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a># Build artifacts
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>dist/
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>build/
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>*.egg-info/
+</code></pre></div>
+<h2 id="secure-usage-recommendations">Secure Usage Recommendations</h2>
+<h3 id="cicd-integration">CI/CD Integration</h3>
+<p>When running in CI/CD, ensure jnkn doesn't have access to secrets:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># GitHub Actions - run before secrets are injected</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nt">jobs</span><span class="p">:</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">analyze</span><span class="p">:</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">      </span><span class="c1"># Run jnkn BEFORE setting up cloud credentials</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Analyze dependencies</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">          </span><span class="no">pip install jnkn</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">          </span><span class="no">jnkn scan .</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">      </span><span class="c1"># Later: deploy with secrets (jnkn not involved)</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deploy</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">        </span><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">          </span><span class="nt">AWS_ACCESS_KEY_ID</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.AWS_ACCESS_KEY_ID }}</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+</code></pre></div>
+<h3 id="air-gapped-environments">Air-Gapped Environments</h3>
+<p>jnkn works fully offline:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Pre-download dependencies</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>pip<span class="w"> </span>download<span class="w"> </span>jnkn<span class="w"> </span>-d<span class="w"> </span>./packages
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Install offline</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>pip<span class="w"> </span>install<span class="w"> </span>--no-index<span class="w"> </span>--find-links<span class="o">=</span>./packages<span class="w"> </span>jnkn
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Run with telemetry disabled (default)</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>.
+</code></pre></div>
+<h3 id="least-privilege">Least Privilege</h3>
+<p>jnkn only needs read access to source code:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Run as read-only user</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>sudo<span class="w"> </span>-u<span class="w"> </span>readonly-user<span class="w"> </span>jnkn<span class="w"> </span>scan<span class="w"> </span>/path/to/code
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1"># Or in container with read-only mount</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span>/code:/code:ro<span class="w"> </span>jnkn<span class="w"> </span>scan<span class="w"> </span>/code
+</code></pre></div>
+<h2 id="future-ideas">Future Ideas</h2>
+<h3 id="short-term-dependency-hash-verification">Short-term: Dependency Hash Verification</h3>
+<p>Verify dependencies match known-good hashes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># pyproject.toml</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">[tool.jnkn.security]</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">verify_hashes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># requirements.lock with hashes</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nv">click</span><span class="o">==</span><span class="m">8</span>.1.7<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span>--hash<span class="o">=</span>sha256:ae74fb96c20a0277a1d615f1e4d73c8414f5a98db8b799a7931d1582f3390c28
+</code></pre></div>
+<h3 id="short-term-signed-releases">Short-term: Signed Releases</h3>
+<p>Sign releases with Sigstore/cosign:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Verify release signature</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>cosign<span class="w"> </span>verify-blob<span class="w"> </span>--signature<span class="w"> </span>jnkn-0.1.0.tar.gz.sig<span class="w"> </span>jnkn-0.1.0.tar.gz
+</code></pre></div>
+<h3 id="medium-term-sbom-integration">Medium-term: SBOM Integration</h3>
+<p>Generate SBOM for analyzed codebases:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>jnkn<span class="w"> </span>sbom<span class="w"> </span>--format<span class="w"> </span>cyclonedx<span class="w"> </span>-o<span class="w"> </span>project-sbom.json
+</code></pre></div>
+<p>Include jnkn-discovered dependencies:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="p">{</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nt">&quot;bomFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CycloneDX&quot;</span><span class="p">,</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nt">&quot;components&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="p">{</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application&quot;</span><span class="p">,</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;payment-service&quot;</span><span class="p">,</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">      </span><span class="nt">&quot;dependencies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">        </span><span class="p">{</span><span class="nt">&quot;ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;infra:payment_db&quot;</span><span class="p">},</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">        </span><span class="p">{</span><span class="nt">&quot;ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;env:STRIPE_API_KEY&quot;</span><span class="p">},</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">        </span><span class="p">{</span><span class="nt">&quot;ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;config:kafka-credentials&quot;</span><span class="p">}</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">      </span><span class="p">]</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w">  </span><span class="p">]</span>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="medium-term-vulnerability-context">Medium-term: Vulnerability Context</h3>
+<p>Show which vulnerabilities affect your dependency graph:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>jnkn<span class="w"> </span>security<span class="w"> </span>--check-vulns
+</code></pre></div>
+<p>Output:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>Vulnerability Impact Analysis:
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>CVE-2024-1234 in log4j affects:
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>  → file://services/java-api/pom.xml
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>  → Downstream impact: 12 services
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>  Blast radius:
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    HIGH: payment-service, auth-service
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    MEDIUM: notification-service
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>    LOW: analytics-worker (test only)
+</code></pre></div></p>
+<h3 id="long-term-supply-chain-graph">Long-term: Supply Chain Graph</h3>
+<p>Extend the dependency graph to include package dependencies:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>┌─────────────────────────────────────────────────────────┐
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>│                    jnkn Extended Graph                   │
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>├─────────────────────────────────────────────────────────┤
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>│                                                          │
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>│  Package Layer:     requests → urllib3 → ssl            │
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>│                          ↓                               │
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>│  Code Layer:        api_client.py                       │
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>│                          ↓                               │
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>│  Infra Layer:       env:API_ENDPOINT → infra:api_gateway│
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>│                                                          │
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>└─────────────────────────────────────────────────────────┘
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Future: combine package deps with cross-domain deps</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">jnkn</span> <span class="n">scan</span> <span class="o">--</span><span class="n">include</span><span class="o">-</span><span class="n">packages</span> <span class="o">.</span>
+</code></pre></div>
+<h3 id="long-term-policy-enforcement">Long-term: Policy Enforcement</h3>
+<p>Define and enforce supply chain policies:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># .jnkn/policies/supply-chain.yaml</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="nt">policies</span><span class="p">:</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">no-unmaintained-deps</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">      </span><span class="no">package.last_update &gt; now() - 365d</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">max-transitive-depth</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">      </span><span class="no">dependency.depth &lt;= 5</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">approved-sources-only</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="w">    </span><span class="nt">rule</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a><span class="w">      </span><span class="no">package.source in [&quot;pypi.org&quot;, &quot;npm.org&quot;, &quot;internal.repo&quot;]</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>jnkn<span class="w"> </span>check<span class="w"> </span>--policy<span class="w"> </span>supply-chain.yaml
+</code></pre></div>
+<h3 id="long-term-reproducible-analysis">Long-term: Reproducible Analysis</h3>
+<p>Ensure analysis results are reproducible:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Generate analysis with provenance</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>jnkn<span class="w"> </span>scan<span class="w"> </span>--provenance<span class="w"> </span>.
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="c1"># Output includes:</span>
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="c1"># - jnkn version</span>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="c1"># - Dependency hashes</span>
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="c1"># - Git commit SHA</span>
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="c1"># - Timestamp</span>
+<a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="c1"># - Analysis checksum</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">{</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span><span class="nt">&quot;provenance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">    </span><span class="nt">&quot;jnkn_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">    </span><span class="nt">&quot;jnkn_hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sha256:abc123...&quot;</span><span class="p">,</span>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">    </span><span class="nt">&quot;analyzed_commit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;def456...&quot;</span><span class="p">,</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-15T10:30:00Z&quot;</span><span class="p">,</span>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="w">    </span><span class="nt">&quot;result_hash&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sha256:789xyz...&quot;</span>
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="w">  </span><span class="nt">&quot;graph&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="p">}</span>
+</code></pre></div>
 
 
 
