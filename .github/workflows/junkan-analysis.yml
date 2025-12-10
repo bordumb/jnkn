@@ -42,9 +42,9 @@ jobs:
       - name: Calculate Blast Radius
         if: steps.changes.outputs.files != ''
         id: blast
-        # Pass the changed files to Junkan
+        # Pass the changed files to Jnkn
         run: |
-          OUTPUT=$(uv run junkan blast-radius ${{ steps.changes.outputs.files }})
+          OUTPUT=$(uv run jnkn blast ${{ steps.changes.outputs.files }})
           # Save output to a file to handle multiline JSON safely
           echo "$OUTPUT" > impact.json
           

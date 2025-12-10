@@ -152,4 +152,4 @@ def init(force: bool):
     console.print("1. Run a scan to build the dependency graph:")
     console.print("   [bold cyan]jnkn scan[/bold cyan]")
     console.print("\n2. Check the blast radius of a critical resource:")
-    console.print("   [bold cyan]jnkn blast-radius env:DATABASE_URL[/bold cyan]")
+    console.print("   [bold cyan]jnkn blast env:DATABASE_URL[/bold cyan]")

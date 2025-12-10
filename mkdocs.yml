@@ -1,11 +1,11 @@
-site_name: Junkan Documentation
-site_url: https://docs.junkan.io
+site_name: Jnkn Documentation
+site_url: https://bordumb.github.io/jnkn/
 site_description: Pre-flight impact analysis for infrastructure and data
-repo_name: junkan-io/junkan
-repo_url: https://github.com/junkan-io/junkan
+repo_name: bordumb/jnkn
+repo_url: https://github.com/bordumb/jnkn
 edit_uri: edit/main/docs/
 
-copyright: Copyright &copy; 2024 Junkan Contributors
+copyright: Copyright &copy; 2024 Jnkn Contributors
 
 theme:
   name: material
@@ -107,7 +107,7 @@ nav:
       - tutorials/advanced/custom-parsers.md
       - tutorials/advanced/custom-stitching-rules.md
       - tutorials/advanced/enterprise-deployment.md
-      - tutorials/advanced/extending-junkan.md
+      - tutorials/advanced/extending-jnkn.md
   - How-To Guides:
     - how-to/index.md
     - Scanning:
@@ -172,8 +172,8 @@ nav:
         - reference/api/analysis/explain.md
         - reference/api/analysis/diff.md
     - Configuration:
-      - reference/configuration/junkan-yaml.md
-      - reference/configuration/junkanignore.md
+      - reference/configuration/jnkn-yaml.md
+      - reference/configuration/jnknignore.md
       - reference/configuration/suppressions-yaml.md
       - reference/configuration/environment-vars.md
     - Patterns:

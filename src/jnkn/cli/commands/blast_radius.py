@@ -23,15 +23,15 @@ def blast_radius(artifacts: tuple, db_path: str, max_depth: int, as_json: bool):
     
     \b
     Examples:
-        jnkn blast-radius env:DB_HOST
-        jnkn blast-radius warehouse.dim_users
-        jnkn blast-radius src/models.py infra:payment_db
+        jnkn blast env:DB_HOST
+        jnkn blast warehouse.dim_users
+        jnkn blast src/models.py infra:payment_db
     """
     if not artifacts:
         echo_error("Provide at least one artifact to analyze")
         click.echo("Examples:")
-        click.echo("  jnkn blast-radius env:DB_HOST")
-        click.echo("  jnkn blast-radius warehouse.dim_users")
+        click.echo("  jnkn blast env:DB_HOST")
+        click.echo("  jnkn blast warehouse.dim_users")
         return
 
     db_file = Path(db_path)

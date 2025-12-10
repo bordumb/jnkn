@@ -59,10 +59,10 @@ Simulate a change to see what breaks downstream.
 
 ```bash
 # If I rename this env var, what code breaks?
-jnkn blast-radius env:DATABASE_URL
+jnkn blast env:DATABASE_URL
 
 # If I modify this Terraform resource, what app fails?
-jnkn blast-radius infra:payment_db_host
+jnkn blast infra:payment_db_host
 ```
 
 -----

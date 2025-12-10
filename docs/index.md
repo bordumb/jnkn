@@ -66,7 +66,7 @@ graph LR
     ---
 
     ```bash
-    pip install junkan
+    pip install jnkn
     ```
 
 -   **2. Scan**
@@ -74,8 +74,8 @@ graph LR
     ---
 
     ```bash
-    junkan init
-    junkan scan
+    jnkn init
+    jnkn scan
     ```
 
 -   **3. Analyze**
@@ -83,7 +83,7 @@ graph LR
     ---
 
     ```bash
-    junkan blast-radius env:DATABASE_URL
+    jnkn blast env:DATABASE_URL
     ```
 
 </div>
