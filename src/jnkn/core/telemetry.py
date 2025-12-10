@@ -14,7 +14,6 @@ import yaml
 # It cannot read data or modify project settings.
 # Safe to distribute in the CLI artifact.
 POSTHOG_API_KEY = "phc_YOUR_REAL_KEY_HERE"
-POSTHOG_API_KEY = "phc_YOUR_PUBLIC_KEY_HERE"
 POSTHOG_HOST = "https://app.posthog.com"
 
 logger = logging.getLogger(__name__)
