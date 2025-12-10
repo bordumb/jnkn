@@ -18,11 +18,11 @@ classifiers = [
 ]
 dependencies = [
     "click>=8.1.7",
-    "networkx>=3.2.1",
     "openlineage-python>=1.40.1",
     "pydantic>=2.5.0",
     "pyyaml>=6.0.0",
     "rich>=13.7.0",
+    "rustworkx>=0.17.1",
 ]
 
 # Essential for PyPI sidebar links
@@ -85,3 +85,8 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 pythonpath = ["src"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]

@@ -59,7 +59,6 @@ class TestConfidenceCalculator:
     def test_evaluate_signals_overlap(self, calculator):
         """Test token overlap signals."""
         # High overlap (3 tokens default)
-        tokens = ["a", "b", "c", "d"] # Assuming 'a' is not common/short for this test context or using config
         # Use simpler tokens that pass filters: length >= 4
         t_list = ["alpha", "beta", "gamma"] 
         results = calculator._evaluate_signals(
@@ -241,7 +240,6 @@ class TestConfidenceCalculator:
         assert "Matched Tokens: ['a']" in text
 
         # Test branch where signal has matched_tokens
-        # Construct fresh object to avoid ambiguity in test state
         res_obj_2 = ConfidenceResult(
             score=0.5,
             signals=[{

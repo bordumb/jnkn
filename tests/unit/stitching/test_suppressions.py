@@ -9,7 +9,7 @@ Tests cover:
 """
 
 import tempfile
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -99,7 +99,8 @@ class TestSuppression:
         suppression = Suppression(
             source_pattern="env:*",
             target_pattern="infra:*",
-            expires_at=datetime.utcnow() + timedelta(days=1),
+            # Future date = Active
+            expires_at=datetime.now(timezone.utc) + timedelta(days=1)
         )
 
         assert suppression.is_expired() is False
@@ -110,12 +111,13 @@ class TestSuppression:
         suppression = Suppression(
             source_pattern="env:*",
             target_pattern="infra:*",
-            expires_at=datetime.utcnow() - timedelta(days=1),
+            # Past date = Expired
+            expires_at=datetime.now(timezone.utc) - timedelta(days=1)
         )
 
         assert suppression.is_expired() is True
         assert suppression.is_active() is False
-        assert suppression.matches("env:HOST", "infra:main") is False  # Expired = no match
+        assert suppression.matches("env:HOST", "infra:main") is False
 
     def test_no_expiration(self):
         """Test suppression without expiration."""
@@ -324,16 +326,18 @@ class TestSuppressionStore:
             store = SuppressionStore(path)
             store.load()
 
-            # Add one expired, one not
+            # Add one expired
             store._suppressions.append(Suppression(
                 source_pattern="env:A",
                 target_pattern="infra:A",
-                expires_at=datetime.utcnow() - timedelta(days=1),
+                expires_at=datetime.now(timezone.utc) - timedelta(days=1)
             ))
+            
+            # Add one active (future expiration)
             store._suppressions.append(Suppression(
                 source_pattern="env:B",
                 target_pattern="infra:B",
-                expires_at=datetime.utcnow() + timedelta(days=1),
+                expires_at=datetime.now(timezone.utc) + timedelta(days=1)
             ))
 
             assert store.count == 2
@@ -389,7 +393,7 @@ class TestSuppressionStore:
             store._suppressions.append(Suppression(
                 source_pattern="env:B",
                 target_pattern="infra:B",
-                expires_at=datetime.utcnow() - timedelta(days=1),
+                expires_at=datetime.now(timezone.utc) - timedelta(days=1)
             ))
 
             assert store.count == 2

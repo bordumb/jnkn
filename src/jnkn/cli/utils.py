@@ -7,9 +7,14 @@ including formatted printing, graph loading logic, and user guidance helpers.
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Set
+from typing import TYPE_CHECKING, Optional, Set, Union
 
 import click
+
+from jnkn.core.graph import DependencyGraph
+
+from ..core.storage.sqlite import SQLiteStorage
+from ..graph.lineage import LineageGraph
 
 if TYPE_CHECKING:
     from ..graph.lineage import LineageGraph
@@ -85,51 +90,52 @@ def echo_low_node_warning(count: int) -> None:
     click.echo()
 
 
-def load_graph(graph_file: str) -> Optional["LineageGraph"]:
+def load_graph(graph_file: str) -> Optional[Union[DependencyGraph, LineageGraph]]:
     """
-    Load a LineageGraph from a file or directory path.
-
-    Handles resolving directory paths to standard graph filenames (e.g., lineage.json).
-
-    Args:
-        graph_file (str): Path to a JSON file or a directory containing .jnkn/lineage.json.
-
-    Returns:
-        Optional[LineageGraph]: The loaded graph object, or None if loading failed.
+    Load a graph from file.
+    
+    Prioritizes SQLite (.db) for rustworkx backend.
+    Falls back to JSON for legacy compatibility.
     """
-    from ..graph.lineage import LineageGraph
-
-    graph_path = Path(graph_file)
-
-    # Handle directory input by looking for default file locations
-    if graph_path.is_dir():
-        potential_files = [
-            graph_path / ".jnkn/lineage.json",
-            graph_path / "lineage.json",
-            graph_path / ".jnkn/jnkn.db", # Though LineageGraph only reads JSON currently
-        ]
-        found = False
-        for p in potential_files:
-            if p.exists():
-                graph_path = p
-                found = True
-                break
-        
-        if not found:
-            echo_error(f"No lineage graph found in directory: {graph_file}")
-            click.echo("Expected .jnkn/lineage.json. Run 'jnkn scan' first.")
+    path = Path(graph_file)
+    
+    # 1. Resolve path
+    target_file = None
+    if path.is_dir():
+        # Prefer DB over JSON
+        if (path / ".jnkn/jnkn.db").exists():
+            target_file = path / ".jnkn/jnkn.db"
+        elif (path / "jnkn.db").exists():
+            target_file = path / "jnkn.db"
+        elif (path / ".jnkn/lineage.json").exists():
+            target_file = path / ".jnkn/lineage.json"
+        else:
+            echo_error(f"No graph found in {path}")
             return None
-
-    if not graph_path.exists():
-        echo_error(f"Graph file not found: {graph_file}")
-        click.echo("Run 'jnkn scan <directory>' first to create it.")
+    elif path.exists():
+        target_file = path
+    else:
+        echo_error(f"File not found: {path}")
         return None
 
-    try:
-        data = json.loads(graph_path.read_text())
-        graph = LineageGraph()
-        graph.load_from_dict(data)
-        return graph
-    except Exception as e:
-        echo_error(f"Failed to load graph: {e}")
-        return None
+    # 2. Load based on extension
+    if target_file.suffix == ".db":
+        try:
+            storage = SQLiteStorage(target_file)
+            # Hydrate the rustworkx graph
+            return storage.load_graph()
+        except Exception as e:
+            echo_error(f"Failed to load DB: {e}")
+            return None
+            
+    elif target_file.suffix == ".json":
+        try:
+            data = json.loads(target_file.read_text())
+            graph = LineageGraph()
+            graph.load_from_dict(data)
+            return graph
+        except Exception as e:
+            echo_error(f"Failed to load JSON: {e}")
+            return None
+            
+    return None

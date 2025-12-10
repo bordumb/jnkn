@@ -16,7 +16,7 @@ Storage Location: .jnkn/suppressions.yaml
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from fnmatch import fnmatch
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -37,7 +37,7 @@ class Suppression(BaseModel):
     target_pattern: str = Field(..., description="Glob pattern for target node (e.g., 'infra:*')")
     reason: str = Field(default="", description="Why this suppression exists")
     created_by: str = Field(default="unknown", description="Who created this suppression")
-    created_at: datetime = Field(default_factory=datetime.utcnow, description="When created")
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="When created")
     expires_at: Optional[datetime] = Field(default=None, description="Optional expiration")
     id: Optional[str] = Field(default=None, description="Unique identifier")
     enabled: bool = Field(default=True, description="Whether suppression is active")
@@ -54,7 +54,7 @@ class Suppression(BaseModel):
         """Check if this suppression has expired."""
         if self.expires_at is None:
             return False
-        return datetime.utcnow() > self.expires_at
+        return datetime.now(timezone.utc) > self.expires_at
 
     def is_active(self) -> bool:
         """Check if this suppression is currently active."""

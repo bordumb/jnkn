@@ -5,7 +5,7 @@ import os
 import platform
 import threading
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from urllib import request
@@ -90,7 +90,7 @@ class TelemetryClient:
                 "$lib": "jnkn-cli",
                 "$os": platform.system(),
                 "$python_version": platform.python_version(),
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 **(properties or {})
             }
         }

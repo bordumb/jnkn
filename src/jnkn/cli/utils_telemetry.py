@@ -26,34 +26,41 @@ class TelemetryGroup(click.Group):
         Returns:
             The result of the invoked command.
         """
-        # Determine the subcommand being run
-        # Use getattr to handle potential deprecations or missing attributes safely
-        cmd_args = getattr(ctx, "protected_args", []) or getattr(ctx, "args", [])
-        command_name = cmd_args[0] if cmd_args else "unknown"
-        subcommand = ctx.invoked_subcommand or command_name
-        
         start_time = time.perf_counter()
         exit_code = 0
         error_type = None
+        caught_exception = None
 
         try:
             return super().invoke(ctx)
-        except Exception as e:
-            # Handle standard exceptions (crashes)
-            exit_code = 1
-            error_type = type(e).__name__
-            raise
         except SystemExit as e:
             # Handle intentional exits via sys.exit() or ctx.exit()
-            # Click's ctx.exit(N) raises SystemExit(N)
             exit_code = e.code if isinstance(e.code, int) else 1
             if exit_code != 0:
                 error_type = "SystemExit"
-            raise
+            caught_exception = e
+        except Exception as e:
+            # Handle unexpected crashes
+            exit_code = 1
+            error_type = type(e).__name__
+            caught_exception = e
         finally:
-            # CRITICAL: Wrap telemetry in try/except so it NEVER affects the CLI exit code
-            # If this block raises an exception, it would mask original errors.
+            # Telemetry logic runs in finally to ensure it sends even on crash
             try:
+                # Resolve subcommand name. 
+                # ctx.invoked_subcommand is populated by super().invoke()
+                # If it's None (e.g. group called without command), use "main" or similar
+                subcommand = ctx.invoked_subcommand or "unknown"
+                
+                # Fallback: if invoke failed before resolution, try to peek at args
+                # (This mimics the previous logic but as a fallback only)
+                if subcommand == "unknown":
+                    # Access protected_args safely to avoid warnings if possible, 
+                    # but it's the only reliable way to see what was passed if invoke crashed early.
+                    # For now, we rely on the fact that if invoke crashed early, 
+                    # it was likely an args error, so "unknown" is acceptable.
+                    pass
+
                 duration_ms = (time.perf_counter() - start_time) * 1000
                 
                 track_event(
@@ -69,3 +76,7 @@ class TelemetryGroup(click.Group):
             except Exception:
                 # Telemetry failures must be silent
                 pass
+        
+        # Re-raise the exception to allow the CLI to handle it (print error, exit)
+        if caught_exception:
+            raise caught_exception

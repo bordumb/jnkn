@@ -11,7 +11,7 @@ from jnkn.analysis.explain import (
     AlternativeMatch,
     create_explanation_generator,
 )
-from jnkn.core.confidence import ConfidenceResult
+from jnkn.core.confidence import ConfidenceResult, ConfidenceCalculator
 from jnkn.core.types import NodeType
 
 class TestExplanationGenerator:
@@ -25,13 +25,26 @@ class TestExplanationGenerator:
         return graph
 
     @pytest.fixture
-    def generator(self, mock_graph):
-        return create_explanation_generator(graph=mock_graph)
+    def mock_calculator(self):
+        """Mock the ConfidenceCalculator to control scoring."""
+        calc = MagicMock(spec=ConfidenceCalculator)
+        # Default behavior: return a low score to prevent accidental matches
+        calc.calculate.return_value = ConfidenceResult(score=0.0)
+        return calc
+
+    @pytest.fixture
+    def generator(self, mock_graph, mock_calculator):
+        return ExplanationGenerator(
+            graph=mock_graph,
+            calculator=mock_calculator,
+            min_confidence=0.5
+        )
 
     def test_initialization(self):
         gen = create_explanation_generator()
         assert gen.graph is None
         assert gen.min_confidence == 0.5
+        assert isinstance(gen.calculator, ConfidenceCalculator)
 
     def test_infer_type_from_id(self):
         """Test static type inference helper."""
@@ -76,15 +89,18 @@ class TestExplanationGenerator:
         assert info.type == "env_var"
         assert info.tokens == ["new", "var"]
 
-    def test_explain_basic_flow(self, generator, mock_graph):
+    def test_explain_basic_flow(self, generator, mock_graph, mock_calculator):
         """Test main explain method."""
         # Setup edge existence
         mock_edge = MagicMock()
         mock_edge.metadata = {"rule": "test_rule"}
         mock_graph.get_edge.return_value = mock_edge
 
-        # Mock calculator behavior implicitly by inputs
-        # (Calculator logic is tested in test_confidence.py)
+        # Setup calculator response
+        mock_calculator.calculate.return_value = ConfidenceResult(
+            score=0.8,
+            signals=[{'signal': 'exact_match', 'weight': 1.0, 'matched': True}]
+        )
         
         explanation = generator.explain(
             "env:DB", "infra:db", find_alternatives=False
@@ -93,30 +109,49 @@ class TestExplanationGenerator:
         assert isinstance(explanation, MatchExplanation)
         assert explanation.edge_exists is True
         assert explanation.edge_metadata["rule"] == "test_rule"
-        assert explanation.confidence_result.score >= 0.0
+        assert explanation.confidence_result.score == 0.8
 
-    def test_find_alternatives(self, generator, mock_graph):
+    def test_find_alternatives(self, generator, mock_graph, mock_calculator):
         """Test logic for finding alternative matches."""
         # Setup source
         source_info = NodeInfo("env:DB", "DB", "env_var", ["db"])
         
         # Setup candidates in graph
         c1 = MagicMock()
-        c1.id, c1.name, c1.tokens = "infra:db", "db", ["db"] # Exact match
+        c1.id, c1.name, c1.tokens = "infra:db", "db", ["db"]
         
         c2 = MagicMock()
-        c2.id, c2.name, c2.tokens = "infra:other", "other", ["other"] # No match
+        c2.id, c2.name, c2.tokens = "infra:other", "other", ["other"]
         
         mock_graph.get_nodes_by_type.return_value = [c1, c2]
 
+        # Define side effect for calculator:
+        # High score for c1 (match), low score for c2 (no match)
+        def calc_side_effect(**kwargs):
+            target = kwargs.get("target_name")
+            if target == "db":
+                return ConfidenceResult(score=0.9, matched_tokens=["db"])
+            return ConfidenceResult(score=0.1, matched_tokens=[])
+
+        mock_calculator.calculate.side_effect = calc_side_effect
+
         # Call internal method
-        alts = generator._find_alternatives(source_info, "infra:different_target")
+        # We pass a 'dummy' target ID to ensure c1 isn't skipped as being the "actual target"
+        alts = generator._find_alternatives(source_info, "infra:actual_target")
         
-        # c1 should be an alternative because it matches tokens
-        # c2 should not be because tokens don't match
-        assert len(alts) >= 1
+        # We expect BOTH to be returned.
+        # - c1 (score 0.9) > min_confidence (0.5) -> Selected/Viable
+        # - c2 (score 0.1) < min_confidence (0.5) -> Rejected (but included in explanation)
+        # Note: logic requires score > 0 to be included at all.
+        assert len(alts) == 2
+        
+        # Alternatives are sorted by score desc
         assert alts[0].node_id == "infra:db"
-        assert alts[0].score > 0
+        assert alts[0].score == 0.9
+        
+        assert alts[1].node_id == "infra:other"
+        assert alts[1].score == 0.1
+        assert "below threshold" in alts[1].rejection_reason
 
     def test_find_alternatives_candidate_types(self, generator, mock_graph):
         """Test selection of candidate types based on source."""
@@ -136,36 +171,53 @@ class TestExplanationGenerator:
         args_list = mock_graph.get_nodes_by_type.call_args_list
         assert any(NodeType.DATA_ASSET in args[0] for args in args_list)
 
-    def test_explain_why_not_low_score(self, generator):
+    def test_explain_why_not_low_score(self, generator, mock_calculator):
         """Test explain_why_not when score is low."""
-        # Create generator with high threshold
-        gen = create_explanation_generator(min_confidence=0.9)
+        # Setup low score response
+        mock_calculator.calculate.return_value = ConfidenceResult(
+            score=0.3,
+            signals=[],
+            penalties=[]
+        )
         
         # Explain a mismatch
-        text = gen.explain_why_not("env:A", "infra:B")
+        text = generator.explain_why_not("env:A", "infra:B")
         
         assert "below threshold" in text
-        assert "No overlapping tokens" in text
         assert "Details:" in text
+        assert "To reach threshold" in text
 
-    def test_explain_why_not_edge_exists(self, generator, mock_graph):
+    def test_explain_why_not_edge_exists(self, generator, mock_graph, mock_calculator):
         """Test explain_why_not when edge actually exists."""
         mock_graph.get_edge.return_value = MagicMock() # Edge exists
+        # Important: Set score > min_confidence so it hits the "Match DOES exist" branch
+        # instead of the "Score below threshold" branch.
+        mock_calculator.calculate.return_value = ConfidenceResult(score=0.9)
         
         text = generator.explain_why_not("env:A", "env:A")
         assert "Match DOES exist" in text
 
-    def test_explain_why_not_high_score_missing_edge(self, generator, mock_graph):
+    def test_explain_why_not_high_score_missing_edge(self, generator, mock_graph, mock_calculator):
         """Test explain_why_not when score is high but edge is missing."""
         mock_graph.get_edge.return_value = None # No edge
+        mock_calculator.calculate.return_value = ConfidenceResult(score=0.9)
         
         text = generator.explain_why_not("env:Exact", "infra:Exact")
         assert "Score" in text
         assert "above threshold, but no edge found" in text
 
-    def test_explain_why_not_penalties(self, generator):
+    def test_explain_why_not_penalties(self, generator, mock_calculator):
         """Test that penalties are listed in why_not."""
-        # Force a penalty (short tokens)
+        # Setup result with penalties
+        mock_calculator.calculate.return_value = ConfidenceResult(
+            score=0.1,
+            penalties=[{
+                "penalty_type": "short_token",
+                "multiplier": 0.5,
+                "reason": "Too short"
+            }]
+        )
+        
         text = generator.explain_why_not("env:id", "infra:id")
         assert "Penalties applied" in text
         assert "short_token" in text
@@ -250,7 +302,7 @@ class TestExplanationGenerator:
         out = generator.format(expl)
         assert "(none matched)" in out
 
-    def test_alternatives_filtering(self, generator, mock_graph):
+    def test_alternatives_filtering(self, generator, mock_graph, mock_calculator):
         """Test that the target itself is excluded from alternatives."""
         # If we ask for alternatives to Target A, and Target A is in the graph,
         # it shouldn't show up in the alternatives list.
@@ -260,8 +312,13 @@ class TestExplanationGenerator:
         target_node.tokens = ["target"]
         
         mock_graph.get_nodes_by_type.return_value = [target_node]
+        mock_calculator.calculate.return_value = ConfidenceResult(score=0.9)
         
         source_info = NodeInfo("env:target", "target", "env", ["target"])
         
+        # We explain source -> target. 
+        # Alternatives logic searches all nodes.
+        # It should skip "infra:target" because that matches the `actual_target_id` arg.
         alts = generator._find_alternatives(source_info, "infra:target")
+        
         assert len(alts) == 0
