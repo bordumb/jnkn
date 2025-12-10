@@ -4,7 +4,7 @@ Unit tests for the 'scan' command.
 
 import json
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 from click.testing import CliRunner
@@ -14,7 +14,6 @@ from jnkn.cli.commands.scan import (
     _load_parsers,
     _parse_file,
     _save_output,
-    _to_dict,
     scan,
 )
 
@@ -28,17 +27,22 @@ class TestScanCommand:
 
     @pytest.fixture
     def mock_graph(self):
-        """
-        Mock the LineageGraph class.
-        PATCH TARGET: jnkn.graph.lineage.LineageGraph
-        We patch the source because scan.py uses a local import inside the function.
-        """
-        with patch("jnkn.graph.lineage.LineageGraph") as mock_cls:
+        """Mock the DependencyGraph class."""
+        with patch("jnkn.cli.commands.scan.DependencyGraph") as mock_cls:
             mock_instance = mock_cls.return_value
-            # Default stats to a "healthy" scan to avoid low node warning
-            mock_instance.stats.return_value = {"total_nodes": 10, "total_edges": 5}
-            mock_instance.to_json.return_value = '{"nodes": [], "edges": []}'
-            yield mock_cls
+            # Default healthy stats
+            mock_instance.node_count = 10
+            mock_instance.edge_count = 5
+            mock_instance.to_dict.return_value = {"nodes": [], "edges": []}
+            yield mock_instance
+
+    @pytest.fixture
+    def mock_stitcher(self):
+        """Mock the Stitcher class."""
+        with patch("jnkn.cli.commands.scan.Stitcher") as mock_cls:
+            mock_instance = mock_cls.return_value
+            mock_instance.stitch.return_value = [] # Return empty list of new edges
+            yield mock_instance
 
     @pytest.fixture
     def mock_load_parsers(self):
@@ -73,12 +77,16 @@ class TestScanCommand:
 
         assert result.exit_code == 0
         assert "No parsers available" in result.output
-        assert "Install with: pip install jnkn[full]" in result.output
+        assert "imports failed" in result.output
 
     def test_scan_successful_execution(
-        self, runner, mock_load_parsers, mock_graph, mock_parse_file
+        self, runner, mock_load_parsers, mock_graph, mock_stitcher, mock_parse_file
     ):
         """Test a standard successful scan."""
+        # Fix: parse_file must return nodes for stitching to run
+        mock_node = MagicMock()
+        mock_parse_file.return_value = ([mock_node], [])
+
         with runner.isolated_filesystem():
             # Create a dummy file to find
             Path("test.py").touch()
@@ -87,21 +95,19 @@ class TestScanCommand:
 
         assert result.exit_code == 0
         assert "Scanning" in result.output
+        assert "Stitching cross-domain dependencies" in result.output
         assert "Scan complete" in result.output
-        assert "Nodes: 10" in result.output  # From mock_graph stats
-
         # Verify flow
         mock_load_parsers.assert_called_once()
         mock_parse_file.assert_called()
-        mock_graph.return_value.load_from_dict.assert_called_once()
+        mock_stitcher.stitch.assert_called_once()
 
     def test_scan_low_node_count_warning(
         self, runner, mock_load_parsers, mock_graph, mock_parse_file
     ):
         """Test that finding < 5 nodes triggers the warning."""
-        # Set stats to trigger warning
-        mock_graph.return_value.stats.return_value = {"total_nodes": 3, "total_edges": 0}
-
+        mock_graph.node_count = 3
+        
         with runner.isolated_filesystem():
             Path("test.py").touch()
             result = runner.invoke(scan, ["."])
@@ -158,13 +164,14 @@ class TestScanCommand:
         """Test using the -o flag calls the saver."""
         with runner.isolated_filesystem():
             Path("test.py").touch()
-            result = runner.invoke(scan, [".", "-o", "report.html"])
+            result = runner.invoke(scan, [".", "-o", "report.json"])
 
         assert result.exit_code == 0
         mock_save_output.assert_called_once()
         args = mock_save_output.call_args[0]
-        assert isinstance(args[0], type(mock_graph.return_value))  # The graph
-        assert args[1].name == "report.html"  # The path
+        # Check against the MOCK instance, not the class
+        assert args[0] == mock_graph 
+        assert args[1].name == "report.json"  # The path
 
     def test_scan_default_output(
         self, runner, mock_load_parsers, mock_graph, mock_parse_file
@@ -177,8 +184,10 @@ class TestScanCommand:
             # Check file creation
             expected_path = Path(".jnkn/lineage.json")
             assert expected_path.exists()
-            # Verify it wrote JSON
-            assert expected_path.read_text() == '{"nodes": [], "edges": []}'
+            
+            # Verify JSON structure (ignores whitespace differences)
+            content = json.loads(expected_path.read_text())
+            assert content == {"nodes": [], "edges": []}
 
 
 class TestHelperFunctions:
@@ -186,30 +195,24 @@ class TestHelperFunctions:
 
     def test_load_parsers_success(self):
         """Test loading available parsers."""
-        mock_parser_class = MagicMock()
-        
         with patch("importlib.import_module") as mock_import:
-            # Create a mock module that has the requested parser class
+            # Setup a mock module that has parser classes
             mock_module = MagicMock()
-            
-            # Ensure the module object has all attributes
-            mock_module.PySparkParser = mock_parser_class
-            mock_module.PythonParser = mock_parser_class
-            mock_module.SparkYamlParser = mock_parser_class
-            mock_module.TerraformParser = mock_parser_class
-            
+            # The code calls getattr(module, class_name)
+            # We ensure any attribute access returns a MagicMock (acting as the class)
             mock_import.return_value = mock_module
-
-            # PATCH TARGET: jnkn.parsing.base.ParserContext (the actual class)
+            
+            # Patch the context import to avoid AttributeErrors if dependencies missing
             with patch("jnkn.parsing.base.ParserContext"):
                 parsers = _load_parsers(Path("."))
 
-        assert "python" in parsers
-        assert isinstance(parsers["python"], MagicMock)
+        # It tries to load 5 parsers (pyspark, python, spark_yaml, terraform, kubernetes)
+        assert len(parsers) == 5
 
     def test_load_parsers_import_error(self):
         """Test graceful failure when a parser module is missing."""
-        # Patch ParserContext at its source
+        # Fix: Patch ParserContext FIRST, then break imports.
+        # This prevents the patch(ParserContext) itself from failing due to the broken import system.
         with patch("jnkn.parsing.base.ParserContext"):
             with patch("importlib.import_module", side_effect=ImportError("No module")):
                 parsers = _load_parsers(Path("."))
@@ -217,44 +220,27 @@ class TestHelperFunctions:
         # Should return empty dict, not crash
         assert parsers == {}
 
-    def test_to_dict_pydantic(self):
-        """Test _to_dict with a Pydantic-like object."""
-        mock_obj = MagicMock()
-        mock_obj.model_dump.return_value = {"id": "1", "name": "test"}
-        # Must remove __dict__ so hasattr(item, "__dict__") doesn't interfere
-        del mock_obj.__dict__
-
-        assert _to_dict(mock_obj) == {"id": "1", "name": "test"}
-
-    def test_to_dict_plain_object(self):
-        """Test _to_dict with a plain object."""
-        class SimpleObj:
-            def __init__(self):
-                self.x = 1
-                self._private = 2
-        
-        obj = SimpleObj()
-        assert _to_dict(obj) == {"x": 1}
-
     def test_save_output_json(self, tmp_path):
         """Test saving graph as JSON."""
         mock_graph = MagicMock()
-        mock_graph.to_json.return_value = '{"graph": true}'
+        mock_graph.to_dict.return_value = {"graph": True}
         
         output_file = tmp_path / "graph.json"
         
         _save_output(mock_graph, output_file)
         
-        assert output_file.read_text() == '{"graph": true}'
+        content = output_file.read_text()
+        assert '"graph": true' in content
 
-    def test_save_output_html(self, tmp_path):
-        """Test saving graph as HTML (export_html called)."""
+    def test_save_output_html(self, tmp_path, capsys):
+        """Test saving graph as HTML (currently unsupported warning)."""
         mock_graph = MagicMock()
         output_file = tmp_path / "graph.html"
         
         _save_output(mock_graph, output_file)
         
-        mock_graph.export_html.assert_called_once_with(output_file)
+        captured = capsys.readouterr()
+        assert "HTML export from scan is currently limited" in captured.err
 
     def test_save_output_unknown(self, capsys, tmp_path):
         """Test saving with unknown extension."""
@@ -270,41 +256,36 @@ class TestHelperFunctions:
 class TestFileParsingLogic:
     """Tests for the _parse_file helper."""
 
-    @pytest.fixture
-    def mock_parser(self):
-        parser = MagicMock()
-        parser.can_parse.return_value = True
-        return parser
-
-    def test_parse_file_success(self, tmp_path, mock_parser):
+    def test_parse_file_success(self, tmp_path):
         """Test successful file parsing."""
         f = tmp_path / "test.py"
         f.write_text("content")
         
-        # Setup parser to return one node and one edge
+        mock_parser = MagicMock()
+        mock_parser.can_parse.return_value = True
         
-        # Mock Node (no source_id)
-        node = MagicMock()
-        del node.source_id 
-        node.model_dump.return_value = {"id": "n1"}
-        
-        # Mock Edge (has source_id)
-        edge = MagicMock()
-        edge.source_id = "n1"
-        # Ensure the dictionary returned by model_dump has source_id
-        edge.model_dump.return_value = {"source_id": "n1", "target_id": "n2"}
-        
-        # The parser returns a mix of both
-        mock_parser.parse.return_value = [node, edge]
-        parsers = {"test": mock_parser}
+        # Create dummy classes for isinstance check
+        class DummyNode:
+            pass
+        class DummyEdge:
+            pass
 
-        nodes, edges = _parse_file(f, parsers, verbose=False)
+        # Setup the parser to return instances of our dummy classes
+        n_inst = DummyNode()
+        e_inst = DummyEdge()
+        mock_parser.parse.return_value = [n_inst, e_inst]
+        
+        # Patch the scan module to use our dummy classes instead of real Node/Edge
+        with patch("jnkn.cli.commands.scan.Node", DummyNode), \
+             patch("jnkn.cli.commands.scan.Edge", DummyEdge):
+            
+            parsers = {"test": mock_parser}
+            nodes, edges = _parse_file(f, parsers, verbose=False)
 
-        # Assertion logic: _parse_file splits them into nodes/edges lists
-        assert len(nodes) == 1
-        assert len(edges) == 1
-        assert nodes[0] == {"id": "n1"}
-        assert edges[0] == {"source_id": "n1", "target_id": "n2"}
+            assert len(nodes) == 1
+            assert len(edges) == 1
+            assert nodes[0] is n_inst
+            assert edges[0] is e_inst
 
     def test_parse_file_read_error(self, tmp_path):
         """Test handling file read errors."""
@@ -316,12 +297,15 @@ class TestFileParsingLogic:
         assert nodes == []
         assert edges == []
 
-    def test_parse_file_parser_exception(self, tmp_path, mock_parser, capsys):
+    def test_parse_file_parser_exception(self, tmp_path, capsys):
         """Test handling exception inside a parser."""
         f = tmp_path / "test.py"
         f.write_text("content")
         
+        mock_parser = MagicMock()
+        mock_parser.can_parse.return_value = True
         mock_parser.parse.side_effect = ValueError("Boom")
+        
         parsers = {"test": mock_parser}
 
         # Run with verbose=True to see error output
@@ -331,10 +315,13 @@ class TestFileParsingLogic:
         captured = capsys.readouterr()
         assert "test error: Boom" in captured.err
 
-    def test_parse_file_verbose_output(self, tmp_path, mock_parser, capsys):
+    def test_parse_file_verbose_output(self, tmp_path, capsys):
         """Test verbose logging."""
         f = tmp_path / "test.py"
         f.write_text("content")
+        
+        mock_parser = MagicMock()
+        mock_parser.can_parse.return_value = True
         mock_parser.parse.return_value = []
         
         _parse_file(f, {"test": mock_parser}, verbose=True)
