@@ -109,6 +109,7 @@ class SparkYamlParser(LanguageParser):
             return False
 
         try:
+            # FIX: Use self.context instead of self._context
             text = content.decode("utf-8")
         except UnicodeDecodeError:
             return False
@@ -154,7 +155,8 @@ class SparkYamlParser(LanguageParser):
 
         # Decode and parse YAML
         try:
-            text = content.decode(self._context.encoding)
+            # FIX: Use self.context instead of self._context
+            text = content.decode(self.context.encoding)
             config = yaml.safe_load(text)
         except yaml.YAMLError as e:
             self._logger.error(f"Failed to parse YAML {file_path}: {e}")

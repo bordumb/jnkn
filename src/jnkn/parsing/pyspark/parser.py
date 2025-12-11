@@ -261,7 +261,8 @@ class PySparkParser(LanguageParser):
 
         # Decode content
         try:
-            text = content.decode(self._context.encoding)
+            # FIX: Use self.context instead of self._context
+            text = content.decode(self.context.encoding)
         except UnicodeDecodeError:
             try:
                 text = content.decode("latin-1")
@@ -379,7 +380,7 @@ class PySparkParser(LanguageParser):
                         source_type="table",
                     )
 
-            # Extract tables from CREATE TABLE AS (writes)
+            # Extract tables from CREATE TABLE AS SELECT (writes)
             for ctas_match in self.SQL_CTAS_PATTERN.finditer(sql_query):
                 table_name = ctas_match.group(1)
                 if self._is_valid_table_name(table_name):
