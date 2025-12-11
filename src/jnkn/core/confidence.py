@@ -1,20 +1,9 @@
 """
-Confidence Calculation Engine for jnkn.
+Confidence Calculation Engine.
 
-This module provides a sophisticated confidence scoring system for dependency matches.
-It combines multiple signals (exact match, token overlap, suffix/prefix match, etc.)
-with configurable weights and penalty factors to produce explainable confidence scores.
-
-Key Features:
-- Multiple confidence signals with configurable weights
-- Penalty factors for short tokens, common tokens, and ambiguous matches
-- Human-readable explanations for all matches
-- Extensible architecture for custom signals
-
-Design Principles:
-- False positives are worse than false negatives
-- Every match must have an explainable confidence score
-- Penalties reduce confidence, never increase it
+This module provides the scoring logic for determining the likelihood that two
+artifacts are related. It combines lexical analysis (token overlap, string matching)
+with semantic heuristics (provider/consumer validation) to minimize false positives.
 """
 
 import logging
@@ -24,10 +13,13 @@ from typing import Dict, List, Optional, Set
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .types import NodeType
+
 logger = logging.getLogger(__name__)
 
 
 class ConfidenceSignal(StrEnum):
+    """Positive indicators that increase confidence."""
     EXACT_MATCH = "exact_match"
     NORMALIZED_MATCH = "normalized_match"
     TOKEN_OVERLAP_HIGH = "token_overlap_high"
@@ -39,14 +31,18 @@ class ConfidenceSignal(StrEnum):
 
 
 class PenaltyType(StrEnum):
+    """Negative indicators that reduce confidence."""
     SHORT_TOKEN = "short_token"
     COMMON_TOKEN = "common_token"
     AMBIGUITY = "ambiguity"
     LOW_VALUE_TOKEN = "low_value_token"
+    GENERIC_MATCH = "generic_match"
+    INVALID_DIRECTION = "invalid_direction"
 
 
 @dataclass
 class SignalResult:
+    """Result of a single positive signal evaluation."""
     signal: ConfidenceSignal
     weight: float
     matched: bool
@@ -56,6 +52,7 @@ class SignalResult:
 
 @dataclass
 class PenaltyResult:
+    """Result of a single penalty evaluation."""
     penalty_type: PenaltyType
     multiplier: float
     reason: str = ""
@@ -64,7 +61,7 @@ class PenaltyResult:
 
 class ConfidenceResult(BaseModel):
     """
-    Complete result of confidence calculation.
+    Final result of a confidence calculation.
     """
     score: float = Field(ge=0.0, le=1.0)
     signals: List[Dict] = Field(default_factory=list)
@@ -79,7 +76,7 @@ class ConfidenceResult(BaseModel):
 
 class ConfidenceConfig(BaseModel):
     """
-    Configuration for confidence calculation.
+    Configuration for the confidence engine.
     """
     signal_weights: Dict[str, float] = Field(default_factory=lambda: {
         ConfidenceSignal.EXACT_MATCH: 1.0,
@@ -94,9 +91,11 @@ class ConfidenceConfig(BaseModel):
 
     penalty_multipliers: Dict[str, float] = Field(default_factory=lambda: {
         PenaltyType.SHORT_TOKEN: 0.5,
-        PenaltyType.COMMON_TOKEN: 0.7,
+        PenaltyType.COMMON_TOKEN: 0.3,
         PenaltyType.AMBIGUITY: 0.8,
         PenaltyType.LOW_VALUE_TOKEN: 0.6,
+        PenaltyType.GENERIC_MATCH: 0.1,
+        PenaltyType.INVALID_DIRECTION: 0.1,
     })
 
     short_token_length: int = 4
@@ -104,18 +103,27 @@ class ConfidenceConfig(BaseModel):
     min_token_overlap_medium: int = 2
 
     common_tokens: Set[str] = Field(default_factory=lambda: {
-        "id", "db", "host", "url", "key", "name", "type", "data",
-        "info", "temp", "test", "api", "app", "env", "var", "val",
-        "config", "setting", "path", "port", "user", "password",
-        "secret", "token", "auth", "log", "file", "dir", "src",
-        "dst", "in", "out", "err", "msg", "str", "int", "num",
+        "id", "name", "type", "key", "value", "data", "info", "config",
+        "url", "uri", "path", "file", "dir", "host", "port", "user",
+        "pass", "password", "token", "secret", "auth", "credential",
+        "src", "dst", "in", "out", "new", "old", "temp", "tmp",
+        "str", "int", "bool", "list", "dict", "obj", "item", "val",
+        "db", "api", "app", "env", "var", "msg", "num", 
+    })
+
+    generic_terms: Set[str] = Field(default_factory=lambda: {
+        "id", "uuid", "guid", "name", "created_at", "updated_at",
+        "timestamp", "date", "time", "version", "status", "state",
+        "type", "kind", "category", "class", "group", "owner",
+        "description", "comment", "note", "text", "message",
+        "error", "warning", "info", "debug", "trace",
     })
 
     low_value_tokens: Set[str] = Field(default_factory=lambda: {
-        "aws", "gcp", "azure", "main", "default", "primary",
-        "production", "prod", "staging", "dev", "development",
-        "internal", "external", "public", "private", "local",
-        "remote", "master", "slave", "read", "write",
+        "aws", "gcp", "azure", "k8s", "kubernetes", "docker",
+        "prod", "production", "dev", "development", "staging", "test",
+        "main", "master", "default", "primary", "secondary", "replica",
+        "public", "private", "internal", "external", "local", "remote",
     })
 
     model_config = ConfigDict(frozen=False)
@@ -123,11 +131,18 @@ class ConfidenceConfig(BaseModel):
 
 class ConfidenceCalculator:
     """
-    Calculate confidence scores for dependency matches.
+    Engine for calculating match confidence scores.
     """
 
     def __init__(self, config: Optional[ConfidenceConfig] = None):
         self.config = config or ConfidenceConfig()
+
+    def _normalize(self, name: str) -> str:
+        """Normalize name for comparison."""
+        s = name.lower()
+        for char in "._-/:":
+            s = s.replace(char, "")
+        return s
 
     def calculate(
         self,
@@ -135,39 +150,37 @@ class ConfidenceCalculator:
         target_name: str,
         source_tokens: List[str],
         target_tokens: List[str],
+        source_type: Optional[NodeType] = None,
+        target_type: Optional[NodeType] = None,
         matched_tokens: Optional[List[str]] = None,
         alternative_match_count: int = 0,
         source_node_id: str = "",
         target_node_id: str = "",
     ) -> ConfidenceResult:
-        """
-        Calculate confidence score for a match between source and target.
-        """
-        # Calculate matched tokens if not provided
+        """Calculate confidence score."""
         if matched_tokens is None:
             source_set = set(source_tokens)
             target_set = set(target_tokens)
             matched_tokens = list(source_set & target_set)
 
-        # Evaluate all signals
         signal_results = self._evaluate_signals(
             source_name, target_name,
             source_tokens, target_tokens,
             matched_tokens
         )
 
-        # Evaluate penalties
         penalty_results = self._evaluate_penalties(
-            matched_tokens, alternative_match_count
+            source_name=source_name,
+            target_name=target_name,
+            matched_tokens=matched_tokens,
+            alternative_match_count=alternative_match_count,
+            source_type=source_type,
+            target_type=target_type
         )
 
-        # Calculate base score from signals
         base_score = self._calculate_base_score(signal_results)
-
-        # Apply penalties
         final_score = self._apply_penalties(base_score, penalty_results)
 
-        # Build explanation
         explanation = self._build_explanation(
             source_name, target_name,
             signal_results, penalty_results,
@@ -192,364 +205,223 @@ class ConfidenceCalculator:
         target_tokens: List[str],
         matched_tokens: List[str],
     ) -> List[SignalResult]:
-        """Evaluate all confidence signals."""
+        """Evaluate positive matching signals."""
         results = []
+        source_norm = self._normalize(source_name)
+        target_norm = self._normalize(target_name)
 
-        # Signal 1: Exact match
         exact_match = source_name == target_name
         results.append(SignalResult(
             signal=ConfidenceSignal.EXACT_MATCH,
             weight=self.config.signal_weights[ConfidenceSignal.EXACT_MATCH],
             matched=exact_match,
-            details=f"'{source_name}' == '{target_name}'" if exact_match else "",
+            details=f"'{source_name}' == '{target_name}'"
         ))
 
-        # Signal 2: Normalized match
-        source_normalized = self._normalize(source_name)
-        target_normalized = self._normalize(target_name)
-        normalized_match = source_normalized == target_normalized
+        norm_match = source_norm == target_norm
         results.append(SignalResult(
             signal=ConfidenceSignal.NORMALIZED_MATCH,
             weight=self.config.signal_weights[ConfidenceSignal.NORMALIZED_MATCH],
-            matched=normalized_match and not exact_match,  # Don't double count
-            details=f"'{source_normalized}' == '{target_normalized}'" if normalized_match else "",
+            matched=norm_match and not exact_match,
+            details=f"'{source_norm}' == '{target_norm}'"
         ))
 
-        # Signal 3 & 4: Token overlap (high vs medium)
-        overlap_count = len(matched_tokens)
-        significant_overlap = [t for t in matched_tokens
-                             if t not in self.config.common_tokens
-                             and len(t) >= self.config.short_token_length]
+        # Filter significant tokens for overlap calculation
+        significant_tokens = [
+            t for t in matched_tokens
+            if t not in self.config.common_tokens and len(t) >= self.config.short_token_length
+        ]
 
-        high_overlap = len(significant_overlap) >= self.config.min_token_overlap_high
-        medium_overlap = len(significant_overlap) >= self.config.min_token_overlap_medium
-
+        high_overlap = len(significant_tokens) >= self.config.min_token_overlap_high
         results.append(SignalResult(
             signal=ConfidenceSignal.TOKEN_OVERLAP_HIGH,
             weight=self.config.signal_weights[ConfidenceSignal.TOKEN_OVERLAP_HIGH],
             matched=high_overlap,
-            details=f"{len(significant_overlap)} significant tokens: {significant_overlap}" if high_overlap else "",
-            matched_tokens=significant_overlap if high_overlap else [],
+            matched_tokens=significant_tokens
         ))
 
+        med_overlap = len(significant_tokens) >= self.config.min_token_overlap_medium
         results.append(SignalResult(
             signal=ConfidenceSignal.TOKEN_OVERLAP_MEDIUM,
             weight=self.config.signal_weights[ConfidenceSignal.TOKEN_OVERLAP_MEDIUM],
-            matched=medium_overlap and not high_overlap,  # Don't double count
-            details=f"{len(significant_overlap)} significant tokens: {significant_overlap}" if medium_overlap and not high_overlap else "",
-            matched_tokens=significant_overlap if medium_overlap and not high_overlap else [],
+            matched=med_overlap and not high_overlap,
+            matched_tokens=significant_tokens
         ))
 
-        # Signal 5: Suffix match
-        suffix_match = (target_normalized.endswith(source_normalized) and
-                       len(source_normalized) >= 4 and
-                       not normalized_match)
+        min_len = 4
+        suffix = target_norm.endswith(source_norm) and len(source_norm) >= min_len and not norm_match
+        prefix = target_norm.startswith(source_norm) and len(source_norm) >= min_len and not norm_match
+        contains = source_norm in target_norm and len(source_norm) >= min_len and not norm_match and not suffix and not prefix
+
         results.append(SignalResult(
             signal=ConfidenceSignal.SUFFIX_MATCH,
             weight=self.config.signal_weights[ConfidenceSignal.SUFFIX_MATCH],
-            matched=suffix_match,
-            details=f"'{target_normalized}' ends with '{source_normalized}'" if suffix_match else "",
+            matched=suffix,
+            details=f"Ends with '{source_norm}'"
         ))
-
-        # Signal 6: Prefix match
-        prefix_match = (target_normalized.startswith(source_normalized) and
-                       len(source_normalized) >= 4 and
-                       not normalized_match)
         results.append(SignalResult(
             signal=ConfidenceSignal.PREFIX_MATCH,
             weight=self.config.signal_weights[ConfidenceSignal.PREFIX_MATCH],
-            matched=prefix_match,
-            details=f"'{target_normalized}' starts with '{source_normalized}'" if prefix_match else "",
+            matched=prefix,
+            details=f"Starts with '{source_norm}'"
         ))
-
-        # Signal 7: Contains
-        contains_match = (source_normalized in target_normalized and
-                        len(source_normalized) >= 4 and
-                        not normalized_match and
-                        not suffix_match and
-                        not prefix_match)
         results.append(SignalResult(
             signal=ConfidenceSignal.CONTAINS,
             weight=self.config.signal_weights[ConfidenceSignal.CONTAINS],
-            matched=contains_match,
-            details=f"'{target_normalized}' contains '{source_normalized}'" if contains_match else "",
+            matched=contains,
+            details=f"Contains '{source_norm}'"
         ))
 
-        # Signal 8: Single token (weak signal, used when no other match)
-        single_token = (overlap_count == 1 and
-                       not any(r.matched for r in results))
+        # Single Token Fallback
+        any_structural = suffix or prefix or contains or norm_match or exact_match
+        single_token = (len(matched_tokens) > 0 and 
+                       not any_structural and 
+                       not high_overlap and 
+                       not med_overlap)
+        
         results.append(SignalResult(
             signal=ConfidenceSignal.SINGLE_TOKEN,
             weight=self.config.signal_weights[ConfidenceSignal.SINGLE_TOKEN],
             matched=single_token,
-            details=f"Single token match: {matched_tokens}" if single_token else "",
-            matched_tokens=matched_tokens if single_token else [],
+            matched_tokens=matched_tokens
         ))
 
         return results
 
     def _evaluate_penalties(
         self,
+        source_name: str,
+        target_name: str,
         matched_tokens: List[str],
         alternative_match_count: int,
+        source_type: Optional[NodeType],
+        target_type: Optional[NodeType],
     ) -> List[PenaltyResult]:
-        """Evaluate all penalty factors."""
+        """Evaluate negative penalties."""
         results = []
+        source_norm = self._normalize(source_name)
 
-        # Penalty 1: Short tokens
-        short_tokens = [t for t in matched_tokens
-                       if len(t) < self.config.short_token_length]
-        if short_tokens:
+        if source_norm in self.config.generic_terms:
             results.append(PenaltyResult(
-                penalty_type=PenaltyType.SHORT_TOKEN,
-                multiplier=self.config.penalty_multipliers[PenaltyType.SHORT_TOKEN],
-                reason=f"Short tokens (< {self.config.short_token_length} chars): {short_tokens}",
-                affected_tokens=short_tokens,
-            ))
-        else:
-            results.append(PenaltyResult(
-                penalty_type=PenaltyType.SHORT_TOKEN,
-                multiplier=1.0,
-                reason="No short tokens",
+                penalty_type=PenaltyType.GENERIC_MATCH,
+                multiplier=self.config.penalty_multipliers[PenaltyType.GENERIC_MATCH],
+                reason=f"Source '{source_name}' is a generic term"
             ))
 
-        # Penalty 2: Common tokens
+        if source_type and target_type:
+            if not self._is_valid_direction(source_type, target_type):
+                results.append(PenaltyResult(
+                    penalty_type=PenaltyType.INVALID_DIRECTION,
+                    multiplier=self.config.penalty_multipliers[PenaltyType.INVALID_DIRECTION],
+                    reason=f"Invalid flow: {source_type.value} -> {target_type.value}"
+                ))
+
         common_found = [t for t in matched_tokens if t in self.config.common_tokens]
         non_common_found = [t for t in matched_tokens if t not in self.config.common_tokens]
-
-        # Only apply penalty if ALL matched tokens are common
         if common_found and not non_common_found:
             results.append(PenaltyResult(
                 penalty_type=PenaltyType.COMMON_TOKEN,
                 multiplier=self.config.penalty_multipliers[PenaltyType.COMMON_TOKEN],
-                reason=f"All matched tokens are common: {common_found}",
-                affected_tokens=common_found,
-            ))
-        else:
-            results.append(PenaltyResult(
-                penalty_type=PenaltyType.COMMON_TOKEN,
-                multiplier=1.0,
-                reason="Has non-common tokens" if non_common_found else "No common tokens",
+                reason="All matched tokens are common words",
+                affected_tokens=common_found
             ))
 
-        # Penalty 3: Ambiguity (multiple potential matches)
-        if alternative_match_count > 2:
-            # Stronger penalty for more alternatives
-            penalty = self.config.penalty_multipliers[PenaltyType.AMBIGUITY]
-            penalty = penalty ** (1 + (alternative_match_count - 2) * 0.2)  # Compound penalty
-            results.append(PenaltyResult(
-                penalty_type=PenaltyType.AMBIGUITY,
-                multiplier=max(0.3, penalty),  # Floor at 0.3
-                reason=f"Source has {alternative_match_count} potential matches",
+        # Modified Short Token Logic: Only penalize if ALL matched tokens are short
+        short_tokens = [t for t in matched_tokens if len(t) < self.config.short_token_length]
+        long_tokens = [t for t in matched_tokens if len(t) >= self.config.short_token_length]
+        
+        if short_tokens and not long_tokens:
+             results.append(PenaltyResult(
+                penalty_type=PenaltyType.SHORT_TOKEN,
+                multiplier=self.config.penalty_multipliers[PenaltyType.SHORT_TOKEN],
+                reason=f"All matched tokens are short (<{self.config.short_token_length})",
+                affected_tokens=short_tokens
             ))
-        else:
+
+        if alternative_match_count > 1:
+            raw_penalty = self.config.penalty_multipliers[PenaltyType.AMBIGUITY]
+            multiplier = max(0.2, raw_penalty ** (alternative_match_count - 1))
             results.append(PenaltyResult(
                 penalty_type=PenaltyType.AMBIGUITY,
-                multiplier=1.0,
-                reason="Low ambiguity" if alternative_match_count <= 1 else "Acceptable ambiguity",
+                multiplier=multiplier,
+                reason=f"Matched {alternative_match_count} distinct targets"
             ))
 
-        # Penalty 4: Low-value tokens
-        low_value_found = [t for t in matched_tokens if t in self.config.low_value_tokens]
-        high_value_found = [t for t in matched_tokens
-                           if t not in self.config.low_value_tokens
-                           and t not in self.config.common_tokens]
-
-        # Only apply if majority of tokens are low-value
-        if low_value_found and len(low_value_found) > len(high_value_found):
+        low_value = [t for t in matched_tokens if t in self.config.low_value_tokens]
+        if low_value and len(low_value) >= len(non_common_found):
             results.append(PenaltyResult(
                 penalty_type=PenaltyType.LOW_VALUE_TOKEN,
                 multiplier=self.config.penalty_multipliers[PenaltyType.LOW_VALUE_TOKEN],
-                reason=f"Mostly low-value tokens: {low_value_found}",
-                affected_tokens=low_value_found,
-            ))
-        else:
-            results.append(PenaltyResult(
-                penalty_type=PenaltyType.LOW_VALUE_TOKEN,
-                multiplier=1.0,
-                reason="Has high-value tokens" if high_value_found else "No low-value tokens",
+                reason="Match dominated by low-value tokens",
+                affected_tokens=low_value
             ))
 
         return results
 
-    def _calculate_base_score(self, signal_results: List[SignalResult]) -> float:
-        """
-        Calculate base score from signal results.
-        
-        Uses the maximum weight among matched signals, not sum,
-        to avoid inflated scores from multiple weak signals.
-        """
-        matched_weights = [s.weight for s in signal_results if s.matched]
+    def _is_valid_direction(self, source: NodeType, target: NodeType) -> bool:
+        valid_pairs = {
+            (NodeType.INFRA_RESOURCE, NodeType.ENV_VAR),
+            (NodeType.CONFIG_KEY, NodeType.ENV_VAR),
+            (NodeType.SECRET, NodeType.ENV_VAR),
+            (NodeType.INFRA_RESOURCE, NodeType.INFRA_RESOURCE),
+            (NodeType.DATA_ASSET, NodeType.CODE_FILE),
+            (NodeType.DATA_ASSET, NodeType.CODE_ENTITY),
+            (NodeType.CODE_FILE, NodeType.CODE_ENTITY),
+        }
+        if (source, target) in valid_pairs:
+            return True
+        if source == NodeType.ENV_VAR and target == NodeType.INFRA_RESOURCE:
+            return False
+        return True
+
+    def _calculate_base_score(self, signals: List[SignalResult]) -> float:
+        matched_weights = [s.weight for s in signals if s.matched]
         if not matched_weights:
             return 0.0
-
-        # Use max weight as base, with small bonus for additional signals
         max_weight = max(matched_weights)
-        additional_signals = len(matched_weights) - 1
-        bonus = min(0.1, additional_signals * 0.02)  # Cap bonus at 0.1
-
+        bonus = min(0.1, (len(matched_weights) - 1) * 0.02)
         return min(1.0, max_weight + bonus)
 
-    def _apply_penalties(
-        self,
-        base_score: float,
-        penalty_results: List[PenaltyResult],
-    ) -> float:
-        """Apply penalty multipliers to base score."""
-        score = base_score
-        for penalty in penalty_results:
-            score *= penalty.multiplier
-        return round(score, 4)
+    def _apply_penalties(self, score: float, penalties: List[PenaltyResult]) -> float:
+        final = score
+        for p in penalties:
+            final *= p.multiplier
+        return round(final, 4)
 
-    def _build_explanation(
-        self,
-        source_name: str,
-        target_name: str,
-        signal_results: List[SignalResult],
-        penalty_results: List[PenaltyResult],
-        base_score: float,
-        final_score: float,
-    ) -> str:
-        """Build human-readable explanation of the confidence calculation."""
-        lines = []
-
-        # Header
-        lines.append(f"Match: {source_name} → {target_name}")
-        lines.append(f"Confidence: {final_score:.2f}")
-        lines.append("")
-        lines.append("Signals:")
-
-        # Matched signals
-        matched_signals = [s for s in signal_results if s.matched]
-        if matched_signals:
-            for signal in matched_signals:
-                lines.append(f"  ✓ {signal.signal.value} ({signal.weight:.2f})")
-                if signal.details:
-                    lines.append(f"    → {signal.details}")
-        else:
-            lines.append("  (none)")
-
-        # Penalties
-        applied_penalties = [p for p in penalty_results if p.multiplier < 1.0]
-        if applied_penalties:
-            lines.append("")
+    def _build_explanation(self, source, target, signals, penalties, base, final) -> str:
+        lines = [f"Match: {source} -> {target}", f"Base Confidence: {base:.2f}"]
+        matched_sigs = [s for s in signals if s.matched]
+        if matched_sigs:
+            lines.append("Signals:")
+            for s in matched_sigs:
+                details = f" ({s.details})" if s.details else ""
+                lines.append(f"  + {s.signal.value} ({s.weight:.2f}){details}")
+        if penalties:
             lines.append("Penalties:")
-            for penalty in applied_penalties:
-                lines.append(f"  - {penalty.penalty_type.value} (×{penalty.multiplier:.2f})")
-                if penalty.reason:
-                    lines.append(f"    → {penalty.reason}")
-        else:
-            lines.append("")
-            lines.append("Penalties: None")
-
+            for p in penalties:
+                lines.append(f"  - {p.penalty_type.value} (x{p.multiplier:.2f}): {p.reason}")
+        lines.append(f"Final Score: {final:.2f}")
         return "\n".join(lines)
 
-    def explain(self, result: ConfidenceResult) -> str:
-        """
-        Generate a detailed, formatted explanation of a confidence result.
-        This is a richer version of the explanation included in the result,
-        suitable for CLI output.
-        """
-        lines = []
-
-        lines.append("═" * 60)
-        lines.append("MATCH EXPLANATION")
-        lines.append("═" * 60)
-        lines.append("")
-
-        if result.source_node_id:
-            lines.append(f"Source: {result.source_node_id}")
-        if result.target_node_id:
-            lines.append(f"Target: {result.target_node_id}")
-        if result.matched_tokens:
-            lines.append(f"Matched Tokens: {result.matched_tokens}")
-
-        lines.append("")
-        lines.append("─" * 60)
-        lines.append("CONFIDENCE CALCULATION")
-        lines.append("─" * 60)
-        lines.append("")
-
-        lines.append("Base signals:")
-        if result.signals:
-            for signal in result.signals:
-                weight = signal.get("weight", 0)
-                name = signal.get("signal", "unknown")
-                details = signal.get("details", "")
-                matched_tokens = signal.get("matched_tokens", [])
-
-                if matched_tokens:
-                    lines.append(f"  [+{weight:.2f}] {name}: {matched_tokens}")
-                elif details:
-                    lines.append(f"  [+{weight:.2f}] {name}")
-                    lines.append(f"         {details}")
-                else:
-                    lines.append(f"  [+{weight:.2f}] {name}")
-        else:
-            lines.append("  (none)")
-
-        lines.append("")
-        lines.append("Penalties:")
-        if result.penalties:
-            for penalty in result.penalties:
-                multiplier = penalty.get("multiplier", 1.0)
-                name = penalty.get("penalty_type", "unknown")
-                reason = penalty.get("reason", "")
-                lines.append(f"  [×{multiplier:.2f}] {name}")
-                if reason:
-                    lines.append(f"         {reason}")
-        else:
-            lines.append("  None applied")
-
-        lines.append("")
-        confidence_level = self._get_confidence_level(result.score)
-        lines.append(f"Final confidence: {result.score:.2f} ({confidence_level})")
-        lines.append("")
-        lines.append("═" * 60)
-
-        return "\n".join(lines)
-
-    def _get_confidence_level(self, score: float) -> str:
-        """Get human-readable confidence level."""
-        if score >= 0.8:
-            return "HIGH"
-        elif score >= 0.6:
-            return "MEDIUM"
-        elif score >= 0.4:
-            return "LOW"
-        else:
-            return "VERY LOW"
-
     @staticmethod
-    def _normalize(name: str) -> str:
-        """Normalize a name by lowercasing and removing separators."""
-        result = name.lower()
-        for sep in ["_", ".", "-", "/", ":"]:
-            result = result.replace(sep, "")
-        return result
-
-    @staticmethod
-    def _signal_to_dict(signal: SignalResult) -> Dict:
-        """Convert SignalResult to dictionary."""
+    def _signal_to_dict(s: SignalResult) -> Dict:
         return {
-            "signal": signal.signal.value,
-            "weight": signal.weight,
-            "matched": signal.matched,
-            "details": signal.details,
-            "matched_tokens": signal.matched_tokens,
+            "signal": s.signal.value,
+            "weight": s.weight,
+            "matched": s.matched,
+            "details": s.details,
+            "matched_tokens": s.matched_tokens
         }
 
     @staticmethod
-    def _penalty_to_dict(penalty: PenaltyResult) -> Dict:
-        """Convert PenaltyResult to dictionary."""
+    def _penalty_to_dict(p: PenaltyResult) -> Dict:
         return {
-            "penalty_type": penalty.penalty_type.value,
-            "multiplier": penalty.multiplier,
-            "reason": penalty.reason,
-            "affected_tokens": penalty.affected_tokens,
+            "penalty_type": p.penalty_type.value,
+            "multiplier": p.multiplier,
+            "reason": p.reason,
+            "affected_tokens": p.affected_tokens
         }
 
 
 def create_default_calculator() -> ConfidenceCalculator:
-    """Create a ConfidenceCalculator with default configuration."""
     return ConfidenceCalculator()

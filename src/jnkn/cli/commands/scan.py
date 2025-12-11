@@ -5,7 +5,7 @@ Scan Command - Parse codebase and build dependency graph.
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple
 
 import click
 
@@ -14,12 +14,12 @@ from ...core.stitching import Stitcher
 from ...core.storage.sqlite import SQLiteStorage
 from ...core.types import Edge, Node
 from ...parsing.base import ParserContext
-from ..utils import SKIP_DIRS, echo_error, echo_info, echo_low_node_warning, echo_success
 
 # We import these directly to ensure they are available.
 # This prevents "No parsers available" errors caused by brittle dynamic discovery.
 from ...parsing.python.parser import PythonParser
 from ...parsing.terraform.parser import TerraformParser
+from ..utils import SKIP_DIRS, echo_error, echo_info, echo_low_node_warning, echo_success
 
 # We wrap these in try/except blocks so the CLI doesn't crash 
 # if specific language dependencies are missing.

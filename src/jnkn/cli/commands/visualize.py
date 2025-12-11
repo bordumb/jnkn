@@ -2,11 +2,11 @@
 Visualize Command - Open interactive graph in browser.
 """
 
-import click
-from pathlib import Path
 
-from ..utils import load_graph, echo_error
+import click
+
 from ...graph.visualize import open_visualization
+from ..utils import echo_error, load_graph
 
 
 @click.command()

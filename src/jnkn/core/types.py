@@ -28,6 +28,7 @@ class NodeType(StrEnum):
     ENV_VAR = "env_var"
     CONFIG_KEY = "config_key"
     SECRET = "secret"
+    JOB = "job"
     UNKNOWN = "unknown"
 
 
@@ -44,6 +45,7 @@ class RelationshipType(StrEnum):
     DEPENDS_ON = "depends_on"
     PROVIDES = "provides"
     CONSUMES = "consumes"
+    TRANSFORMS = "transforms"
 
 
 class MatchStrategy(StrEnum):
@@ -138,8 +140,16 @@ class Node(BaseModel):
         overlap = set(self.tokens) & set(other_tokens)
         return len(overlap) >= min_overlap
 
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        if isinstance(other, Node):
+            return self.id == other.id
+        return False
+
     class Config:
-        frozen = True
+        frozen = False  # Allow post-init modification, rely on manual hash
 
 
 class Edge(BaseModel):

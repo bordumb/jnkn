@@ -18,7 +18,7 @@ from . import (
     stats,
     suppress,
     trace,
-    visualize
+    visualize,
 )
 
 __all__ = [

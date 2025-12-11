@@ -6,10 +6,10 @@ Defines the contracts for:
 2. Parsers (IParser) - Ensures strict return types for all language parsers.
 """
 
-from typing import Protocol, List, Optional, Any, Iterator, Union, Set
 from pathlib import Path
+from typing import Iterator, List, Optional, Protocol, Set, Union
 
-from .types import Node, Edge
+from .types import Edge, Node
 
 
 class IGraph(Protocol):
