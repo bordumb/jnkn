@@ -40,6 +40,7 @@ class RelationshipType(StrEnum):
     PROVIDES = "provides"
     CONSUMES = "consumes"
     TRANSFORMS = "transforms"
+    ROUTES_TO = "routes_to"  # Added for K8s Ingress -> Service
 
 
 class MatchStrategy(StrEnum):
@@ -102,8 +103,6 @@ class Node(BaseModel):
     tokens: List[str] = Field(default_factory=list)
     
     # REFACTORED: Use TypedDict instead of Dict[str, Any]
-    # Pydantic v2 configuration to allow extra fields is handled via model_config if needed,
-    # but for TypedDict fields, it relies on the definition. We added 'lines' to NodeMetadata above.
     metadata: NodeMetadata = Field(default_factory=dict)
     
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
