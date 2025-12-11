@@ -155,18 +155,33 @@ def _handle_suppression(edge, store) -> bool:
     tgt_patterns = suggest_patterns(edge.target_id)
 
     # Get the broadest meaningful pattern (usually the last or second to last)
-    # suggest_patterns ensures list is not empty (contains exact match at least)
     broad_src = src_patterns[-1]
     broad_tgt = tgt_patterns[-1]
 
-    console.print("\n[bold]Create Suppression Rule:[/bold]")
-    console.print(f"1. Exact:        {edge.source_id} -> {edge.target_id}")
-    console.print(f"2. Broad Source: [yellow]{broad_src}[/yellow] -> {edge.target_id}")
-    console.print(f"3. Broad Target: {edge.source_id} -> [magenta]{broad_tgt}[/magenta]")
-    console.print(f"4. Wildcard:     [yellow]{broad_src}[/yellow] -> [magenta]{broad_tgt}[/magenta]")
-    console.print("c. Cancel")
+    console.print("\n[bold]How wide should this suppression rule be?[/bold]")
+    
+    # Option 1: Exact
+    console.print("\n[bold cyan]1. Just this specific link[/bold cyan] (Safest)")
+    console.print(f"   [dim]Block only:[/dim] {edge.source_id} -> {edge.target_id}")
 
-    choice = Prompt.ask("Choose pattern", choices=["1", "2", "3", "4", "c"], default="1")
+    # Option 2: Source Wildcard
+    console.print("\n[bold cyan]2. Ignore this Source Pattern[/bold cyan]")
+    console.print(f"   [dim]Block:[/dim]      [yellow]{broad_src}[/yellow] -> {edge.target_id}")
+    console.print(f"   [dim]Meaning:[/dim]    [italic]Nothing matching '{broad_src}' should ever link to this target.[/italic]")
+
+    # Option 3: Target Wildcard
+    console.print("\n[bold cyan]3. Ignore this Target Pattern[/bold cyan]")
+    console.print(f"   [dim]Block:[/dim]      {edge.source_id} -> [magenta]{broad_tgt}[/magenta]")
+    console.print(f"   [dim]Meaning:[/dim]    [italic]This source should never link to anything matching '{broad_tgt}'.[/italic]")
+
+    # Option 4: Full Wildcard
+    console.print("\n[bold cyan]4. Ignore this Pattern entirely[/bold cyan] (Broadest)")
+    console.print(f"   [dim]Block:[/dim]      [yellow]{broad_src}[/yellow] -> [magenta]{broad_tgt}[/magenta]")
+    console.print("   [dim]Meaning:[/dim]    [italic]Never link these two types of things together.[/italic]")
+
+    console.print("\n[dim]c. Cancel[/dim]")
+
+    choice = Prompt.ask("Choose scope", choices=["1", "2", "3", "4", "c"], default="1")
 
     if choice == "c":
         return False
