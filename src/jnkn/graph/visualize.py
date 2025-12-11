@@ -8,13 +8,11 @@ so it can be viewed offline without a backend server.
 
 import json
 import webbrowser
-from datetime import datetime, date
+from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from ..core.interfaces import IGraph
-from ..core.types import NodeType, RelationshipType
-
 
 # Minimal template with embedded logic
 HTML_TEMPLATE = """<!DOCTYPE html>

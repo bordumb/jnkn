@@ -2,13 +2,14 @@
 Graph Implementation backed by rustworkx.
 """
 
-from typing import List, Optional, Set, Iterator, Dict, Any
-import rustworkx as rx
-from dataclasses import dataclass, field
 from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import Any, Dict, Iterator, List, Optional, Set
+
+import rustworkx as rx
 
 from .interfaces import IGraph
-from .types import Node, Edge, NodeType, RelationshipType
+from .types import Edge, Node, NodeType
 
 
 @dataclass

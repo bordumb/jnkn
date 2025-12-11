@@ -8,12 +8,12 @@ Identifies:
 """
 
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import Dict, List, Set, Optional, Any
 from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List
 
 from ..core.interfaces import IGraph
-from ..core.types import Node, Edge, NodeType, RelationshipType
+from ..core.types import Node, NodeType, RelationshipType
 
 
 class ChangeType(str, Enum):

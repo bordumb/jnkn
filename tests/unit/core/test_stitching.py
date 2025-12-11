@@ -37,12 +37,24 @@ class TestEnvVarToInfraRule:
 
     def test_apply_creates_infra_to_env_edge(self, graph):
         # Setup
-        env_node = Node(id="env:DB_HOST", name="DB_HOST", type=NodeType.ENV_VAR)
-        infra_node = Node(id="infra:db_host", name="db_host", type=NodeType.INFRA_RESOURCE)
+        # Use PAYMENT_DB_HOST to avoid common token penalties
+        env_node = Node(
+            id="env:PAYMENT_DB_HOST", 
+            name="PAYMENT_DB_HOST", 
+            type=NodeType.ENV_VAR, 
+            tokens=["payment", "db", "host"]
+        )
+        infra_node = Node(
+            id="infra:payment_db_host", 
+            name="payment_db_host", 
+            type=NodeType.INFRA_RESOURCE, 
+            tokens=["payment", "db", "host"]
+        )
         
         graph.get_nodes_by_type.side_effect = lambda t: {
             NodeType.ENV_VAR: [env_node],
-            NodeType.INFRA_RESOURCE: [infra_node]
+            NodeType.INFRA_RESOURCE: [infra_node],
+            NodeType.CONFIG_KEY: [] # Empty for this test
         }.get(t, [])
         graph.get_node.return_value = infra_node # For validation lookup
 
@@ -52,8 +64,8 @@ class TestEnvVarToInfraRule:
         assert len(edges) == 1
         edge = edges[0]
         # Verify Direction: Infra -> Env
-        assert edge.source_id == "infra:db_host"
-        assert edge.target_id == "env:DB_HOST"
+        assert edge.source_id == "infra:payment_db_host"
+        assert edge.target_id == "env:PAYMENT_DB_HOST"
 
 class TestInfraToInfraRule:
     def test_hierarchy_direction(self):
