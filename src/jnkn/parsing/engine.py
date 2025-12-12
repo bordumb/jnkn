@@ -9,7 +9,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Dict, Generator, Set
+from typing import Callable, Dict, Generator, List, Set
 
 from ..core.result import Err, Ok, Result
 from ..core.storage.base import StorageAdapter
@@ -97,19 +97,22 @@ class ParserRegistry:
 
     def __init__(self):
         self._parsers: Dict[str, LanguageParser] = {}
-        self._extension_map: Dict[str, str] = {}
+        # FIX: Map extension to LIST of parser names to support multiple parsers per ext
+        self._extension_map: Dict[str, List[str]] = {}
 
     def register(self, parser: LanguageParser) -> None:
         self._parsers[parser.name] = parser
         for ext in parser.extensions:
-            self._extension_map[ext.lower()] = parser.name
+            ext_lower = ext.lower()
+            if ext_lower not in self._extension_map:
+                self._extension_map[ext_lower] = []
+            self._extension_map[ext_lower].append(parser.name)
 
-    def get_parser_for_file(self, file_path: Path) -> LanguageParser | None:
+    def get_parsers_for_file(self, file_path: Path) -> List[LanguageParser]:
+        """Get all potential parsers for a file extension."""
         ext = file_path.suffix.lower()
-        name = self._extension_map.get(ext)
-        if name:
-            return self._parsers.get(name)
-        return None
+        parser_names = self._extension_map.get(ext, [])
+        return [self._parsers[name] for name in parser_names]
 
     def discover_parsers(self):
         # Implementation omitted for brevity, assuming standard discovery
@@ -169,14 +172,6 @@ class ParserEngine:
             tracked_metadata = {}
 
         # 3. Handle Deletions (Pruning)
-        # Identify files in DB that are no longer on disk
-        # We need absolute paths or consistent relative paths.
-        # _discover_files yields Paths. ScanMetadata stores paths as strings.
-        # Ideally both are consistent (e.g., relative to project root or absolute).
-        # ScanMetadata usually stores paths as strings provided by parse result.
-
-        # Convert disk files to string set for comparison
-        # Assuming parse_file_full uses str(path)
         disk_paths = set(str(f) for f in files_on_disk)
 
         if config.incremental:
@@ -188,7 +183,6 @@ class ParserEngine:
                         storage.delete_nodes_by_file(tracked_path)
                         storage.delete_scan_metadata(tracked_path)
                         stats.files_deleted += 1
-                        # Remove from local cache to prevent confusion
                         del tracked_metadata[tracked_path]
                     except Exception as e:
                         self._logger.error(f"Failed to prune {tracked_path}: {e}")
@@ -259,15 +253,36 @@ class ParserEngine:
         return Ok(stats)
 
     def _parse_file_full(self, file_path: Path, file_hash: str) -> ParseResult:
-        """Parse a single file using the registry."""
-        parser = self._registry.get_parser_for_file(file_path)
+        """
+        Parse a single file using the best available parser.
+        Iterates through all parsers registered for this extension.
+        """
+        candidate_parsers = self._registry.get_parsers_for_file(file_path)
 
-        if not parser:
+        if not candidate_parsers:
+            return ParseResult(file_path=file_path, file_hash=file_hash, success=False)
+
+        # Try to read content once
+        try:
+            content = file_path.read_bytes()
+        except Exception as e:
+            return ParseResult(
+                file_path=file_path, file_hash=file_hash, errors=[str(e)], success=False
+            )
+
+        # Find the first parser that accepts this file content
+        selected_parser = None
+        for parser in candidate_parsers:
+            if parser.can_parse(file_path, content):
+                selected_parser = parser
+                break
+
+        if not selected_parser:
+            # No parser claimed it (e.g. .yaml file that isn't K8s or Spark)
             return ParseResult(file_path=file_path, file_hash=file_hash, success=False)
 
         try:
-            content = file_path.read_bytes()
-            items = list(parser.parse(file_path, content))
+            items = list(selected_parser.parse(file_path, content))
 
             nodes = [i for i in items if isinstance(i, Node)]
             edges = [i for i in items if isinstance(i, Edge)]
@@ -281,7 +296,7 @@ class ParserEngine:
                 file_path=file_path, file_hash=file_hash, nodes=nodes, edges=edges, success=True
             )
         except Exception as e:
-            self._logger.error(f"Failed to parse {file_path}: {e}")
+            self._logger.error(f"Failed to parse {file_path} with {selected_parser.name}: {e}")
             return ParseResult(
                 file_path=file_path, file_hash=file_hash, errors=[str(e)], success=False
             )
@@ -295,7 +310,8 @@ class ParserEngine:
             for file in files:
                 path = root / file
                 if not config.should_skip_file(path):
-                    if self._registry.get_parser_for_file(path):
+                    # Check if ANY registered parser supports this extension
+                    if self._registry.get_parsers_for_file(path):
                         yield path
 
 
@@ -303,8 +319,8 @@ def create_default_engine() -> ParserEngine:
     """Factory to create a ParserEngine with standard parsers registered."""
     engine = ParserEngine()
 
-    # Try registering available parsers
-    # We catch ImportError to make dependencies optional
+    # Register parsers (Order doesn't matter for extension mapping now)
+
     try:
         from .python.parser import PythonParser
 

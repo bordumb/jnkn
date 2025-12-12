@@ -50,7 +50,7 @@ class JavaParser(LanguageParser):
     def extensions(self) -> List[str]:
         return [".java"]
 
-    def can_parse(self, file_path: Path) -> bool:
+    def can_parse(self, file_path: Path, content: bytes | None = None) -> bool:
         return file_path.suffix.lower() == ".java"
 
     def parse(

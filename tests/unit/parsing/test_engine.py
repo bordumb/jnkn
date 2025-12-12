@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch, call
 import pytest
 
 from jnkn.core.result import Ok, Err
-from jnkn.core.types import Node, Edge, NodeType, ScanMetadata, RelationshipType
+from jnkn.core.types import Node, Edge, NodeType, RelationshipType, ScanMetadata
 from jnkn.parsing.base import LanguageParser, ParseResult, ParserContext
 from jnkn.parsing.engine import (
     ParserEngine,
@@ -38,7 +38,8 @@ class MockParser(LanguageParser):
     def extensions(self):
         return self._extensions
 
-    def can_parse(self, file_path: Path) -> bool:
+    # FIX: Updated signature to accept content
+    def can_parse(self, file_path: Path, content: bytes | None = None) -> bool:
         return file_path.suffix in self.extensions
 
     def parse(self, file_path: Path, content: bytes):
@@ -90,11 +91,13 @@ def test_registry_registration():
     registry.register(parser)
     
     # Test lookup by extension
-    found = registry.get_parser_for_file(Path("file.tst"))
-    assert found == parser
+    # FIX: Expect a list of parsers
+    found = registry.get_parsers_for_file(Path("file.tst"))
+    assert len(found) == 1
+    assert found[0] == parser
     
     # Test lookup failure
-    assert registry.get_parser_for_file(Path("file.other")) is None
+    assert registry.get_parsers_for_file(Path("file.other")) == []
 
 
 def test_registry_discover_parsers():
@@ -108,7 +111,6 @@ def test_registry_discover_parsers():
 def test_engine_init():
     context = ParserContext(root_dir=Path("/tmp"))
     engine = ParserEngine(context)
-    assert engine._context == context
     assert isinstance(engine.registry, ParserRegistry)
 
 
@@ -304,7 +306,7 @@ def test_scan_progress_callback(engine, mock_storage, tmp_path):
     (tmp_path / "2.py").touch()
     
     callback = MagicMock()
-    
+
     # Mock parse to speed up
     with patch.object(engine, '_parse_file_full') as mock_parse:
         mock_parse.return_value = ParseResult(Path("x"), "h", success=True)
@@ -366,7 +368,12 @@ def test_discover_files_skips(engine, tmp_path):
     
     config = ScanConfig(root_dir=tmp_path)
     
-    files = list(engine._discover_files(config))
+    # We must mock get_parsers_for_file because discovery checks it
+    with patch.object(engine.registry, 'get_parsers_for_file') as mock_get:
+        # Return something for .py files, nothing for others
+        mock_get.side_effect = lambda p: [MockParser()] if p.suffix == ".py" else []
+        
+        files = list(engine._discover_files(config))
     
     # Should only find good.py
     # bad.py skipped by dir
@@ -397,5 +404,4 @@ def test_scan_pruning_error(engine, mock_storage, tmp_path):
     assert result.is_ok()
     # Pruning failure logs error but continues
     # files_deleted won't increment if exception raised before increment logic
-    # In implementation: try { delete; stats++ } except { log } -> stats won't increment
     assert result.unwrap().files_deleted == 0

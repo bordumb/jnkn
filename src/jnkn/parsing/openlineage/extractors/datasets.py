@@ -1,3 +1,11 @@
+"""
+Dataset Extractor for OpenLineage.
+
+This module handles the extraction of Input and Output datasets from OpenLineage events.
+It creates nodes for the data assets (tables, files, topics) and establishes the
+read/write relationships with the Job.
+"""
+
 import json
 import re
 from typing import Any, Dict, Generator, List, Union
@@ -7,15 +15,38 @@ from ...base import ExtractionContext
 
 
 class DatasetExtractor:
-    """Extract Input/Output Datasets and link them to Jobs."""
+    """
+    Extract Input/Output Datasets and link them to Jobs.
+
+    This extractor processes the `inputs` and `outputs` arrays in an OpenLineage event.
+    It creates DATA_ASSET nodes and connects them to the JOB node via READS/WRITES edges.
+    """
 
     name = "openlineage_datasets"
     priority = 90
 
     def can_extract(self, ctx: ExtractionContext) -> bool:
+        """
+        Check if the text contains dataset definitions.
+
+        Args:
+            ctx: The extraction context.
+
+        Returns:
+            bool: True if 'inputs' or 'outputs' keys are present.
+        """
         return '"inputs"' in ctx.text or '"outputs"' in ctx.text
 
     def extract(self, ctx: ExtractionContext) -> Generator[Union[Node, Edge], None, None]:
+        """
+        Extract Dataset nodes and edges.
+
+        Args:
+            ctx: The extraction context.
+
+        Yields:
+            Union[Node, Edge]: Dataset nodes and READS/WRITES edges.
+        """
         try:
             data = json.loads(ctx.text)
         except json.JSONDecodeError:
@@ -28,7 +59,13 @@ class DatasetExtractor:
                 continue
 
             job = event.get("job", {})
-            job_id = f"job:{job.get('namespace', 'default')}/{job.get('name')}"
+            job_ns = job.get("namespace", "default")
+            job_name = job.get("name")
+
+            if not job_name:
+                continue
+
+            job_id = f"job:{job_ns}/{job_name}"
 
             # Process Inputs
             for ds in event.get("inputs", []):
@@ -41,6 +78,15 @@ class DatasetExtractor:
     def _process_dataset(
         self, dataset: Dict[str, Any], job_id: str, direction: str, ctx: ExtractionContext
     ) -> Generator[Union[Node, Edge], None, None]:
+        """
+        Helper to process a single dataset dictionary.
+
+        Args:
+            dataset: The dataset dictionary from the JSON.
+            job_id: The ID of the job related to this dataset.
+            direction: 'input' or 'output'.
+            ctx: The extraction context.
+        """
         namespace = dataset.get("namespace", "default")
         name = dataset.get("name")
 
@@ -49,7 +95,7 @@ class DatasetExtractor:
 
         dataset_id = f"data:{namespace}/{name}"
 
-        # Create Node if not seen
+        # Create Node if not seen in this context
         if dataset_id not in ctx.seen_ids:
             ctx.seen_ids.add(dataset_id)
 
@@ -80,7 +126,7 @@ class DatasetExtractor:
                 source_id=job_id,
                 target_id=dataset_id,
                 type=RelationshipType.READS,
-                confidence=1.0,
+                confidence=1.0,  # Observed runtime data is high confidence
                 metadata={"source": "openlineage"},
             )
         else:
@@ -93,4 +139,5 @@ class DatasetExtractor:
             )
 
     def _tokenize(self, name: str) -> List[str]:
+        """Tokenize dataset name."""
         return [t for t in re.split(r"[_\-./]", name.lower()) if len(t) >= 2]

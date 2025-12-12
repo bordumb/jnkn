@@ -159,7 +159,7 @@ class LanguageParser(IParser, ABC):
         return []
 
     @abstractmethod
-    def can_parse(self, file_path: Path) -> bool:
+    def can_parse(self, file_path: Path, content: bytes | None = None) -> bool:
         pass
 
     @abstractmethod
@@ -218,12 +218,12 @@ class CompositeParser(LanguageParser):
         super().__init__(context)
         self.parsers = parsers
 
-    def can_parse(self, file_path: Path) -> bool:
-        return any(p.can_parse(file_path) for p in self.parsers)
+    def can_parse(self, file_path: Path, content: bytes | None = None) -> bool:
+        return any(p.can_parse(file_path, content) for p in self.parsers)
 
     def parse(self, file_path: Path, content: bytes) -> List[Union[Node, Edge]]:
         results = []
         for parser in self.parsers:
-            if parser.can_parse(file_path):
+            if parser.can_parse(file_path, content):
                 results.extend(parser.parse(file_path, content))
         return results
