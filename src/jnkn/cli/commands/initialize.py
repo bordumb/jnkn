@@ -3,6 +3,10 @@ Init Command - Onboarding Automation.
 
 This module handles the `jnkn init` command, which bootstraps a project
 with a configuration file tailored to the detected technology stack.
+
+Security Note:
+    This command includes a specific "Privacy Manifesto" display to ensure
+    users understand exactly what data remains local vs what is sent.
 """
 
 import uuid
@@ -14,6 +18,7 @@ import yaml
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Confirm
+from rich.markdown import Markdown
 
 from ...core.demo import DemoManager
 
@@ -72,7 +77,36 @@ def create_gitignore(jnkn_dir: Path):
                 f.write(entry)
 
 
-def _init_project(root_dir: Path, force: bool, is_demo: bool = False):
+def _display_privacy_manifesto():
+    """Display the privacy and telemetry transparency panel."""
+    manifesto = """
+**Your Code Stays Here.**
+
+Jnkan is built for security-conscious environments. We want to be hyper-transparent about how we handle your data:
+
+* ❌ **WE DO NOT** collect source code, file names, or secrets.
+* ❌ **WE DO NOT** collect environment variable values.
+* ❌ **WE DO NOT** upload your dependency graph.
+
+**What We Do Collect (Telemetry):**
+* ✅ **Anonymous Metrics:** Command run counts (e.g., `scan`, `blast`), execution duration, and success/failure status.
+* ✅ **System Info:** Python version, OS platform, and CLI version.
+
+*This helps us improve performance and prioritize feature development.*
+    """
+    console.print(
+        Panel(
+            Markdown(manifesto.strip()),
+            title="🔒 [bold]Security & Privacy[/bold]",
+            border_style="green",
+            expand=False,
+        )
+    )
+
+
+def _init_project(
+    root_dir: Path, force: bool, is_demo: bool = False, telemetry_opt_in: bool | None = None
+):
     """Internal helper to initialize a project."""
     jnkn_dir = root_dir / ".jnkn"
     config_file = jnkn_dir / "config.yaml"
@@ -110,17 +144,27 @@ def _init_project(root_dir: Path, force: bool, is_demo: bool = False):
 
     config["scan"]["include"] = includes
 
-    # Telemetry Opt-in
-    # In demo mode, we enable it by default for the demo session (or skip prompt)
-    if is_demo:
+    # Telemetry Configuration
+    # Logic:
+    # 1. If --telemetry or --no-telemetry passed explicitly, honor it.
+    # 2. If --demo mode, enable by default (it's a sandbox).
+    # 3. Otherwise, show the manifesto and ask.
+    
+    if telemetry_opt_in is not None:
+        allow_telemetry = telemetry_opt_in
+        status = "ENABLED" if allow_telemetry else "DISABLED"
+        console.print(f"\n[bold]Telemetry:[/bold] {status} (via flag)")
+    elif is_demo:
         allow_telemetry = True
     else:
-        console.print("\n[bold]Telemetry[/bold]")
+        _display_privacy_manifesto()
         allow_telemetry = Confirm.ask(
-            "Allow anonymous usage statistics to help us improve Jnkan?", default=True
+            "\nAllow anonymous usage statistics?", default=True
         )
 
     config["telemetry"]["enabled"] = allow_telemetry
+    # Only generate a distinct ID if telemetry is enabled or might be enabled later
+    # This ID is random UUID v4 and contains no PII
     config["telemetry"]["distinct_id"] = str(uuid.uuid4())
 
     # Write Files
@@ -137,14 +181,21 @@ def _init_project(root_dir: Path, force: bool, is_demo: bool = False):
 @click.command()
 @click.option("--force", is_flag=True, help="Overwrite existing configuration")
 @click.option("--demo", is_flag=True, help="Download example repo to try Jnkan instantly")
-def init(force: bool, demo: bool):
+@click.option(
+    "--telemetry/--no-telemetry",
+    default=None,
+    help="Explicitly enable or disable telemetry (skips prompt)",
+)
+def init(force: bool, demo: bool, telemetry: bool | None):
     """
     Initialize Jnkan in the current directory.
 
     If --demo is used, a sample project structure is created in ./jnkn-demo
     and initialized automatically.
     """
-    console.print(Panel.fit("🚀 [bold blue]Jnkan Initialization[/bold blue]", border_style="blue"))
+    console.print(
+        Panel.fit("🚀 [bold blue]Jnkan Initialization[/bold blue]", border_style="blue")
+    )
 
     if demo:
         console.print("[cyan]Provisioning demo environment...[/cyan]")
@@ -154,7 +205,7 @@ def init(force: bool, demo: bool):
         console.print(f"📂 Created demo project at: [bold]{demo_dir}[/bold]")
 
         # Initialize inside the new demo directory
-        _init_project(demo_dir, force=True, is_demo=True)
+        _init_project(demo_dir, force=True, is_demo=True, telemetry_opt_in=True)
 
         console.print("\n[bold green]Ready to go! Try these commands:[/bold green]")
         console.print(f"1. cd {demo_dir.name}")
@@ -172,4 +223,4 @@ def init(force: bool, demo: bool):
             console.print("Aborted.")
             return
 
-    _init_project(root_dir, force)
+    _init_project(root_dir, force, telemetry_opt_in=telemetry)
