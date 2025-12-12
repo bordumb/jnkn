@@ -67,22 +67,23 @@ class TestReviewerSuggester:
     @patch("subprocess.run")
     def test_git_blame_suggestions(self, mock_run, suggester):
         """Test suggestions derived from git blame."""
-        # Mock git blame output
+        # Mock git blame output with handles (e.g. 'alice', 'bob')
+        # This matches the use case of generating @handles for PRs
         mock_run.return_value.returncode = 0
         mock_run.return_value.stdout = """
-author alice@example.com
+author alice
 author-mail <alice@example.com>
 author-time 1600000000
 summary First commit
 filename file.py
         
-author bob@example.com
+author bob
 author-mail <bob@example.com>
 author-time 1600000001
 summary Fix bug
 filename file.py
 
-author alice@example.com
+author alice
 author-mail <alice@example.com>
 author-time 1600000002
 summary Update
@@ -95,8 +96,9 @@ filename file.py
 
         assert len(suggestions) >= 2
         # Alice appears twice, Bob once
-        alice = next(s for s in suggestions if s.username == "alice@example.com")
-        bob = next(s for s in suggestions if s.username == "bob@example.com")
+        # Suggestion logic adds '@' to handles
+        alice = next(s for s in suggestions if s.username == "@alice")
+        bob = next(s for s in suggestions if s.username == "@bob")
 
         assert alice.score > bob.score
         assert "Recent contributor" in alice.reason
@@ -131,10 +133,15 @@ filename file.py
         assert suggestions["@alice"].score == 8  # Scores sum up
         assert len(suggestions["@alice"].files) == 2
         
+        # Test implicit @ adding
+        suggester._add_suggestion(suggestions, "charlie", "Reason 3", 1, "file3.py")
+        assert "@charlie" in suggestions
+        
         # Ignore empty or commented usernames
         suggester._add_suggestion(suggestions, "", "Bad", 1, "f.py")
         suggester._add_suggestion(suggestions, "#comment", "Bad", 1, "f.py")
-        assert len(suggestions) == 1
+        # Ensure we still only have alice and charlie
+        assert len(suggestions) == 2
 
     def test_load_codeowners_file_parsing(self, mock_repo_path):
         """Test parsing of actual CODEOWNERS file content."""

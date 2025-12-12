@@ -114,6 +114,11 @@ class ReviewerSuggester:
         if not username or username.startswith("#"):
             return
 
+        # NEW: Automatically prepend @ if it looks like a handle (no spaces)
+        # This makes 'bordumb' -> '@bordumb' so it hyperlinks in PR comments
+        if " " not in username and not username.startswith("@"):
+            username = f"@{username}"
+
         if username in suggestions:
             suggestions[username].score += score
             if file_path not in suggestions[username].files:
@@ -194,38 +199,23 @@ class ReviewerSuggester:
         pattern = re.escape(pattern)
 
         # 3. Replace placeholders with regex logic
-
-        # Handle recursive glob followed by slash: **/ -> (?:.*/)?
-        # This allows matching "zero or more directories"
-        # Note: re.escape might have escaped the slash, check both cases
         pattern = pattern.replace("__DS__\\/", r"(?:.*/)?")
         pattern = pattern.replace("__DS__/", r"(?:.*/)?")
-
-        # Remaining double stars are just "match anything"
         pattern = pattern.replace("__DS__", r".*")
-
-        # Single star: match anything except slash
         pattern = pattern.replace("__SS__", r"[^/]*")
-
-        # Question mark: match any single char
         pattern = pattern.replace("__QM__", r".")
 
         # 4. Handle Anchoring
         if pattern.startswith("/") or pattern.startswith(r"\/"):
-            # Root anchored: remove slash and anchor to start
             if pattern.startswith(r"\/"):
                 pattern = pattern[2:]
             else:
                 pattern = pattern[1:]
             pattern = f"^{pattern}"
         else:
-            # Fuzzy match: match at start OR after a slash
-            # "docs/foo" matches "docs/foo" and "src/docs/foo"
             pattern = f"(?:^|/){pattern}"
 
         # 5. Handle Trailing Boundary
-        # Ensure we don't match partial filenames (e.g. "doc" matching "docs")
-        # Match end of string or a directory separator
         pattern = f"{pattern}(?:$|/)"
 
         return pattern
@@ -233,9 +223,6 @@ class ReviewerSuggester:
     def _find_codeowners(self, file_path: str) -> List[str]:
         """Find CODEOWNERS for a file. Last match wins."""
         matching_owners = []
-
-        # CODEOWNERS paths should generally be checked relative to root
-        # Ensure we have a clean relative path string
         clean_path = str(file_path).lstrip("./")
 
         for pattern, owners in self.codeowners_rules:
@@ -253,7 +240,6 @@ class ReviewerSuggester:
             return authors
 
         try:
-            # Use git blame with email format for consistency
             result = subprocess.run(
                 [
                     "git",
@@ -285,7 +271,6 @@ class ReviewerSuggester:
         self, files: List[str], suggestions: Dict[str, SuggestedReviewer]
     ) -> None:
         """Apply directory-based heuristics when no owners found."""
-        # Map top-level directories to team handles
         directory_teams = {
             "terraform": "@platform-team",
             "infra": "@platform-team",
@@ -300,8 +285,6 @@ class ReviewerSuggester:
 
         for file_path in files:
             path = Path(file_path)
-
-            # Check each directory mapping
             for dir_pattern, team in directory_teams.items():
                 if file_path.startswith(dir_pattern) and team not in seen_teams:
                     seen_teams.add(team)
