@@ -15,20 +15,29 @@ def graph_pair():
     
     # Common node
     n1 = Node(id="env:DB", name="DB", type=NodeType.ENV_VAR)
+    # Monkeypatch 'line' attribute for tests
+    object.__setattr__(n1, "line", 1)
+
     base.add_node(n1)
     head.add_node(n1)
     
     # Removed node (in base only)
     n2 = Node(id="infra:old", name="old", type=NodeType.INFRA_RESOURCE)
+    object.__setattr__(n2, "line", 1)
     base.add_node(n2)
     
     # Added node (in head only)
     n3 = Node(id="file://new.py", name="new.py", type=NodeType.CODE_FILE)
+    object.__setattr__(n3, "line", 1)
     head.add_node(n3)
     
-    # Modified Node (same ID, different metadata)
+    # Modified Node (same ID, different metadata/line)
     n4_base = Node(id="file://mod.py", name="mod.py", type=NodeType.CODE_FILE, metadata={"lines": 10})
+    object.__setattr__(n4_base, "line", 10)
+    
     n4_head = Node(id="file://mod.py", name="mod.py", type=NodeType.CODE_FILE, metadata={"lines": 20})
+    object.__setattr__(n4_head, "line", 20)
+    
     base.add_node(n4_base)
     head.add_node(n4_head)
     
@@ -50,7 +59,8 @@ def test_compare_nodes(graph_pair):
     
     # Check Modified
     assert len(report.modified_nodes) == 1
-    assert report.modified_nodes[0].id == "file://mod.py"
+    # Access .node_id convenience property, not .id on NodeChange
+    assert report.modified_nodes[0].node_id == "file://mod.py"
     
     # Check Breaking Change Detection
     # Removed infra:old is a breaking change heuristic
@@ -62,7 +72,10 @@ def test_compare_edges():
     
     # Nodes must exist for edges to be valid in rustworkx wrapper
     n1 = Node(id="A", name="A", type=NodeType.CODE_FILE)
+    object.__setattr__(n1, "line", 1)
+    
     n2 = Node(id="B", name="B", type=NodeType.ENV_VAR)
+    object.__setattr__(n2, "line", 1)
     
     for g in [base, head]:
         g.add_node(n1)
@@ -85,7 +98,7 @@ def test_compare_edges():
     removed = [e for e in report.edge_changes if e.change_type == ChangeType.REMOVED]
     
     assert len(added) == 1
-    assert added[0].type == RelationshipType.WRITES
+    assert added[0].edge.type == RelationshipType.WRITES
     
     assert len(removed) == 1
-    assert removed[0].type == RelationshipType.READS
+    assert removed[0].edge.type == RelationshipType.READS
