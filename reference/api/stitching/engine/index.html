@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://bordumb.github.io/jnkn/reference/api/stitching/engine/">
       
       
-        <link rel="prev" href="../../parsing/kubernetes/">
+        <link rel="prev" href="../../parsing/dbt/">
       
       
         <link rel="next" href="../matchers/">
@@ -3230,14 +3230,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../parsing/dbt.md" class="md-nav__link">
+      <a href="../../parsing/dbt/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    None
+    DBT Parser
   
 
     
@@ -3465,10 +3465,21 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#jnkn.core.stitching.Stitcher.__init__" class="md-nav__link">
+  <a href="#jnkn.core.stitching.Stitcher.apply_pack" class="md-nav__link">
     <span class="md-ellipsis">
       
-        __init__
+        apply_pack
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jnkn.core.stitching.Stitcher.should_suppress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        should_suppress
       
     </span>
   </a>
@@ -3504,40 +3515,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="MatchConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jnkn.core.stitching.MatchConfig-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jnkn.core.stitching.MatchConfig.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -5917,10 +5894,21 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#jnkn.core.stitching.Stitcher.__init__" class="md-nav__link">
+  <a href="#jnkn.core.stitching.Stitcher.apply_pack" class="md-nav__link">
     <span class="md-ellipsis">
       
-        __init__
+        apply_pack
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jnkn.core.stitching.Stitcher.should_suppress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        should_suppress
       
     </span>
   </a>
@@ -5956,40 +5944,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="MatchConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jnkn.core.stitching.MatchConfig-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Functions
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Functions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#jnkn.core.stitching.MatchConfig.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -6113,16 +6067,9 @@
     <div class="doc doc-contents first">
 
         <p>Cross-domain dependency stitching.</p>
-<p>This module implements the core "glue" logic that connects disparate domains:
-- Environment variables to infrastructure resources
-- Code references to data assets
-- Configuration keys to their providers</p>
-<p>Key capabilities include:
-- Linking environment variables to infrastructure resources (e.g., <code>PAYMENT_DB_HOST</code> -&gt; <code>aws_db_instance.payment</code>).
-- Linking infrastructure resources to each other (e.g., Security Groups to EC2 instances).
-- Configurable confidence scoring to minimize false positives.</p>
-<p>The stitching process transforms a collection of isolated nodes (from parsing) into a
-connected graph that represents the full system architecture.</p>
+<p>Refactored to use the Collect-then-Apply pattern.
+Phase 1: Read-only analysis creates a StitchingPlan.
+Phase 2: Write-only application mutates the graph.</p>
 
 
 
@@ -6158,45 +6105,7 @@ connected graph that represents the full system architecture.</p>
 
 
 
-        <p>Orchestrator for cross-domain dependency stitching.</p>
-<p>The Stitcher manages the lifecycle of applying multiple <code>StitchingRule</code>s to a graph.
-It handles configuration, rule execution, and aggregation of results.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="jnkn.core.stitching.Stitcher.config">config</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="MatchConfig (jnkn.core.stitching.MatchConfig)" href="#jnkn.core.stitching.MatchConfig">MatchConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Configuration for matching thresholds.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="jnkn.core.stitching.Stitcher.rules">rules</span></code></td>
-            <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="StitchingRule (jnkn.core.stitching.StitchingRule)" href="../rules/#jnkn.core.stitching.StitchingRule">StitchingRule</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>List of active rules to apply.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Cross-domain dependency stitcher.</p>
 
 
 
@@ -6222,46 +6131,33 @@ It handles configuration, rule execution, and aggregation of results.</p>
 <div class="doc doc-object doc-function">
 
 
-<h5 id="jnkn.core.stitching.Stitcher.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<h5 id="jnkn.core.stitching.Stitcher.apply_pack" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">apply_pack</span><span class="p">(</span><span class="n">pack</span><span class="p">)</span></code>
 
 </h5>
 
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the Stitcher.</p>
+        <p>Apply a framework pack to this stitcher.</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>config</code>
-            </td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="MatchConfig (jnkn.core.stitching.MatchConfig)" href="#jnkn.core.stitching.MatchConfig">MatchConfig</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional match configuration. Uses defaults if None.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h5 id="jnkn.core.stitching.Stitcher.should_suppress" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">should_suppress</span><span class="p">(</span><span class="n">source_id</span><span class="p">,</span> <span class="n">target_id</span><span class="p">)</span></code>
+
+</h5>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Check if a connection should be suppressed.</p>
 
 
     </div>
@@ -6279,62 +6175,8 @@ It handles configuration, rule execution, and aggregation of results.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Apply all configured stitching rules to the graph.</p>
-<p>Discovered edges are automatically added to the graph if they do not already exist.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>graph</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="DependencyGraph (jnkn.core.graph.DependencyGraph)" href="../../core/graph/#jnkn.core.graph.DependencyGraph">DependencyGraph</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The dependency graph to update.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="Edge (jnkn.core.types.Edge)" href="../../core/types/#jnkn.core.types.Edge">Edge</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>List[Edge]: A list of all new edges created during this stitching session.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Run all stitching rules and return new edges.
+Applies pack logic (boosts and suppressions) if a pack is configured.</p>
 
 
     </div>
@@ -6365,69 +6207,6 @@ It handles configuration, rule execution, and aggregation of results.</p>
 
 
         <p>Configuration for the fuzzy matching engine.</p>
-<p>Controls the thresholds and weights used to determine if two artifacts are related.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="jnkn.core.stitching.MatchConfig.min_confidence">min_confidence</span></code></td>
-            <td>
-                  <code><span title="float">float</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The minimum score (0.0 - 1.0) required to create an edge.
-Defaults to 0.5.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="jnkn.core.stitching.MatchConfig.min_token_overlap">min_token_overlap</span></code></td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The minimum number of shared tokens required for a match.
-Defaults to 2.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="jnkn.core.stitching.MatchConfig.min_token_length">min_token_length</span></code></td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tokens shorter than this length are ignored to reduce noise.
-Defaults to 2.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="jnkn.core.stitching.MatchConfig.strategy_weights">strategy_weights</span></code></td>
-            <td>
-                  <code><span title="typing.Dict">Dict</span>[<a class="autorefs autorefs-internal" title="MatchStrategy (jnkn.core.types.MatchStrategy)" href="../../core/types/#jnkn.core.types.MatchStrategy">MatchStrategy</a>, <span title="float">float</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A mapping of matching strategies to
-their base confidence scores.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
 
 
 
@@ -6448,104 +6227,7 @@ their base confidence scores.</p>
 
 
 
-<h4 id="jnkn.core.stitching.MatchConfig-functions">Functions</h4>
 
-<div class="doc doc-object doc-function">
-
-
-<h5 id="jnkn.core.stitching.MatchConfig.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">min_confidence</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_token_overlap</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">min_token_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">strategy_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-
-</h5>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Initialize the match configuration.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>min_confidence</code>
-            </td>
-            <td>
-                  <code><span title="float">float</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Minimum score (0.0-1.0) to accept a match.</p>
-              </div>
-            </td>
-            <td>
-                  <code>0.5</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>min_token_overlap</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Minimum shared tokens required.</p>
-              </div>
-            </td>
-            <td>
-                  <code>2</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>min_token_length</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Minimum character length for valid tokens.</p>
-              </div>
-            </td>
-            <td>
-                  <code>2</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>strategy_weights</code>
-            </td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[<a class="autorefs autorefs-internal" title="MatchStrategy (jnkn.core.types.MatchStrategy)" href="../../core/types/#jnkn.core.types.MatchStrategy">MatchStrategy</a>, <span title="float">float</span>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional overrides for strategy scoring weights.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
 
 
 

@@ -3349,14 +3349,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/parsing/dbt.md" class="md-nav__link">
+      <a href="../../api/parsing/dbt/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    None
+    DBT Parser
   
 
     
@@ -5985,6 +5985,12 @@
 with a configuration file tailored to the detected technology stack.</p>
 
 
+<details class="security-note" open>
+  <summary>Security Note</summary>
+  <p>This command includes a specific "Privacy Manifesto" display to ensure
+users understand exactly what data remains local vs what is sent.</p>
+</details>
+
 
 
 
@@ -6044,7 +6050,7 @@ with a configuration file tailored to the detected technology stack.</p>
 
 
 <h3 id="jnkn.cli.commands.initialize.init" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">init</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">demo</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">init</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">demo</span><span class="p">,</span> <span class="n">telemetry</span><span class="p">,</span> <span class="n">pack_name</span><span class="p">,</span> <span class="n">list_packs</span><span class="p">)</span></code>
 
 </h3>
 
@@ -6052,8 +6058,16 @@ with a configuration file tailored to the detected technology stack.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize Jnkan in the current directory.</p>
-<p>If --demo is used, a sample project structure is created in ./jnkn-demo
-and initialized automatically.</p>
+<p>
+Framework Packs:
+  Packs are pre-tuned configurations for specific technology stacks.
+  They reduce false positives and improve accuracy out-of-the-box.</p>
+<p>
+Examples:
+    jnkn init                      # Auto-detect and configure
+    jnkn init --pack django-aws    # Use Django+AWS pack
+    jnkn init --demo               # Try with sample project
+    jnkn init --list-packs         # See available packs</p>
 
 
     </div>

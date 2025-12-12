@@ -2644,6 +2644,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jnkn.cli.commands.scan.ScanSummaryResponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ScanSummaryResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3327,14 +3344,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/parsing/dbt.md" class="md-nav__link">
+      <a href="../../api/parsing/dbt/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    None
+    DBT Parser
   
 
     
@@ -5810,6 +5827,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jnkn.cli.commands.scan.ScanSummaryResponse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ScanSummaryResponse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -5936,7 +5970,8 @@
 <a id="jnkn.cli.commands.scan"></a>
     <div class="doc doc-contents first">
 
-        <p>Scan Command - Parse codebase and build dependency graph.</p>
+        <p>Scan Command - Parse codebase and build dependency graph.
+Enhanced with Discovery/Enforcement modes and manager-readable output.</p>
 
 
 
@@ -5956,13 +5991,61 @@
 
 
 <h2 id="jnkn.cli.commands.scan-classes">Classes</h2>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="jnkn.cli.commands.scan.ScanSummaryResponse" class="doc doc-heading">
+            <code>ScanSummaryResponse</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Structured response for the scan command.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 <h2 id="jnkn.cli.commands.scan-functions">Functions</h2>
 
 <div class="doc doc-object doc-function">
 
 
 <h3 id="jnkn.cli.commands.scan.scan" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">scan</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">no_recursive</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">scan</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">no_recursive</span><span class="p">,</span> <span class="n">force</span><span class="p">,</span> <span class="n">as_json</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">pack_name</span><span class="p">,</span> <span class="n">summary_only</span><span class="p">)</span></code>
 
 </h3>
 
@@ -5970,11 +6053,17 @@
     <div class="doc doc-contents ">
 
         <p>Scan directory and build dependency graph.</p>
-
-
-<p><span class="doc-section-title">Examples:</span></p>
-    <p>jnkn scan
-jnkn scan ./src --output my_graph.db</p>
+<p>Uses incremental scanning by default: only changed files are re-parsed.</p>
+<p>
+Modes:
+  discovery    - Show more connections (lower threshold), great for first scan
+  enforcement  - Show validated connections only, respect suppressions</p>
+<p>
+Examples:
+    jnkn scan                           # Scan current directory
+    jnkn scan ./src --mode discovery    # Force discovery mode
+    jnkn scan --pack django-aws         # Use Django+AWS framework pack
+    jnkn scan --summary-only            # Brief output</p>
 
 
     </div>
