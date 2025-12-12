@@ -36,9 +36,9 @@ jobs:
       - name: Run Semantic Check
         id: jnkn
         # Runs the check command comparing the PR head against the base branch
-        # Outputs strict JSON for the next step to parse
+        # We append '|| true' to prevent the step from failing immediately if violations are found (exit code 1)
         run: |
-          uv run jnkn check --git-diff origin/${{ github.base_ref }} HEAD --json > check_output.json 2> check_error.log
+          uv run jnkn check --git-diff origin/${{ github.base_ref }} HEAD --json > check_output.json 2> check_error.log || true
           
           # Debugging: Print output to logs
           cat check_output.json
