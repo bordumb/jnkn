@@ -23,6 +23,7 @@ ENV_VAR_PATTERNS = [
     (r'(?<!os\.)getenv\s*\(\s*["\']([^"\']+)["\']', "getenv"),
 ]
 
+
 class StdlibExtractor(BaseExtractor):
     @property
     def name(self) -> str:
@@ -43,7 +44,6 @@ class StdlibExtractor(BaseExtractor):
         text: str,
         seen_vars: Set[str],
     ) -> Generator[Union[Node, Edge], None, None]:
-
         for pattern, pattern_name in ENV_VAR_PATTERNS:
             regex = re.compile(pattern)
 
@@ -58,7 +58,7 @@ class StdlibExtractor(BaseExtractor):
                     continue
 
                 # Calculate line number
-                line = text[:match.start()].count('\n') + 1
+                line = text[: match.start()].count("\n") + 1
 
                 env_id = f"env:{var_name}"
 

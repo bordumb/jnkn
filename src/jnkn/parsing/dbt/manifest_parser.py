@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class DbtColumn:
     """Represents a column in a dbt model."""
+
     name: str
     description: str | None = None
     data_type: str | None = None
@@ -49,15 +50,16 @@ class DbtColumn:
 class DbtNode:
     """
     Represents a dbt node (model, source, seed, snapshot, etc.)
-    
+
     This is the unified representation of any dbt artifact.
     """
-    unique_id: str              # model.project.name or source.project.schema.name
-    name: str                   # The node name
-    resource_type: str          # model, source, seed, snapshot, test, etc.
-    schema_name: str            # Database schema
-    database: str | None     # Database name
-    package_name: str           # dbt project name
+
+    unique_id: str  # model.project.name or source.project.schema.name
+    name: str  # The node name
+    resource_type: str  # model, source, seed, snapshot, test, etc.
+    schema_name: str  # Database schema
+    database: str | None  # Database name
+    package_name: str  # dbt project name
     original_file_path: str | None = None
     columns: List[DbtColumn] = field(default_factory=list)
     depends_on: List[str] = field(default_factory=list)
@@ -90,6 +92,7 @@ class DbtNode:
 @dataclass
 class DbtExposure:
     """Represents a dbt exposure (downstream consumer)."""
+
     unique_id: str
     name: str
     type: str  # dashboard, notebook, analysis, ml, application
@@ -106,7 +109,7 @@ class DbtExposure:
 class DbtManifestParser(LanguageParser):
     """
     Parser for dbt manifest.json files.
-    
+
     Extracts the complete dbt project structure including:
     - All node types (models, sources, seeds, snapshots)
     - ref() and source() dependencies
@@ -165,11 +168,11 @@ class DbtManifestParser(LanguageParser):
     ) -> Generator[Union[Node, Edge], None, None]:
         """
         Parse a dbt manifest.json and yield nodes and edges.
-        
+
         Args:
             file_path: Path to manifest.json
             content: File contents as bytes
-            
+
         Yields:
             Node and Edge objects for dbt artifacts
         """
@@ -401,7 +404,7 @@ class DbtManifestParser(LanguageParser):
     ) -> Generator[Union[Node, Edge], None, None]:
         """Extract test definitions and their relationships."""
         return  # Early return - tests don't generate nodes currently
-        yield   # Makes this a generator (never reached but needed for type)
+        yield  # Makes this a generator (never reached but needed for type)
 
         nodes = manifest.get("nodes", {})
 
@@ -430,13 +433,15 @@ class DbtManifestParser(LanguageParser):
         columns = []
 
         for col_name, col_data in columns_data.items():
-            columns.append(DbtColumn(
-                name=col_name,
-                description=col_data.get("description"),
-                data_type=col_data.get("data_type"),
-                tags=col_data.get("tags", []),
-                meta=col_data.get("meta", {}),
-            ))
+            columns.append(
+                DbtColumn(
+                    name=col_name,
+                    description=col_data.get("description"),
+                    data_type=col_data.get("data_type"),
+                    tags=col_data.get("tags", []),
+                    meta=col_data.get("meta", {}),
+                )
+            )
 
         return columns
 
@@ -447,7 +452,7 @@ class DbtManifestParser(LanguageParser):
     ) -> str | None:
         """
         Convert a dbt unique_id to a jnkn node ID.
-        
+
         dbt IDs are like: model.project.name or source.project.schema.table
         """
         parts = dbt_id.split(".")
@@ -490,12 +495,12 @@ class DbtManifestParser(LanguageParser):
     def extract_lineage(self, manifest_path: Path) -> Dict[str, List[str]]:
         """
         Extract a simple lineage dictionary from the manifest.
-        
+
         Returns a dict mapping each model to its upstream dependencies.
-        
+
         Args:
             manifest_path: Path to manifest.json
-            
+
         Returns:
             Dict mapping model names to list of upstream model names
         """
@@ -532,12 +537,12 @@ class DbtManifestParser(LanguageParser):
     def extract_nodes_list(self, manifest_path: Path) -> List[DbtNode]:
         """
         Extract all dbt nodes as DbtNode objects.
-        
+
         This is a convenience method for getting typed node objects.
-        
+
         Args:
             manifest_path: Path to manifest.json
-            
+
         Returns:
             List of DbtNode objects
         """
@@ -560,39 +565,43 @@ class DbtManifestParser(LanguageParser):
             columns = self._extract_columns(node_data.get("columns", {}))
             depends_on = node_data.get("depends_on", {}).get("nodes", [])
 
-            result.append(DbtNode(
-                unique_id=unique_id,
-                name=node_data.get("name", ""),
-                resource_type=resource_type,
-                schema_name=node_data.get("schema", ""),
-                database=node_data.get("database"),
-                package_name=node_data.get("package_name", ""),
-                original_file_path=node_data.get("original_file_path"),
-                columns=columns,
-                depends_on=depends_on,
-                raw_sql=node_data.get("raw_sql"),
-                description=node_data.get("description"),
-                tags=node_data.get("tags", []),
-                meta=node_data.get("meta", {}),
-            ))
+            result.append(
+                DbtNode(
+                    unique_id=unique_id,
+                    name=node_data.get("name", ""),
+                    resource_type=resource_type,
+                    schema_name=node_data.get("schema", ""),
+                    database=node_data.get("database"),
+                    package_name=node_data.get("package_name", ""),
+                    original_file_path=node_data.get("original_file_path"),
+                    columns=columns,
+                    depends_on=depends_on,
+                    raw_sql=node_data.get("raw_sql"),
+                    description=node_data.get("description"),
+                    tags=node_data.get("tags", []),
+                    meta=node_data.get("meta", {}),
+                )
+            )
 
         # Extract sources
         for unique_id, source_data in manifest.get("sources", {}).items():
             columns = self._extract_columns(source_data.get("columns", {}))
 
-            result.append(DbtNode(
-                unique_id=unique_id,
-                name=source_data.get("name", ""),
-                resource_type="source",
-                schema_name=source_data.get("schema", ""),
-                database=source_data.get("database"),
-                package_name=source_data.get("package_name", ""),
-                columns=columns,
-                depends_on=[],
-                description=source_data.get("description"),
-                tags=source_data.get("tags", []),
-                meta=source_data.get("meta", {}),
-            ))
+            result.append(
+                DbtNode(
+                    unique_id=unique_id,
+                    name=source_data.get("name", ""),
+                    resource_type="source",
+                    schema_name=source_data.get("schema", ""),
+                    database=source_data.get("database"),
+                    package_name=source_data.get("package_name", ""),
+                    columns=columns,
+                    depends_on=[],
+                    description=source_data.get("description"),
+                    tags=source_data.get("tags", []),
+                    meta=source_data.get("meta", {}),
+                )
+            )
 
         return result
 

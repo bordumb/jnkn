@@ -10,6 +10,7 @@ Tree = Any
 
 try:
     from tree_sitter_languages import get_language, get_parser
+
     TREE_SITTER_AVAILABLE = True
 except ImportError:
     TREE_SITTER_AVAILABLE = False
@@ -42,7 +43,7 @@ class PythonParser(LanguageParser):
         """Initialize tree-sitter parser lazily."""
         if not TREE_SITTER_AVAILABLE:
             return False
-        
+
         if self._tree_sitter_initialized:
             return True
 
@@ -57,7 +58,7 @@ class PythonParser(LanguageParser):
 
     def parse(self, file_path: Path, content: bytes) -> List[Union[Node, Edge]]:
         results: List[Union[Node, Edge]] = []
-        
+
         try:
             # Decode content
             text = content.decode(self.context.encoding)
@@ -69,14 +70,14 @@ class PythonParser(LanguageParser):
 
         rel_path = self._relativize(file_path)
         file_id = f"file://{rel_path}"
-        
+
         # 1. Create the File Node
         file_node = Node(
             id=file_id,
             name=file_path.name,
             type=NodeType.CODE_FILE,
             path=rel_path,
-            metadata={"language": "python"}
+            metadata={"language": "python"},
         )
         results.append(file_node)
 
@@ -90,15 +91,15 @@ class PythonParser(LanguageParser):
 
         # 3. Run all registered extractors
         seen_vars: Set[str] = set()
-        
+
         for extractor in self._extractors:
             if not extractor.can_extract(text):
                 continue
-                
+
             try:
                 for item in extractor.extract(file_path, file_id, tree, text, seen_vars):
                     results.append(item)
-                    
+
                     # Track seen env vars to prevent duplicates across extractors
                     # (Higher priority extractors take precedence)
                     if isinstance(item, Node) and item.type == NodeType.ENV_VAR:

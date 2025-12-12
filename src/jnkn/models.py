@@ -12,8 +12,10 @@ class RelationshipType(StrEnum):
     DEPENDS_ON = "depends_on"
     TRIGGERS = "triggers"
 
+
 class ImpactRelationship(BaseModel):
     """Represents a dependency between two artifacts."""
+
     upstream_artifact: str
     downstream_artifact: str
     relationship_type: RelationshipType

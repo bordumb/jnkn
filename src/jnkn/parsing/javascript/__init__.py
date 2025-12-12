@@ -9,7 +9,7 @@ Provides parsing for JavaScript and TypeScript files:
 
 Usage:
     from jnkn.parsing.javascript import JavaScriptParser
-    
+
     parser = JavaScriptParser()
     result = parser.parse_full(Path("app.ts"))
 """

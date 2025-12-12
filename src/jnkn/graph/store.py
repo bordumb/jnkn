@@ -9,6 +9,7 @@ from jnkn.models import ImpactRelationship
 
 DB_PATH = Path(".jnkn/jnkn.db")
 
+
 class GraphStore:
     def __init__(self, db_path: Path = DB_PATH):
         self.db_path = db_path
@@ -50,10 +51,18 @@ class GraphStore:
         cur = conn.cursor()
 
         # Upsert logic (SQLite specific)
-        cur.execute("""
+        cur.execute(
+            """
             INSERT OR REPLACE INTO edges (upstream, downstream, type, metadata)
             VALUES (?, ?, ?, ?)
-        """, (rel.upstream_artifact, rel.downstream_artifact, rel.relationship_type, json.dumps(rel.metadata)))
+        """,
+            (
+                rel.upstream_artifact,
+                rel.downstream_artifact,
+                rel.relationship_type,
+                json.dumps(rel.metadata),
+            ),
+        )
 
         conn.commit()
         conn.close()
@@ -62,7 +71,7 @@ class GraphStore:
             rel.upstream_artifact,
             rel.downstream_artifact,
             relationship_type=rel.relationship_type,
-            metadata=rel.metadata
+            metadata=rel.metadata,
         )
 
     def calculate_blast_radius(self, changed_artifacts: List[str]) -> Dict[str, Any]:
@@ -90,5 +99,5 @@ class GraphStore:
             "source_artifacts": changed_artifacts,
             "total_impacted_count": len(unique_downstream),
             "impacted_artifacts": list(unique_downstream),
-            "breakdown": breakdown
+            "breakdown": breakdown,
         }

@@ -21,6 +21,7 @@ class Ok(Generic[T]):
     Represents a successful computation.
     Maps to Rust's Result::Ok.
     """
+
     value: T
 
     def is_ok(self) -> bool:
@@ -49,6 +50,7 @@ class Err(Generic[E]):
     Represents a failed computation.
     Maps to Rust's Result::Err.
     """
+
     error: E
 
     def is_ok(self) -> bool:

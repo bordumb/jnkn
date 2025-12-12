@@ -16,7 +16,7 @@ class HeuristicExtractor(BaseExtractor):
         return 10
 
     def can_extract(self, text: str) -> bool:
-        return True # Runs on everything as a fallback
+        return True  # Runs on everything as a fallback
 
     def extract(
         self,
@@ -26,12 +26,11 @@ class HeuristicExtractor(BaseExtractor):
         text: str,
         seen_vars: Set[str],
     ) -> Generator[Union[Node, Edge], None, None]:
-
         # Pattern: VAR_NAME = ... where VAR_NAME suggests an env var
         # Restricted to UPPERCASE start to avoid local variable false positives (e.g. db_host)
         env_like_assignment = re.compile(
-            r'^([A-Z][A-Z0-9_]*(?:_URL|_HOST|_PORT|_KEY|_SECRET|_TOKEN|_PASSWORD|_USER|_PATH|_DIR|_ENDPOINT|_URI|_DSN|_CONN))\s*=',
-            re.MULTILINE
+            r"^([A-Z][A-Z0-9_]*(?:_URL|_HOST|_PORT|_KEY|_SECRET|_TOKEN|_PASSWORD|_USER|_PATH|_DIR|_ENDPOINT|_URI|_DSN|_CONN))\s*=",
+            re.MULTILINE,
         )
 
         for match in env_like_assignment.finditer(text):
@@ -42,22 +41,28 @@ class HeuristicExtractor(BaseExtractor):
                 continue
 
             # Context check: Look for environment-related keywords nearby
-            line_start = text.rfind('\n', 0, match.start()) + 1
-            line_end = text.find('\n', match.end())
+            line_start = text.rfind("\n", 0, match.start()) + 1
+            line_end = text.find("\n", match.end())
             if line_end == -1:
                 line_end = len(text)
             line_content = text[line_start:line_end]
 
             env_indicators = [
-                'os.getenv', 'os.environ', 'getenv', 'environ',
-                'config', 'settings', 'env', 'ENV',
+                "os.getenv",
+                "os.environ",
+                "getenv",
+                "environ",
+                "config",
+                "settings",
+                "env",
+                "ENV",
             ]
 
             # Only proceed if we see indicators that this isn't just a constant
             if not any(ind in line_content for ind in env_indicators):
                 continue
 
-            line = text[:match.start()].count('\n') + 1
+            line = text[: match.start()].count("\n") + 1
             env_id = f"env:{var_name}"
 
             yield Node(

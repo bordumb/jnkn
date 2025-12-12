@@ -27,17 +27,18 @@ class DotenvExtractor(BaseExtractor):
         text: str,
         seen_vars: Set[str],
     ) -> Generator[Union[Node, Edge], None, None]:
-
         # 1. Inline usage: dotenv_values(...)["VAR"]
         inline_pattern = r'dotenv_values\s*\([^)]*\)\s*\[\s*["\']([^"\']+)["\']'
         for match in re.finditer(inline_pattern, text):
             # Must use 'yield from' because _yield_match is a generator
-            yield from self._yield_match(match, 1, text, file_path, file_id, "dotenv_values", seen_vars)
+            yield from self._yield_match(
+                match, 1, text, file_path, file_id, "dotenv_values", seen_vars
+            )
 
         # 2. Assignment tracking: config = dotenv_values(...)
         # Step A: Find variable names assigned to dotenv_values
         # Match: my_conf = dotenv_values(...)
-        assignment_pattern = r'(\w+)\s*=\s*dotenv_values\s*\('
+        assignment_pattern = r"(\w+)\s*=\s*dotenv_values\s*\("
         config_vars = set()
         for match in re.finditer(assignment_pattern, text):
             config_vars.add(match.group(1))
@@ -52,24 +53,28 @@ class DotenvExtractor(BaseExtractor):
             # Use raw f-string (rf) to handle backslashes correctly
             dict_access_pattern = rf'(?:{vars_regex})\s*\[\s*["\']([^"\']+)["\']'
             for match in re.finditer(dict_access_pattern, text):
-                yield from self._yield_match(match, 1, text, file_path, file_id, "dotenv_values", seen_vars)
+                yield from self._yield_match(
+                    match, 1, text, file_path, file_id, "dotenv_values", seen_vars
+                )
 
             # Match: config.get("VAR")
             # Use raw f-string (rf)
             get_access_pattern = rf'(?:{vars_regex})\.get\s*\(\s*["\']([^"\']+)["\']'
             for match in re.finditer(get_access_pattern, text):
-                yield from self._yield_match(match, 1, text, file_path, file_id, "dotenv_values", seen_vars)
+                yield from self._yield_match(
+                    match, 1, text, file_path, file_id, "dotenv_values", seen_vars
+                )
 
     def _yield_match(self, match, group_idx, text, file_path, file_id, pattern_name, seen_vars):
         var_name = match.group(group_idx)
 
         if not is_valid_env_var_name(var_name):
             return
-        
+
         if var_name in seen_vars:
             return
 
-        line = text[:match.start()].count('\n') + 1
+        line = text[: match.start()].count("\n") + 1
         env_id = f"env:{var_name}"
 
         yield Node(

@@ -19,11 +19,13 @@ from ..utils import SKIP_DIRS, echo_low_node_warning, echo_success
 
 logger = logging.getLogger(__name__)
 
+
 # --- API Models ---
 class ScanSummary(BaseModel):
     """
     Structured response for the scan command.
     """
+
     total_files: int
     files_parsed: int
     files_skipped: int
@@ -36,8 +38,12 @@ class ScanSummary(BaseModel):
 
 class _null_context:
     """Helper for non-capture mode."""
-    def __enter__(self): pass
-    def __exit__(self, *args): pass
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, *args):
+        pass
 
 
 @click.command()
@@ -48,33 +54,28 @@ class _null_context:
 @click.option("--force", is_flag=True, help="Force full rescan (ignore incremental cache)")
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON")
 def scan(
-    directory: str, 
-    output: str, 
-    verbose: bool, 
-    no_recursive: bool, 
-    force: bool,
-    as_json: bool
+    directory: str, output: str, verbose: bool, no_recursive: bool, force: bool, as_json: bool
 ):
     """
     Scan directory and build dependency graph.
-    
+
     Uses incremental scanning by default: only changed files are re-parsed.
     """
     scan_path = Path(directory).absolute()
     renderer = JsonRenderer("scan")
-    
+
     # 1. Determine Output Path (Persistent DB)
     if output:
         output_path = Path(output)
     else:
         # Default persistent storage
         output_path = Path(".jnkn/jnkn.db")
-    
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Capture context for JSON mode, null context otherwise
     context_manager = renderer.capture() if as_json else _null_context()
-    
+
     error_to_report = None
     response_data = None
 
@@ -88,7 +89,7 @@ def scan(
             # 2. Initialize Engine & Storage
             engine = create_default_engine()
             storage = SQLiteStorage(output_path)
-            
+
             # If force flag is set, clear existing data
             if force:
                 storage.clear()
@@ -97,16 +98,12 @@ def scan(
             # Convert user SKIP_DIRS to set
             skip_dirs = SKIP_DIRS.copy()
             if no_recursive:
-                # If no recursive, we just rely on engine's discovery which we can't easily restrict 
+                # If no recursive, we just rely on engine's discovery which we can't easily restrict
                 # depth on via config yet, but we can hack it or rely on walkers.
                 # For now, ScanConfig handles directory skipping.
                 pass
 
-            config = ScanConfig(
-                root_dir=scan_path,
-                skip_dirs=skip_dirs,
-                incremental=not force
-            )
+            config = ScanConfig(root_dir=scan_path, skip_dirs=skip_dirs, incremental=not force)
 
             # 4. Run Scan (Incremental)
             # Progress callback for text mode
@@ -124,16 +121,23 @@ def scan(
 
             if not as_json:
                 if stats.files_scanned > 0:
-                    click.echo(f"   Parsed {stats.files_scanned} files ({stats.files_unchanged} unchanged)")
+                    click.echo(
+                        f"   Parsed {stats.files_scanned} files ({stats.files_unchanged} unchanged)"
+                    )
                 else:
                     click.echo(f"   All {stats.files_unchanged} files up to date")
-                
+
                 if stats.files_deleted > 0:
                     click.echo(f"   Pruned {stats.files_deleted} deleted files")
 
                 # Explicitly report failures so users don't think they are safe when parsing failed
                 if stats.files_failed > 0:
-                    click.echo(click.style(f"   ❌ Failed to parse {stats.files_failed} files (run with -v to see details)", fg="red"))
+                    click.echo(
+                        click.style(
+                            f"   ❌ Failed to parse {stats.files_failed} files (run with -v to see details)",
+                            fg="red",
+                        )
+                    )
 
             # 5. Hydrate Graph for Stitching
             # We need the full graph in memory to perform cross-file stitching
@@ -144,14 +148,14 @@ def scan(
             if graph.node_count > 0:
                 if not as_json:
                     click.echo("🧵 Stitching cross-domain dependencies...")
-                
+
                 stitcher = Stitcher()
                 stitched_edges = stitcher.stitch(graph)
-                
+
                 if stitched_edges:
                     storage.save_edges_batch(stitched_edges)
                     stitched_count = len(stitched_edges)
-                
+
                 if not as_json:
                     click.echo(f"   Created {stitched_count} new links")
 
@@ -182,9 +186,9 @@ def scan(
                 edges_found=graph.edge_count,
                 new_links_stitched=stitched_count,
                 output_path=str(output_path),
-                duration_sec=round(stats.scan_time_ms / 1000, 2)
+                duration_sec=round(stats.scan_time_ms / 1000, 2),
             )
-            
+
             # Close DB connection
             storage.close()
 

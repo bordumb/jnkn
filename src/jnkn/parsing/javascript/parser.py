@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 # Check if tree-sitter is available
 try:
     from tree_sitter_languages import get_language, get_parser
+
     TREE_SITTER_AVAILABLE = True
 except ImportError:
     TREE_SITTER_AVAILABLE = False
@@ -123,13 +124,15 @@ class JSImport:
 
 
 class JavaScriptParser(LanguageParser):
-    
     # Regex patterns for fallback parsing
     ENV_VAR_PATTERNS = [
-        (r'process\.env\.([A-Z][A-Z0-9_]*)', "process.env."),
+        (r"process\.env\.([A-Z][A-Z0-9_]*)", "process.env."),
         (r'process\.env\[["\']([^"\']+)["\']\]', "process.env[]"),
-        (r'const\s*\{\s*([A-Z][A-Z0-9_]*(?:\s*,\s*[A-Z][A-Z0-9_]*)*)\s*\}\s*=\s*process\.env', "destructuring"),
-        (r'import\.meta\.env\.([A-Z][A-Z0-9_]*)', "import.meta.env"),
+        (
+            r"const\s*\{\s*([A-Z][A-Z0-9_]*(?:\s*,\s*[A-Z][A-Z0-9_]*)*)\s*\}\s*=\s*process\.env",
+            "destructuring",
+        ),
+        (r"import\.meta\.env\.([A-Z][A-Z0-9_]*)", "import.meta.env"),
     ]
 
     IMPORT_PATTERNS = [
@@ -146,8 +149,7 @@ class JavaScriptParser(LanguageParser):
     ]
 
     DEF_PATTERN = re.compile(
-        r'^(?:export\s+)?(?:async\s+)?(?:function|class)\s+(\w+)',
-        re.MULTILINE
+        r"^(?:export\s+)?(?:async\s+)?(?:function|class)\s+(\w+)", re.MULTILINE
     )
 
     def __init__(self, context: ParserContext | None = None):
@@ -268,10 +270,15 @@ class JavaScriptParser(LanguageParser):
         seen_vars: Set[str] = set()
 
         for node, capture_name in captures:
-            if capture_name not in ("env_var", "env_var_bracket", "destructured_var", "vite_env_var"):
+            if capture_name not in (
+                "env_var",
+                "env_var_bracket",
+                "destructured_var",
+                "vite_env_var",
+            ):
                 continue
 
-            var_name = node.text.decode("utf-8").strip('"\'')
+            var_name = node.text.decode("utf-8").strip("\"'")
 
             if var_name in seen_vars:
                 continue
@@ -320,10 +327,15 @@ class JavaScriptParser(LanguageParser):
         seen_imports: Set[str] = set()
 
         for node, capture_name in captures:
-            if capture_name not in ("import_source", "dynamic_import", "require_source", "export_source"):
+            if capture_name not in (
+                "import_source",
+                "dynamic_import",
+                "require_source",
+                "export_source",
+            ):
                 continue
 
-            module_name = node.text.decode("utf-8").strip('"\'')
+            module_name = node.text.decode("utf-8").strip("\"'")
 
             if module_name in seen_imports:
                 continue
@@ -440,7 +452,7 @@ class JavaScriptParser(LanguageParser):
                         continue
                     seen_vars.add(var_name)
 
-                    line = text[:match.start()].count('\n') + 1
+                    line = text[: match.start()].count("\n") + 1
                     framework = self._detect_framework(var_name)
                     is_public = var_name.startswith(("NEXT_PUBLIC_", "VITE_", "REACT_APP_"))
 
@@ -486,7 +498,9 @@ class JavaScriptParser(LanguageParser):
                 matched_text = match.group(0)
                 is_commonjs = "require" in matched_text
                 # If regex has 'import(' then it is dynamic
-                is_dynamic = "import(" in matched_text or ("import" in matched_text and "(" in matched_text)
+                is_dynamic = "import(" in matched_text or (
+                    "import" in matched_text and "(" in matched_text
+                )
 
                 if module_name.startswith("."):
                     target_path = module_name

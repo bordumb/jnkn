@@ -24,12 +24,32 @@ logger = logging.getLogger(__name__)
 
 # Default configurations
 DEFAULT_SKIP_DIRS: Set[str] = {
-    ".git", ".jnkn", "__pycache__", "node_modules", ".venv", "venv", "env",
-    ".env", "dist", "build", "target", "out", "bin", ".idea", ".vscode",
+    ".git",
+    ".jnkn",
+    "__pycache__",
+    "node_modules",
+    ".venv",
+    "venv",
+    "env",
+    ".env",
+    "dist",
+    "build",
+    "target",
+    "out",
+    "bin",
+    ".idea",
+    ".vscode",
 }
 DEFAULT_SKIP_PATTERNS: Set[str] = {
-    "*.pyc", "*.pyo", "*.so", "*.dll", "*.min.js", "*.lock", "*.log",
+    "*.pyc",
+    "*.pyo",
+    "*.so",
+    "*.dll",
+    "*.min.js",
+    "*.lock",
+    "*.log",
 }
+
 
 @dataclass
 class ScanConfig:
@@ -46,6 +66,7 @@ class ScanConfig:
 
     def should_skip_file(self, file_path: Path) -> bool:
         from fnmatch import fnmatch
+
         name = file_path.name
         return any(fnmatch(name, pattern) for pattern in self.skip_patterns)
 
@@ -65,6 +86,7 @@ class ScanStats:
 @dataclass
 class ScanError:
     """Structured error for scan operations."""
+
     message: str
     file_path: str | None = None
     cause: Exception | None = None
@@ -72,10 +94,11 @@ class ScanError:
 
 class ParserRegistry:
     """Registry for language parsers."""
+
     def __init__(self):
         self._parsers: Dict[str, LanguageParser] = {}
         self._extension_map: Dict[str, str] = {}
-    
+
     def register(self, parser: LanguageParser) -> None:
         self._parsers[parser.name] = parser
         for ext in parser.extensions:
@@ -87,7 +110,7 @@ class ParserRegistry:
         if name:
             return self._parsers.get(name)
         return None
-    
+
     def discover_parsers(self):
         # Implementation omitted for brevity, assuming standard discovery
         pass
@@ -136,12 +159,10 @@ class ParserEngine:
             return Err(ScanError(f"File discovery failed: {e}", cause=e))
 
         total_files = len(files_on_disk)
-        
+
         # 2. Fetch existing metadata from DB
         try:
-            tracked_metadata = {
-                m.file_path: m for m in storage.get_all_scan_metadata()
-            }
+            tracked_metadata = {m.file_path: m for m in storage.get_all_scan_metadata()}
         except Exception as e:
             # If DB read fails, treat as empty cache rather than crashing scan
             self._logger.warning(f"Failed to read scan metadata: {e}")
@@ -149,15 +170,15 @@ class ParserEngine:
 
         # 3. Handle Deletions (Pruning)
         # Identify files in DB that are no longer on disk
-        # We need absolute paths or consistent relative paths. 
+        # We need absolute paths or consistent relative paths.
         # _discover_files yields Paths. ScanMetadata stores paths as strings.
         # Ideally both are consistent (e.g., relative to project root or absolute).
         # ScanMetadata usually stores paths as strings provided by parse result.
-        
+
         # Convert disk files to string set for comparison
         # Assuming parse_file_full uses str(path)
         disk_paths = set(str(f) for f in files_on_disk)
-        
+
         if config.incremental:
             for tracked_path in list(tracked_metadata.keys()):
                 if tracked_path not in disk_paths:
@@ -180,13 +201,13 @@ class ParserEngine:
             str_path = str(file_path)
             should_parse = True
             file_hash = ""
-            
+
             if config.incremental:
                 hash_res = ScanMetadata.compute_hash(str_path)
                 if hash_res:
                     file_hash = hash_res
                     existing_meta = tracked_metadata.get(str_path)
-                    
+
                     if existing_meta and existing_meta.file_hash == file_hash:
                         should_parse = False
                         stats.files_unchanged += 1
@@ -197,7 +218,7 @@ class ParserEngine:
                 continue
 
             # --- Parse & Persist ---
-            
+
             # Clean up old data for modified files before re-parsing
             if config.incremental and str_path in tracked_metadata:
                 try:
@@ -215,13 +236,13 @@ class ParserEngine:
                         storage.save_nodes_batch(result.nodes)
                     if result.edges:
                         storage.save_edges_batch(result.edges)
-                    
+
                     # Update metadata
                     meta = ScanMetadata(
                         file_path=str_path,
                         file_hash=file_hash,
                         node_count=len(result.nodes),
-                        edge_count=len(result.edges)
+                        edge_count=len(result.edges),
                     )
                     storage.save_scan_metadata(meta)
 
@@ -240,36 +261,29 @@ class ParserEngine:
     def _parse_file_full(self, file_path: Path, file_hash: str) -> ParseResult:
         """Parse a single file using the registry."""
         parser = self._registry.get_parser_for_file(file_path)
-        
+
         if not parser:
             return ParseResult(file_path=file_path, file_hash=file_hash, success=False)
 
         try:
             content = file_path.read_bytes()
             items = list(parser.parse(file_path, content))
-            
+
             nodes = [i for i in items if isinstance(i, Node)]
             edges = [i for i in items if isinstance(i, Edge)]
-            
+
             # Inject file_hash into file nodes
             for node in nodes:
                 if node.type == "code_file" and not node.file_hash:
                     node.file_hash = file_hash
 
             return ParseResult(
-                file_path=file_path,
-                file_hash=file_hash,
-                nodes=nodes,
-                edges=edges,
-                success=True
+                file_path=file_path, file_hash=file_hash, nodes=nodes, edges=edges, success=True
             )
         except Exception as e:
             self._logger.error(f"Failed to parse {file_path}: {e}")
             return ParseResult(
-                file_path=file_path, 
-                file_hash=file_hash, 
-                errors=[str(e)], 
-                success=False
+                file_path=file_path, file_hash=file_hash, errors=[str(e)], success=False
             )
 
     def _discover_files(self, config: ScanConfig) -> Generator[Path, None, None]:
@@ -277,7 +291,7 @@ class ParserEngine:
         for root, dirs, files in config.root_dir.walk():
             # In-place filtering of directories to prevent recursion into skipped dirs
             dirs[:] = [d for d in dirs if not config.should_skip_dir(d)]
-            
+
             for file in files:
                 path = root / file
                 if not config.should_skip_file(path):
@@ -288,42 +302,70 @@ class ParserEngine:
 def create_default_engine() -> ParserEngine:
     """Factory to create a ParserEngine with standard parsers registered."""
     engine = ParserEngine()
-    
+
     # Try registering available parsers
     # We catch ImportError to make dependencies optional
     try:
         from .python.parser import PythonParser
+
         engine.register(PythonParser())
-    except ImportError: pass
-    
+    except ImportError:
+        pass
+
     try:
         from .terraform.parser import TerraformParser
+
         engine.register(TerraformParser())
-    except ImportError: pass
+    except ImportError:
+        pass
 
     try:
         from .javascript.parser import JavaScriptParser
+
         engine.register(JavaScriptParser())
-    except ImportError: pass
+    except ImportError:
+        pass
 
     try:
         from .kubernetes.parser import KubernetesParser
+
         engine.register(KubernetesParser())
-    except ImportError: pass
+    except ImportError:
+        pass
 
     try:
         from .dbt.manifest_parser import DbtManifestParser
+
         engine.register(DbtManifestParser())
-    except ImportError: pass
+    except ImportError:
+        pass
 
     try:
         from .pyspark.parser import PySparkParser
+
         engine.register(PySparkParser())
-    except ImportError: pass
+    except ImportError:
+        pass
 
     try:
         from .spark_yaml.parser import SparkYamlParser
+
         engine.register(SparkYamlParser())
-    except ImportError: pass
-    
+    except ImportError:
+        pass
+
+    try:
+        from .go.parser import GoParser
+
+        engine.register(GoParser())
+    except ImportError:
+        pass
+
+    try:
+        from .java.parser import JavaParser
+
+        engine.register(JavaParser())
+    except ImportError:
+        pass
+
     return engine

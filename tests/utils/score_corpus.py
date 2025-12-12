@@ -282,6 +282,20 @@ class CorpusScorer:
             except ImportError:
                 pass
 
+            # NEW: Register Go Parser
+            try:
+                from jnkn.parsing.go.parser import GoParser
+                self._parsers["go"] = GoParser(self._context)
+            except ImportError:
+                pass
+
+            # NEW: Register Java Parser
+            try:
+                from jnkn.parsing.java.parser import JavaParser
+                self._parsers["java"] = JavaParser(self._context)
+            except ImportError:
+                pass
+
         except ImportError as e:
             print(f"{Colors.RED}Error importing parsers: {e}{Colors.RESET}")
             print("Make sure you're running from the jnkn project root with:")
@@ -334,6 +348,9 @@ class CorpusScorer:
             "pyspark": [".py"],
             "spark_yaml": [".yml", ".yaml"],
             "openlineage": [".json"],
+            # NEW: Add Go and Java
+            "go": [".go"],
+            "java": [".java"],
         }
 
         extensions = extension_map.get(parser_name, [])

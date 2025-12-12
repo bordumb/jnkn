@@ -13,6 +13,7 @@ from typing import Any, Dict, Generator, List, Set, Union
 
 try:
     import yaml
+
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
@@ -32,6 +33,7 @@ class K8sEnvVar:
     """
     Represents a detected environment variable in a Kubernetes container spec.
     """
+
     name: str
     value: str | None = None
     config_map_name: str | None = None
@@ -59,8 +61,13 @@ class KubernetesParser(LanguageParser):
     """
 
     WORKLOAD_KINDS = {
-        "Deployment", "StatefulSet", "Job", "CronJob",
-        "DaemonSet", "ReplicaSet", "Pod",
+        "Deployment",
+        "StatefulSet",
+        "Job",
+        "CronJob",
+        "DaemonSet",
+        "ReplicaSet",
+        "Pod",
     }
 
     def __init__(self, context: ParserContext | None = None):
@@ -95,8 +102,14 @@ class KubernetesParser(LanguageParser):
 
         # 1. Directory heuristics
         k8s_indicators = {
-            "kubernetes", "k8s", "manifests", "deploy",
-            "deployments", "helm", "charts", "templates",
+            "kubernetes",
+            "k8s",
+            "manifests",
+            "deploy",
+            "deployments",
+            "helm",
+            "charts",
+            "templates",
         }
         for part in file_path.parts:
             if part.lower() in k8s_indicators:
@@ -105,9 +118,18 @@ class KubernetesParser(LanguageParser):
         # 2. Filename heuristics
         name = file_path.stem.lower()
         k8s_patterns = {
-            "deployment", "service", "ingress", "configmap",
-            "secret", "statefulset", "daemonset", "job",
-            "cronjob", "namespace", "pod", "values",
+            "deployment",
+            "service",
+            "ingress",
+            "configmap",
+            "secret",
+            "statefulset",
+            "daemonset",
+            "job",
+            "cronjob",
+            "namespace",
+            "pod",
+            "values",
         }
         for pattern in k8s_patterns:
             if pattern in name:
@@ -226,10 +248,11 @@ class KubernetesParser(LanguageParser):
     def _process_ingress(self, doc: Dict[str, Any], ingress_id: str, namespace: str):
         """Extract backend services from Ingress."""
         spec = doc.get("spec", {})
-        
+
         # Helper to yield edge
         def link_service(svc_name):
-            if not svc_name: return
+            if not svc_name:
+                return
             svc_id = f"k8s:{namespace}/service/{svc_name}"
             # We don't yield the service node itself (it might be defined elsewhere)
             # but we create the edge. The graph builder handles missing nodes gracefully usually,
@@ -237,8 +260,8 @@ class KubernetesParser(LanguageParser):
             yield Edge(
                 source_id=ingress_id,
                 target_id=svc_id,
-                type=RelationshipType.ROUTES_TO, # Custom type or mapped to DEPENDS_ON
-                metadata={"type": "routes_to"}
+                type=RelationshipType.ROUTES_TO,  # Custom type or mapped to DEPENDS_ON
+                metadata={"type": "routes_to"},
             )
 
         # Default backend
@@ -251,7 +274,7 @@ class KubernetesParser(LanguageParser):
             http = rule.get("http", {})
             for path in http.get("paths", []):
                 backend = path.get("backend", {})
-                
+
                 # Networking V1
                 if "service" in backend:
                     yield from link_service(backend["service"].get("name"))
@@ -271,7 +294,7 @@ class KubernetesParser(LanguageParser):
             env_list = container.get("env", [])
             for env_var in self._extract_env_vars(env_list):
                 env_id = f"env:{env_var.name}"
-                
+
                 yield Node(
                     id=env_id,
                     name=env_var.name,
@@ -286,12 +309,22 @@ class KubernetesParser(LanguageParser):
 
                 if env_var.is_config_map_ref and env_var.config_map_name:
                     cm_id = f"k8s:{namespace}/configmap/{env_var.config_map_name}"
-                    yield Node(id=cm_id, name=env_var.config_map_name, type=NodeType.CONFIG_KEY, metadata={"virtual": True})
+                    yield Node(
+                        id=cm_id,
+                        name=env_var.config_map_name,
+                        type=NodeType.CONFIG_KEY,
+                        metadata={"virtual": True},
+                    )
                     yield Edge(source_id=env_id, target_id=cm_id, type=RelationshipType.READS)
-                
+
                 if env_var.is_secret_ref and env_var.secret_name:
                     secret_id = f"k8s:{namespace}/secret/{env_var.secret_name}"
-                    yield Node(id=secret_id, name=env_var.secret_name, type=NodeType.SECRET, metadata={"virtual": True})
+                    yield Node(
+                        id=secret_id,
+                        name=env_var.secret_name,
+                        type=NodeType.SECRET,
+                        metadata={"virtual": True},
+                    )
                     yield Edge(source_id=env_id, target_id=secret_id, type=RelationshipType.READS)
 
             # envFrom
@@ -300,19 +333,33 @@ class KubernetesParser(LanguageParser):
                     cm_name = env_from["configMapRef"].get("name")
                     if cm_name:
                         cm_id = f"k8s:{namespace}/configmap/{cm_name}"
-                        yield Node(id=cm_id, name=cm_name, type=NodeType.CONFIG_KEY, metadata={"virtual": True})
-                        yield Edge(source_id=workload_id, target_id=cm_id, type=RelationshipType.READS)
+                        yield Node(
+                            id=cm_id,
+                            name=cm_name,
+                            type=NodeType.CONFIG_KEY,
+                            metadata={"virtual": True},
+                        )
+                        yield Edge(
+                            source_id=workload_id, target_id=cm_id, type=RelationshipType.READS
+                        )
                 if "secretRef" in env_from:
                     secret_name = env_from["secretRef"].get("name")
                     if secret_name:
                         secret_id = f"k8s:{namespace}/secret/{secret_name}"
-                        yield Node(id=secret_id, name=secret_name, type=NodeType.SECRET, metadata={"virtual": True})
-                        yield Edge(source_id=workload_id, target_id=secret_id, type=RelationshipType.READS)
+                        yield Node(
+                            id=secret_id,
+                            name=secret_name,
+                            type=NodeType.SECRET,
+                            metadata={"virtual": True},
+                        )
+                        yield Edge(
+                            source_id=workload_id, target_id=secret_id, type=RelationshipType.READS
+                        )
 
     def _get_pod_spec(self, doc: Dict[str, Any]) -> Dict[str, Any] | None:
         kind = doc.get("kind", "")
         spec = doc.get("spec", {})
-        
+
         if kind == "Pod":
             return spec
         elif kind in ("Deployment", "ReplicaSet", "DaemonSet", "StatefulSet", "Job"):
@@ -327,7 +374,7 @@ class KubernetesParser(LanguageParser):
             name = env.get("name")
             if not name:
                 continue
-            
+
             var = K8sEnvVar(name=name)
             if "value" in env:
                 var.value = str(env["value"])
@@ -339,7 +386,7 @@ class KubernetesParser(LanguageParser):
                 elif "secretKeyRef" in vf:
                     var.secret_name = vf["secretKeyRef"].get("name")
                     var.secret_key = vf["secretKeyRef"].get("key")
-            
+
             result.append(var)
         return result
 

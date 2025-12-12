@@ -27,7 +27,6 @@ class DjangoExtractor(BaseExtractor):
         text: str,
         seen_vars: Set[str],
     ) -> Generator[Union[Node, Edge], None, None]:
-
         # env("VAR"), env.str("VAR"), env.bool("VAR"), etc.
         # Matches env('VAR') or env.method('VAR')
         pattern = r'env(?:\.[a-zA-Z_]+)?\s*\(\s*["\']([^"\']+)["\']'
@@ -38,11 +37,11 @@ class DjangoExtractor(BaseExtractor):
 
             if not is_valid_env_var_name(var_name):
                 continue
-            
+
             if var_name in seen_vars:
                 continue
 
-            line = text[:match.start()].count('\n') + 1
+            line = text[: match.start()].count("\n") + 1
             env_id = f"env:{var_name}"
 
             yield Node(

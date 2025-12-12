@@ -22,7 +22,7 @@ Usage:
             graph.add_node(item)
         elif isinstance(item, Edge):
             graph.add_edge(item)
-    
+
     # From Marquez API
     parser = OpenLineageParser()
     events = parser.fetch_from_marquez("http://marquez:5000", namespace="spark")
@@ -41,6 +41,7 @@ from typing import Any, Dict, Iterator, List, Set, Tuple, Union
 
 try:
     import requests
+
     HAS_REQUESTS = True
 except ImportError:
     HAS_REQUESTS = False
@@ -50,8 +51,10 @@ except ImportError:
 # Data Models
 # =============================================================================
 
+
 class NodeType(Enum):
     """Types of nodes in the dependency graph."""
+
     CODE_FILE = "code_file"
     CODE_ENTITY = "code_entity"
     ENV_VAR = "env_var"
@@ -63,6 +66,7 @@ class NodeType(Enum):
 
 class RelationshipType(Enum):
     """Types of relationships between nodes."""
+
     IMPORTS = "imports"
     READS = "reads"
     WRITES = "writes"
@@ -75,6 +79,7 @@ class RelationshipType(Enum):
 @dataclass
 class Node:
     """A node in the dependency graph."""
+
     id: str
     name: str
     type: NodeType
@@ -98,6 +103,7 @@ class Node:
 @dataclass
 class Edge:
     """An edge (relationship) in the dependency graph."""
+
     source_id: str
     target_id: str
     type: RelationshipType
@@ -118,25 +124,26 @@ class Edge:
 # OpenLineage Parser
 # =============================================================================
 
+
 class OpenLineageParser:
     """
     Parser for OpenLineage events.
-    
+
     Converts runtime lineage events into jnkn's Node/Edge format,
     enabling correlation between static code analysis and observed
     production data flows.
-    
+
     Confidence Levels:
         - Runtime lineage has confidence=1.0 (observed, not inferred)
         - This is higher than static analysis which may miss dynamic patterns
-    
+
     Example:
         parser = OpenLineageParser()
-        
+
         # From file
         for item in parser.parse(Path("events.json"), content):
             graph.add(item)
-        
+
         # From Marquez API
         events = parser.fetch_from_marquez("http://marquez:5000")
         for item in parser.parse_events(events):
@@ -146,7 +153,7 @@ class OpenLineageParser:
     def __init__(self, namespace_filter: str | None = None):
         """
         Initialize the parser.
-        
+
         Args:
             namespace_filter: Optional regex to filter namespaces
         """
@@ -173,13 +180,13 @@ class OpenLineageParser:
     ) -> Iterator[Union[Node, Edge]]:
         """
         Parse OpenLineage events from a JSON file.
-        
+
         Supports both single events and arrays of events.
-        
+
         Args:
             file_path: Path to JSON file
             content: File content as bytes
-            
+
         Yields:
             Node and Edge objects
         """
@@ -209,10 +216,10 @@ class OpenLineageParser:
     ) -> Iterator[Union[Node, Edge]]:
         """
         Parse a list of OpenLineage events.
-        
+
         Args:
             events: List of OpenLineage event dictionaries
-            
+
         Yields:
             Node and Edge objects (deduplicated)
         """
@@ -330,9 +337,7 @@ class OpenLineageParser:
                     col_id = f"column:{namespace}/{name}/{col_name}"
                     if col_id not in self._seen_nodes:
                         self._seen_nodes.add(col_id)
-                        yield self._create_column_node(
-                            namespace, name, col_name, field_info
-                        )
+                        yield self._create_column_node(namespace, name, col_name, field_info)
 
         # Column lineage facet
         col_lineage = facets.get("columnLineage", {})
@@ -404,9 +409,7 @@ class OpenLineageParser:
         schema_fields = []
 
         if "schema" in facets:
-            schema_fields = [
-                f.get("name") for f in facets["schema"].get("fields", [])
-            ]
+            schema_fields = [f.get("name") for f in facets["schema"].get("fields", [])]
 
         return Node(
             id=f"data:{namespace}/{name}",
@@ -446,7 +449,7 @@ class OpenLineageParser:
     def _tokenize(self, name: str) -> Tuple[str, ...]:
         """Tokenize a name for cross-domain stitching."""
         # Split on common separators
-        parts = re.split(r'[_\-./]', name.lower())
+        parts = re.split(r"[_\-./]", name.lower())
         # Filter out empty and very short tokens
         return tuple(p for p in parts if len(p) >= 2)
 
@@ -462,12 +465,12 @@ class OpenLineageParser:
     ) -> List[Dict[str, Any]]:
         """
         Fetch lineage events from Marquez API.
-        
+
         Args:
             base_url: Marquez API base URL (e.g., "http://marquez:5000")
             namespace: Optional namespace to filter by
             limit: Maximum number of events to fetch
-            
+
         Returns:
             List of OpenLineage events
         """
@@ -540,13 +543,14 @@ class OpenLineageParser:
 # Convenience Functions
 # =============================================================================
 
+
 def parse_openlineage_file(file_path: str) -> Tuple[List[Node], List[Edge]]:
     """
     Parse an OpenLineage JSON file and return nodes and edges.
-    
+
     Args:
         file_path: Path to JSON file with OpenLineage events
-        
+
     Returns:
         Tuple of (nodes, edges)
     """
@@ -573,11 +577,11 @@ def fetch_and_parse_marquez(
 ) -> Tuple[List[Node], List[Edge]]:
     """
     Fetch from Marquez API and parse into nodes and edges.
-    
+
     Args:
         base_url: Marquez API URL
         namespace: Optional namespace filter
-        
+
     Returns:
         Tuple of (nodes, edges)
     """
@@ -606,10 +610,7 @@ if __name__ == "__main__":
         {
             "eventType": "COMPLETE",
             "eventTime": "2024-12-09T10:00:00Z",
-            "job": {
-                "namespace": "spark",
-                "name": "daily_user_etl"
-            },
+            "job": {"namespace": "spark", "name": "daily_user_etl"},
             "inputs": [
                 {
                     "namespace": "postgres",
@@ -619,15 +620,12 @@ if __name__ == "__main__":
                             "fields": [
                                 {"name": "user_id", "type": "INTEGER"},
                                 {"name": "email", "type": "VARCHAR"},
-                                {"name": "created_at", "type": "TIMESTAMP"}
+                                {"name": "created_at", "type": "TIMESTAMP"},
                             ]
                         }
-                    }
+                    },
                 },
-                {
-                    "namespace": "postgres",
-                    "name": "public.user_events"
-                }
+                {"namespace": "postgres", "name": "public.user_events"},
             ],
             "outputs": [
                 {
@@ -639,70 +637,53 @@ if __name__ == "__main__":
                                 {"name": "user_id", "type": "INTEGER"},
                                 {"name": "email", "type": "VARCHAR"},
                                 {"name": "event_count", "type": "INTEGER"},
-                                {"name": "last_event_at", "type": "TIMESTAMP"}
+                                {"name": "last_event_at", "type": "TIMESTAMP"},
                             ]
                         },
                         "columnLineage": {
                             "fields": {
                                 "user_id": {
                                     "inputFields": [
-                                        {"namespace": "postgres", "name": "public.raw_users", "field": "user_id"}
+                                        {
+                                            "namespace": "postgres",
+                                            "name": "public.raw_users",
+                                            "field": "user_id",
+                                        }
                                     ]
                                 },
                                 "event_count": {
                                     "inputFields": [
-                                        {"namespace": "postgres", "name": "public.user_events", "field": "event_id", "transformations": ["count"]}
+                                        {
+                                            "namespace": "postgres",
+                                            "name": "public.user_events",
+                                            "field": "event_id",
+                                            "transformations": ["count"],
+                                        }
                                     ]
-                                }
+                                },
                             }
-                        }
-                    }
+                        },
+                    },
                 }
             ],
-            "run": {"runId": "run-001"}
+            "run": {"runId": "run-001"},
         },
         {
             "eventType": "COMPLETE",
             "eventTime": "2024-12-09T11:00:00Z",
-            "job": {
-                "namespace": "spark",
-                "name": "user_metrics_aggregator"
-            },
-            "inputs": [
-                {
-                    "namespace": "s3",
-                    "name": "warehouse/dim_users"
-                }
-            ],
-            "outputs": [
-                {
-                    "namespace": "s3",
-                    "name": "warehouse/agg_user_metrics"
-                }
-            ],
-            "run": {"runId": "run-002"}
+            "job": {"namespace": "spark", "name": "user_metrics_aggregator"},
+            "inputs": [{"namespace": "s3", "name": "warehouse/dim_users"}],
+            "outputs": [{"namespace": "s3", "name": "warehouse/agg_user_metrics"}],
+            "run": {"runId": "run-002"},
         },
         {
             "eventType": "COMPLETE",
             "eventTime": "2024-12-09T12:00:00Z",
-            "job": {
-                "namespace": "spark",
-                "name": "executive_dashboard_loader"
-            },
-            "inputs": [
-                {
-                    "namespace": "s3",
-                    "name": "warehouse/agg_user_metrics"
-                }
-            ],
-            "outputs": [
-                {
-                    "namespace": "redshift",
-                    "name": "analytics.exec_dashboard"
-                }
-            ],
-            "run": {"runId": "run-003"}
-        }
+            "job": {"namespace": "spark", "name": "executive_dashboard_loader"},
+            "inputs": [{"namespace": "s3", "name": "warehouse/agg_user_metrics"}],
+            "outputs": [{"namespace": "redshift", "name": "analytics.exec_dashboard"}],
+            "run": {"runId": "run-003"},
+        },
     ]
 
     print("=" * 70)
