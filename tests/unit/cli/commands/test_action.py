@@ -5,6 +5,7 @@ This suite verifies the end-to-end orchestration of the CI/CD workflow,
 including scanning, stitching, checking, and reporting to GitHub.
 """
 
+import io
 import json
 from unittest.mock import MagicMock, patch, mock_open
 
@@ -253,26 +254,26 @@ class TestActionCommand:
 
     def test_github_comment_update(self, mock_dependencies, mock_event_file):
         """Test updating an existing comment instead of creating a new one."""
-        # Mock GET response containing an existing jnkn signature
         existing_comments = [
-            {"id": 999, "body": "Old comment\n"} # Signature matching simplified for test
+            {"id": 999, "body": "Old comment\n"} 
         ]
         
-        # We need to simulate the sequence of API calls
-        # 1. GET comments -> returns existing_comments
-        # 2. PATCH comment -> returns success
+        # Use io.BytesIO to simulate real file-like response objects for json.load()
+        # This prevents MagicMock read/iterator issues
         
-        response_get = MagicMock()
-        response_get.read.return_value = json.dumps(existing_comments).encode()
-        response_get.status = 200
+        # 1. GET response (List comments)
+        resp_get = io.BytesIO(json.dumps(existing_comments).encode())
+        resp_get.status = 200
         
-        response_patch = MagicMock()
-        response_patch.read.return_value = b"{}"
-        response_patch.status = 200
+        # 2. PATCH response (Update comment)
+        resp_patch = io.BytesIO(b"{}")
+        resp_patch.status = 200
         
+        # NOTE: urlopen returns the response object, which is also the context manager
+        # (i.e. __enter__ returns self). io.BytesIO works the same way.
         mock_dependencies["urlopen"].side_effect = [
-            MagicMock(__enter__=MagicMock(return_value=response_get)),
-            MagicMock(__enter__=MagicMock(return_value=response_patch))
+            resp_get,
+            resp_patch
         ]
 
         runner = CliRunner()
@@ -288,7 +289,7 @@ class TestActionCommand:
 
     def test_github_env_missing(self, mock_dependencies):
         """Test behavior when running outside GitHub Actions (no env vars)."""
-        # CRITICAL FIX: Explicitly clear the side_effect so return_value is respected
+        # Explicitly clear side_effect so return_value is respected
         mock_dependencies["getenv"].side_effect = None
         mock_dependencies["getenv"].return_value = None 
 
