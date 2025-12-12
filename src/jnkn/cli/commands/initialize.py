@@ -16,9 +16,9 @@ from typing import Set
 import click
 import yaml
 from rich.console import Console
+from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.prompt import Confirm
-from rich.markdown import Markdown
 
 from ...core.demo import DemoManager
 
@@ -149,7 +149,7 @@ def _init_project(
     # 1. If --telemetry or --no-telemetry passed explicitly, honor it.
     # 2. If --demo mode, enable by default (it's a sandbox).
     # 3. Otherwise, show the manifesto and ask.
-    
+
     if telemetry_opt_in is not None:
         allow_telemetry = telemetry_opt_in
         status = "ENABLED" if allow_telemetry else "DISABLED"
@@ -158,9 +158,7 @@ def _init_project(
         allow_telemetry = True
     else:
         _display_privacy_manifesto()
-        allow_telemetry = Confirm.ask(
-            "\nAllow anonymous usage statistics?", default=True
-        )
+        allow_telemetry = Confirm.ask("\nAllow anonymous usage statistics?", default=True)
 
     config["telemetry"]["enabled"] = allow_telemetry
     # Only generate a distinct ID if telemetry is enabled or might be enabled later
@@ -193,9 +191,7 @@ def init(force: bool, demo: bool, telemetry: bool | None):
     If --demo is used, a sample project structure is created in ./jnkn-demo
     and initialized automatically.
     """
-    console.print(
-        Panel.fit("🚀 [bold blue]Jnkan Initialization[/bold blue]", border_style="blue")
-    )
+    console.print(Panel.fit("🚀 [bold blue]Jnkan Initialization[/bold blue]", border_style="blue"))
 
     if demo:
         console.print("[cyan]Provisioning demo environment...[/cyan]")
