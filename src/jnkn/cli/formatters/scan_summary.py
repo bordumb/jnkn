@@ -181,9 +181,7 @@ class ScanSummaryFormatter:
                 f"     └── {icon} [yellow]NO MATCH FOUND[/yellow] - "
                 f"This env var has no infrastructure provider"
             )
-            self.console.print(
-                "         [dim]💡 Is this set manually? Consider documenting.[/dim]"
-            )
+            self.console.print("         [dim]💡 Is this set manually? Consider documenting.[/dim]")
 
         # Ambiguity warning
         if finding.metadata.get("is_ambiguous"):
