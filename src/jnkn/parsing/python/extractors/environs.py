@@ -39,6 +39,7 @@ class EnvironsExtractor(BaseExtractor):
                 id=env_id,
                 name=var_name,
                 type=NodeType.ENV_VAR,
+                path=str(ctx.file_path),
                 metadata={
                     "source": "environs",
                     "file": str(ctx.file_path),

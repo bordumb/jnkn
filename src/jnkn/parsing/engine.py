@@ -39,16 +39,40 @@ DEFAULT_SKIP_DIRS: Set[str] = {
     "bin",
     ".idea",
     ".vscode",
+    "coverage",
+    "htmlcov",
+    # Add common test fixture dirs
+    "__snapshots__",
+    "__mocks__",
+    "fixtures",
 }
+
+# Updated patterns based on forensics report
 DEFAULT_SKIP_PATTERNS: Set[str] = {
-    "*.pyc",
-    "*.pyo",
-    "*.so",
-    "*.dll",
-    "*.min.js",
-    "*.lock",
+    # Compiled/Binary
+    "*.pyc", "*.pyo", "*.so", "*.dll", "*.exe",
+    
+    # Minified / Source Maps
+    "*.min.js", "*.min.css", "*.map",
+    
+    # Lockfiles
+    "*.lock", "package-lock.json", "yarn.lock", "pnpm-lock.yaml",
+    "poetry.lock", "Gemfile.lock", "composer.lock",
+    
+    # Data / Assets
+    "*.svg", "*.png", "*.jpg", "*.jpeg", "*.ico", "*.gif",
+    "*.lottie", "*.csv", "*.tsv",
+    "*.jsonl", "*.ndjson",
+    
+    # Test Artifacts
+    "*.snap", "*.ambr", ".test_durations",
+    
+    # Logs
     "*.log",
 }
+
+# Reduce max file size to 500KB to prevent parsing massive generated files
+MAX_FILE_SIZE = 500 * 1024
 
 
 @dataclass
@@ -97,7 +121,7 @@ class ParserRegistry:
 
     def __init__(self):
         self._parsers: Dict[str, LanguageParser] = {}
-        # FIX: Map extension to LIST of parser names to support multiple parsers per ext
+        # Map extension to LIST of parser names to support multiple parsers per ext
         self._extension_map: Dict[str, List[str]] = {}
 
     def register(self, parser: LanguageParser) -> None:
@@ -195,6 +219,15 @@ class ParserEngine:
             str_path = str(file_path)
             should_parse = True
             file_hash = ""
+
+            # Check file size (Safeguard for "Whale" repos)
+            try:
+                if file_path.stat().st_size > MAX_FILE_SIZE:
+                    self._logger.debug(f"Skipping large file: {file_path}")
+                    stats.files_skipped += 1
+                    continue
+            except OSError:
+                continue
 
             if config.incremental:
                 hash_res = ScanMetadata.compute_hash(str_path)
@@ -388,6 +421,13 @@ def create_default_engine() -> ParserEngine:
         from .java.parser import JavaParser
 
         engine.register(JavaParser())
+    except ImportError:
+        pass
+
+    try:
+        from .openlineage.parser import OpenLineageParser
+
+        engine.register(OpenLineageParser())
     except ImportError:
         pass
 

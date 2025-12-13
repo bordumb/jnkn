@@ -246,7 +246,8 @@ def _post_to_github(token: str, body: str):
             else:
                 console.print(f"⚠️  Failed to post comment: HTTP {resp.status}")
     except urllib.error.HTTPError as e:
-        console.print(f"❌ [red]HTTP Error {e.code}: {e.reason}[/red]")
+        # UPDATED: Unified error message format to satisfy tests and maintain consistency
+        console.print(f"❌ [red]Error posting comment: HTTP Error {e.code}: {e.reason}[/red]")
         console.print(f"   [dim]URL: {url}[/dim]")
         if e.code == 404 and method == "POST":
             console.print(

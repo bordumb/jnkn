@@ -59,6 +59,7 @@ class StdlibExtractor(BaseExtractor):
                     id=env_id,
                     name=var_name,
                     type=NodeType.ENV_VAR,
+                    path=str(ctx.file_path),
                     metadata={
                         "source": pattern_name,
                         "file": str(ctx.file_path),
