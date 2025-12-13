@@ -50,23 +50,39 @@ DEFAULT_SKIP_DIRS: Set[str] = {
 # Updated patterns based on forensics report
 DEFAULT_SKIP_PATTERNS: Set[str] = {
     # Compiled/Binary
-    "*.pyc", "*.pyo", "*.so", "*.dll", "*.exe",
-    
+    "*.pyc",
+    "*.pyo",
+    "*.so",
+    "*.dll",
+    "*.exe",
     # Minified / Source Maps
-    "*.min.js", "*.min.css", "*.map",
-    
+    "*.min.js",
+    "*.min.css",
+    "*.map",
     # Lockfiles
-    "*.lock", "package-lock.json", "yarn.lock", "pnpm-lock.yaml",
-    "poetry.lock", "Gemfile.lock", "composer.lock",
-    
+    "*.lock",
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    "poetry.lock",
+    "Gemfile.lock",
+    "composer.lock",
     # Data / Assets
-    "*.svg", "*.png", "*.jpg", "*.jpeg", "*.ico", "*.gif",
-    "*.lottie", "*.csv", "*.tsv",
-    "*.jsonl", "*.ndjson",
-    
+    "*.svg",
+    "*.png",
+    "*.jpg",
+    "*.jpeg",
+    "*.ico",
+    "*.gif",
+    "*.lottie",
+    "*.csv",
+    "*.tsv",
+    "*.jsonl",
+    "*.ndjson",
     # Test Artifacts
-    "*.snap", "*.ambr", ".test_durations",
-    
+    "*.snap",
+    "*.ambr",
+    ".test_durations",
     # Logs
     "*.log",
 }

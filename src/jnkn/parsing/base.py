@@ -1,3 +1,4 @@
+# FILE: src/jnkn/parsing/base.py
 """
 Base Parser Infrastructure.
 
@@ -10,18 +11,6 @@ Architecture Goals:
     - Every Node MUST have a `path` set to enable "Open in Editor" functionality
     - Extractors use `NodeFactory` to create nodes with guaranteed field population
     - `ExtractionContext` carries file information that extractors inherit
-
-Example:
-    ```python
-    class MyExtractor(BaseExtractor):
-        def extract(self, ctx: ExtractionContext) -> Generator[Union[Node, Edge], None, None]:
-            # Use the factory - path is automatically set from ctx
-            yield ctx.create_env_var_node(
-                name="DATABASE_URL",
-                line=42,
-                source="os.getenv",
-            )
-    ```
 """
 
 from __future__ import annotations
@@ -170,19 +159,6 @@ class ExtractionContext:
         text: The decoded text content of the file.
         tree: Optional Tree-sitter AST object for advanced parsing.
         seen_ids: Set of IDs already emitted (for deduplication).
-
-    Example:
-        ```python
-        ctx = ExtractionContext(
-            file_path=Path("src/app.py"),
-            file_id="file://src/app.py",
-            text=source_code,
-        )
-
-        # Create a node - path is automatically populated
-        node = ctx.create_env_var_node(name="API_KEY", line=10, source="os.getenv")
-        assert node.path == "src/app.py"
-        ```
     """
 
     file_path: Path
@@ -228,13 +204,17 @@ class ExtractionContext:
         if line is not None:
             meta["line"] = line
 
+        # Fix: Ensure tokens is never None to satisfy Pydantic validation
+        # Node model expects List[str], defaulting to empty list if None
+        safe_tokens = tokens if tokens is not None else []
+
         return Node(
             id=id,
             name=name,
             type=type,
             path=str(self.file_path),
             language=language,
-            tokens=tokens,
+            tokens=safe_tokens,
             metadata=meta,
         )
 
@@ -250,9 +230,6 @@ class ExtractionContext:
         """
         Create an environment variable node with standardized fields.
 
-        This helper ensures consistent env var node creation across
-        all extractors (Python, JavaScript, Go, Java, etc.).
-
         Args:
             name: The environment variable name (e.g., "DATABASE_URL").
             line: Line number where the env var is referenced.
@@ -262,16 +239,6 @@ class ExtractionContext:
 
         Returns:
             Node: An ENV_VAR node with path and line set.
-
-        Example:
-            ```python
-            node = ctx.create_env_var_node(
-                name="DATABASE_URL",
-                line=42,
-                source="os.getenv",
-                default_value="localhost:5432",
-            )
-            ```
         """
         env_id = f"env:{name}"
         tokens = self._tokenize(name)
@@ -600,41 +567,6 @@ class BaseExtractor(ABC):
     Provides a standard inheritance base for implementing the Extractor protocol.
     Subclasses should use the factory methods on ExtractionContext to create
     nodes, ensuring consistent field population.
-
-    Example:
-        ```python
-        class MyEnvExtractor(BaseExtractor):
-            @property
-            def name(self) -> str:
-                return "my_env"
-
-            @property
-            def priority(self) -> int:
-                return 100
-
-            def can_extract(self, ctx: ExtractionContext) -> bool:
-                return "os.getenv" in ctx.text
-
-            def extract(self, ctx: ExtractionContext):
-                for match in MY_PATTERN.finditer(ctx.text):
-                    var_name = match.group(1)
-                    if not ctx.mark_seen(var_name):
-                        continue
-
-                    line = ctx.get_line_number(match.start())
-
-                    yield ctx.create_env_var_node(
-                        name=var_name,
-                        line=line,
-                        source="my_pattern",
-                    )
-
-                    yield ctx.create_reads_edge(
-                        target_id=f"env:{var_name}",
-                        line=line,
-                        pattern="my_pattern",
-                    )
-        ```
     """
 
     @property

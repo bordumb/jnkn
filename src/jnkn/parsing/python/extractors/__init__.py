@@ -40,14 +40,14 @@ from .stdlib import StdlibExtractor
 
 # Registry of extractor classes ordered by priority (highest first)
 EXTRACTORS: List[type[BaseExtractor]] = [
-    StdlibExtractor,      # 100
-    PydanticExtractor,    # 90
+    StdlibExtractor,  # 100
+    PydanticExtractor,  # 90
     ClickTyperExtractor,  # 80
-    DotenvExtractor,      # 70
-    DjangoExtractor,      # 60
-    AirflowExtractor,     # 50
-    EnvironsExtractor,    # 40
-    HeuristicExtractor,   # 10
+    DotenvExtractor,  # 70
+    DjangoExtractor,  # 60
+    AirflowExtractor,  # 50
+    EnvironsExtractor,  # 40
+    HeuristicExtractor,  # 10
 ]
 
 __all__ = [

@@ -13,7 +13,7 @@ commonly used for configuring DAGs with environment-specific values.
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, RelationshipType
+from ....core.types import Edge, Node
 from ...base import BaseExtractor, ExtractionContext
 from ..validation import is_valid_env_var_name
 

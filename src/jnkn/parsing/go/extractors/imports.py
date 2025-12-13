@@ -2,7 +2,7 @@
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node, RelationshipType
 from ...base import ExtractionContext
 
 
@@ -56,7 +56,7 @@ class GoImportExtractor:
             # FIX: Use factory method
             yield ctx.create_code_entity_node(
                 name=parts[-1],
-                line=1, # Approx
+                line=1,  # Approx
                 entity_type="go_package",
                 extra_metadata={
                     "full_path": imp,

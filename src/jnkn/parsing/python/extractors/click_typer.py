@@ -15,7 +15,7 @@ command-line options to environment variables.
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, RelationshipType
+from ....core.types import Edge, Node
 from ...base import BaseExtractor, ExtractionContext
 from ..validation import is_valid_env_var_name
 
@@ -92,7 +92,7 @@ class ClickTyperExtractor(BaseExtractor):
         # Pattern matches both string and list values for envvar:
         # envvar=\"VAR\" or envvar=[\"VAR1\", \"VAR2\"]
         click_pattern = re.compile(
-            r'(?:@click\.option|typer\.Option)\s*\([^)]*envvar\s*=\s*'
+            r"(?:@click\.option|typer\.Option)\s*\([^)]*envvar\s*=\s*"
             r'(\[[^\]]+\]|["\'][^"\']+["\'])',
             re.DOTALL,
         )

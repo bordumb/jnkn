@@ -6,7 +6,7 @@ Environment Variable Extractor for JavaScript/TypeScript.
 import re
 from typing import Generator, Set, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node
 from ...base import ExtractionContext
 
 

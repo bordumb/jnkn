@@ -11,7 +11,7 @@ import json
 import re
 from typing import Generator, List, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node, RelationshipType
 from ...base import ExtractionContext
 
 
@@ -63,7 +63,7 @@ class ColumnExtractor:
 
                         if col_id not in ctx.seen_ids:
                             ctx.seen_ids.add(col_id)
-                            
+
                             yield ctx.create_data_asset_node(
                                 id=col_id,
                                 name=col_name,
@@ -76,7 +76,7 @@ class ColumnExtractor:
                                     "is_column": True,
                                 },
                             )
-                            
+
                             yield Edge(
                                 source_id=f"data:{namespace}/{name}",
                                 target_id=col_id,

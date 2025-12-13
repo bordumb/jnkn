@@ -15,7 +15,7 @@ specific extractors.
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node
 from ...base import BaseExtractor, ExtractionContext
 
 

@@ -17,7 +17,7 @@ schema validation and type coercion, popular in Flask and other frameworks.
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, RelationshipType
+from ....core.types import Edge, Node
 from ...base import BaseExtractor, ExtractionContext
 from ..validation import is_valid_env_var_name
 
@@ -97,7 +97,7 @@ class EnvironsExtractor(BaseExtractor):
         # Pattern matches: env.TYPE(\"VAR\")
         # Where TYPE is one of the supported accessor methods
         pattern = (
-            r'env\.(str|int|bool|float|list|dict|json|url|path|db|cache|email_url|search_url)'
+            r"env\.(str|int|bool|float|list|dict|json|url|path|db|cache|email_url|search_url)"
             r'\s*\(\s*["\']([^"\']+)["\']'
         )
         regex = re.compile(pattern)

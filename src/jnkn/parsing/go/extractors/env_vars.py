@@ -61,9 +61,7 @@ class GoEnvVarExtractor:
     LOOKUPENV = re.compile(r'os\.LookupEnv\s*\(\s*"([^"]+)"\s*\)')
 
     # viper.GetString("key") - commonly used for config which can be env vars
-    VIPER = re.compile(
-        r'viper\.Get(?:String|Int|Bool|Float64|Duration)\s*\(\s*"([^"]+)"\s*\)'
-    )
+    VIPER = re.compile(r'viper\.Get(?:String|Int|Bool|Float64|Duration)\s*\(\s*"([^"]+)"\s*\)')
 
     def can_extract(self, ctx: ExtractionContext) -> bool:
         """

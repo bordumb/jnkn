@@ -40,39 +40,32 @@ class NextJSExtractor:
             route_path = self._path_to_route(ctx.file_path)
             api_node_id = f"api:{route_path}"
 
-            yield ctx.create_code_entity_node(
-                name=route_path,
-                line=1,
-                entity_type="api_route",
-                extra_metadata={"framework": "nextjs"},
-            )
-            
-            # Since create_code_entity_node creates an entity ID based on name,
-            # but API routes are often identified by 'api:...' prefix in graph,
-            # we might yield an extra edge if needed, or rely on the entity node.
-            # Assuming standard entity ID is fine, or we can manually construct if ID format is strict.
-            # Here we follow the legacy ID format but use the factory for path consistency.
-            # Note: The factory uses "entity:file:name". The legacy uses "api:/route".
-            # We will use create_node for strict ID control.
-            
+            # FIX: Use create_node directly instead of create_code_entity_node
+            # This allows us to use the custom 'api:...' ID format required by tests
+            # while still getting the 'path' field populated automatically.
             yield ctx.create_node(
                 id=api_node_id,
                 name=route_path,
                 type=NodeType.CODE_ENTITY,
-                metadata={"framework": "nextjs", "type": "api_route"},
+                line=1,
+                metadata={
+                    "framework": "nextjs",
+                    "type": "api_route",
+                },
             )
 
             yield ctx.create_contains_edge(target_id=api_node_id)
 
         # Server-side data fetching functions
         if self.GET_SERVER_PROPS.search(ctx.text):
+            # For standard functions, create_code_entity_node is fine
             yield ctx.create_code_entity_node(
                 name="getServerSideProps",
-                line=1, # simplified
+                line=1,
                 entity_type="server_function",
                 extra_metadata={"framework": "nextjs", "runs_on": "server"},
             )
-            
+
             func_id = f"entity:{ctx.file_path}:getServerSideProps"
             yield ctx.create_contains_edge(target_id=func_id)
 
@@ -95,17 +88,16 @@ class NextJSExtractor:
                 content = env_block_match.group(1)
                 keys = re.findall(r"([A-Z_][A-Z0-9_]*)\s*:", content)
                 for key in keys:
-                    env_id = f"env:{key}"
-                    
+                    # env var node creation handles the ID internally (env:NAME)
                     yield ctx.create_env_var_node(
                         name=key,
                         line=1,
                         source="next.config.js",
                     )
-                    
+
                     yield Edge(
                         source_id=config_id,
-                        target_id=env_id,
+                        target_id=f"env:{key}",
                         type=RelationshipType.PROVIDES,
                         metadata={"context": "build_time_env"},
                     )
@@ -119,15 +111,14 @@ class NextJSExtractor:
                 domains = re.findall(r'["\']([^"\']+)["\']', domains_str)
                 for domain in domains:
                     domain_id = f"external:domain:{domain}"
-                    
-                    # Manual node for external resource, but linked to this config file
+
                     yield ctx.create_node(
                         id=domain_id,
                         name=domain,
                         type=NodeType.DATA_ASSET,
                         metadata={"type": "image_domain"},
                     )
-                    
+
                     yield Edge(
                         source_id=config_id,
                         target_id=domain_id,

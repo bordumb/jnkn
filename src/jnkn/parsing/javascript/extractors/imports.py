@@ -68,7 +68,7 @@ class ImportExtractor:
                     id=target_id,
                     name=module_name,
                     type=NodeType.CODE_FILE,  # Virtual file or package
-                    path=target_path,         # Path points to the target
+                    path=target_path,  # Path points to the target
                     metadata={"virtual": True, "import_type": kind, "line": line},
                 )
 

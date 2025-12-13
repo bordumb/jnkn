@@ -2,7 +2,7 @@
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node, RelationshipType
 from ...base import ExtractionContext
 
 

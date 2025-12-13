@@ -6,7 +6,7 @@ Definition Extractor for JavaScript/TypeScript.
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node
 from ...base import ExtractionContext
 
 
@@ -57,7 +57,7 @@ class DefinitionExtractor:
 
     def _create_entity(self, ctx: ExtractionContext, name: str, pos: int, kind: str):
         line = ctx.get_line_number(pos)
-        
+
         yield ctx.create_code_entity_node(
             name=name,
             line=line,

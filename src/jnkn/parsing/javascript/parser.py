@@ -65,7 +65,7 @@ class JavaScriptParser(LanguageParser):
         # This avoids parsing massive schema.json or fixture.json files
         if file_path.suffix == ".json":
             return file_path.name == "package.json"
-            
+
         return file_path.suffix.lower() in self.extensions
 
     def _init_tree_sitter(self, file_path: Path) -> bool:
@@ -91,21 +91,21 @@ class JavaScriptParser(LanguageParser):
         """
         if not text:
             return False
-        
+
         # Check for extremely long lines (characteristic of bundlers/minifiers)
         # 10000 chars on a single line is suspicious for source code
         MAX_LINE_LENGTH = 10000
-        
+
         # Check the first few lines to fail fast
         first_chunk = text[:20000]
-        if '\n' not in first_chunk and len(first_chunk) > 1000:
-             # If we have > 1000 chars and no newline, assume minified
-             return True
+        if "\n" not in first_chunk and len(first_chunk) > 1000:
+            # If we have > 1000 chars and no newline, assume minified
+            return True
 
-        for line in text.splitlines(keepends=True)[:10]: # Check first 10 lines
+        for line in text.splitlines(keepends=True)[:10]:  # Check first 10 lines
             if len(line) > MAX_LINE_LENGTH:
                 return True
-                
+
         return False
 
     def parse(

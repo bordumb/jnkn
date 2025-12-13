@@ -11,7 +11,7 @@ import json
 import re
 from typing import Any, Dict, Generator, List, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node, RelationshipType
 from ...base import ExtractionContext
 
 
