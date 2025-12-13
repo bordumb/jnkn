@@ -105,19 +105,19 @@ class CheckEngine:
             return
 
         console.print("[dim]Graph not found or empty. Running auto-scan...[/dim]")
-        
+
         # Setup paths
         db_path = Path(self.graph_path)
         root_dir = Path.cwd()
-        
+
         # Run scan
         engine = create_default_engine()
         storage = SQLiteStorage(db_path)
         storage.clear()
-        
+
         config = ScanConfig(root_dir=root_dir, incremental=False)
         result = engine.scan_and_store(storage, config)
-        
+
         if result.is_err():
             console.print(f"[red]Auto-scan failed:[/red] {result.unwrap_err().message}")
             return
@@ -127,7 +127,7 @@ class CheckEngine:
         stitcher = Stitcher()
         new_edges = stitcher.stitch(graph)
         storage.save_edges_batch(new_edges)
-        
+
         # Reload graph
         self.graph = storage.load_graph()
         storage.close()
@@ -136,7 +136,7 @@ class CheckEngine:
     def analyze(self, changes: List[ChangedFile]) -> CheckReport:
         # Ensure we have data to analyze
         self.ensure_graph_exists()
-        
+
         report = CheckReport(changed_files=changes)
 
         # If no graph (even after auto-scan attempt), fallback to static
@@ -400,12 +400,12 @@ def check(
                     f"\n[bold]Analysis Complete:[/bold] {len(api_response.violations)} violations found."
                 )
                 for v in api_response.violations:
-                    icon = "🔴" if v.severity == "critical" else "🟠" if v.severity == "high" else "⚪"
+                    icon = (
+                        "🔴" if v.severity == "critical" else "🟠" if v.severity == "high" else "⚪"
+                    )
                     console.print(f"  {icon} [{v.severity.upper()}] {v.message}")
 
-                console.print(
-                    f"\nResult: [bold {color}]{api_response.result.value}[/bold {color}]"
-                )
+                console.print(f"\nResult: [bold {color}]{api_response.result.value}[/bold {color}]")
 
             sys.exit(api_response.exit_code)
 

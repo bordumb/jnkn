@@ -256,6 +256,8 @@ def _post_to_github(token: str, body: str):
             console.print("   [yellow]permissions:[/yellow]")
             console.print("   [yellow]  pull-requests: write[/yellow]")
         elif e.code == 404:
-            console.print("   [yellow]Hint: The PR or Issue might not exist or be accessible.[/yellow]")
+            console.print(
+                "   [yellow]Hint: The PR or Issue might not exist or be accessible.[/yellow]"
+            )
     except Exception as e:
         console.print(f"❌ [red]Error posting comment: {e}[/red]")

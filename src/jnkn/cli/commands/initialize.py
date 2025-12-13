@@ -278,7 +278,9 @@ def init(
 
         console.print("\n[bold green]Ready to go! Try these commands:[/bold green]")
         console.print(f"1. cd {demo_dir.name}")
-        console.print("2. [bold cyan]jnkn check[/bold cyan]") # Updated to recommend check instead of scan
+        console.print(
+            "2. [bold cyan]jnkn check[/bold cyan]"
+        )  # Updated to recommend check instead of scan
         return
 
     # Standard initialization
