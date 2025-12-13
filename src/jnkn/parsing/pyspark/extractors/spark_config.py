@@ -1,3 +1,4 @@
+# FILE: src/jnkn/parsing/pyspark/extractors/spark_config.py
 import re
 from typing import Generator, Union
 
@@ -11,11 +12,9 @@ class SparkConfigExtractor:
     name = "spark_config"
     priority = 80
 
-    # spark.conf.get("key") or spark.conf.get("key", "default")
+    # spark.conf.get("key")
     CONF_GET = re.compile(r'spark\.conf\.get\s*\(\s*["\']([^"\']+)["\']')
-    # spark.conf.set("key", value)
     CONF_SET = re.compile(r'spark\.conf\.set\s*\(\s*["\']([^"\']+)["\']\s*,')
-    # SparkConf().set("key", value)
     SPARK_CONF = re.compile(r'SparkConf\(\)(?:\.set\s*\(\s*["\']([^"\']+)["\'])+', re.DOTALL)
 
     def can_extract(self, ctx: ExtractionContext) -> bool:
@@ -32,22 +31,17 @@ class SparkConfigExtractor:
                 continue
             seen.add(key)
 
-            line = ctx.text[: match.start()].count("\n") + 1
+            line = ctx.get_line_number(match.start())
             config_id = f"config:spark:{key}"
 
-            yield Node(
+            yield ctx.create_config_node(
                 id=config_id,
                 name=key,
-                type=NodeType.CONFIG_KEY,
-                path=str(ctx.file_path),
-                metadata={
-                    "config_type": "spark",
-                    "line": line,
-                },
+                line=line,
+                config_type="spark",
             )
 
-            yield Edge(
-                source_id=ctx.file_id,
+            yield ctx.create_reads_edge(
                 target_id=config_id,
-                type=RelationshipType.READS,
+                line=line,
             )

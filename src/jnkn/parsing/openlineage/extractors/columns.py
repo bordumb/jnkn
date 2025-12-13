@@ -1,3 +1,4 @@
+# FILE: src/jnkn/parsing/openlineage/extractors/columns.py
 """
 Column Extractor for OpenLineage.
 
@@ -26,27 +27,9 @@ class ColumnExtractor:
     priority = 80
 
     def can_extract(self, ctx: ExtractionContext) -> bool:
-        """
-        Check if the text contains schema or column lineage information.
-
-        Args:
-            ctx: The extraction context.
-
-        Returns:
-            bool: True if 'schema' or 'columnLineage' keys are present.
-        """
         return '"schema"' in ctx.text or '"columnLineage"' in ctx.text
 
     def extract(self, ctx: ExtractionContext) -> Generator[Union[Node, Edge], None, None]:
-        """
-        Extract Column nodes and Transformation edges.
-
-        Args:
-            ctx: The extraction context.
-
-        Yields:
-            Union[Node, Edge]: Column nodes, CONTAINS edges (Dataset->Column), and TRANSFORMS edges.
-        """
         try:
             data = json.loads(ctx.text)
         except json.JSONDecodeError:
@@ -55,11 +38,9 @@ class ColumnExtractor:
         events = data if isinstance(data, list) else [data] if isinstance(data, dict) else []
 
         for event in events:
-            # We typically only get schema/lineage on COMPLETE events
             if event.get("eventType") != "COMPLETE":
                 continue
 
-            # Check both inputs and outputs for schema info
             all_datasets = event.get("inputs", []) + event.get("outputs", [])
 
             for ds in all_datasets:
@@ -82,12 +63,12 @@ class ColumnExtractor:
 
                         if col_id not in ctx.seen_ids:
                             ctx.seen_ids.add(col_id)
-                            yield Node(
+                            
+                            yield ctx.create_data_asset_node(
                                 id=col_id,
                                 name=col_name,
-                                type=NodeType.DATA_ASSET,
-                                tokens=self._tokenize(col_name),
-                                metadata={
+                                asset_type="column",
+                                extra_metadata={
                                     "namespace": namespace,
                                     "table": name,
                                     "data_type": field_info.get("type"),
@@ -95,8 +76,7 @@ class ColumnExtractor:
                                     "is_column": True,
                                 },
                             )
-                            # Link Dataset -> Column (Contains)
-                            # Note: We rely on DatasetExtractor having run to create the parent dataset node
+                            
                             yield Edge(
                                 source_id=f"data:{namespace}/{name}",
                                 target_id=col_id,
@@ -104,7 +84,6 @@ class ColumnExtractor:
                             )
 
                 # 2. Extract Lineage from ColumnLineage Facet
-                # This maps Output Column <- Input Columns
                 col_lineage = facets.get("columnLineage", {})
                 if col_lineage and "fields" in col_lineage:
                     for tgt_col, lineage_info in col_lineage["fields"].items():
@@ -130,5 +109,4 @@ class ColumnExtractor:
                                 )
 
     def _tokenize(self, name: str) -> List[str]:
-        """Tokenize column name."""
         return [t for t in re.split(r"[_\-./]", name.lower()) if len(t) >= 2]

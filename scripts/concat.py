@@ -15,11 +15,9 @@ from pathlib import Path
 # If non-empty: ONLY include files under these paths (relative to repo root)
 #
 # Examples:
-# MASTER_INCLUDE_PATHS = ["packages/junkan-cli"]
-# MASTER_INCLUDE_PATHS = ["apps/web/src"]
-# MASTER_INCLUDE_PATHS = ["crates/ios-tauri/src-tauri"]
+# MASTER_INCLUDE_PATHS = ["src/jnkn/parsing"]
 #
-MASTER_INCLUDE_PATHS = ["src/jnkn/parsing"]
+MASTER_INCLUDE_PATHS = []
 
 # ------------------------------------------------------------
 # CONFIGURATION

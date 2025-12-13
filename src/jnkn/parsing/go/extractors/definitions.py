@@ -1,3 +1,4 @@
+# FILE: src/jnkn/parsing/go/extractors/definitions.py
 import re
 from typing import Generator, Union
 
@@ -37,69 +38,55 @@ class GoDefinitionExtractor:
         # 1. Functions
         for match in self.FUNC_DEF.finditer(ctx.text):
             func_name = match.group(1)
-            line = ctx.text[: match.start()].count("\n") + 1
+            line = ctx.get_line_number(match.start())
 
-            entity_id = f"entity:{ctx.file_path}:{func_name}"
             is_exported = func_name[0].isupper()
 
-            yield Node(
-                id=entity_id,
+            yield ctx.create_code_entity_node(
                 name=func_name,
-                type=NodeType.CODE_ENTITY,
-                path=str(ctx.file_path),
+                line=line,
+                entity_type="function",
                 language="go",
-                metadata={"entity_type": "function", "line": line, "is_exported": is_exported},
+                extra_metadata={"is_exported": is_exported},
             )
 
-            yield Edge(
-                source_id=ctx.file_id,
-                target_id=entity_id,
-                type=RelationshipType.CONTAINS,
-            )
+            # Link file to function
+            entity_id = f"entity:{ctx.file_path}:{func_name}"
+            yield ctx.create_contains_edge(target_id=entity_id)
 
         # 2. Methods
         for match in self.METHOD_DEF.finditer(ctx.text):
             method_name = match.group(1)
-            line = ctx.text[: match.start()].count("\n") + 1
+            line = ctx.get_line_number(match.start())
 
-            entity_id = f"entity:{ctx.file_path}:{method_name}"
             is_exported = method_name[0].isupper()
 
-            yield Node(
-                id=entity_id,
+            yield ctx.create_code_entity_node(
                 name=method_name,
-                type=NodeType.CODE_ENTITY,
-                path=str(ctx.file_path),
+                line=line,
+                entity_type="method",
                 language="go",
-                metadata={"entity_type": "method", "line": line, "is_exported": is_exported},
+                extra_metadata={"is_exported": is_exported},
             )
 
-            yield Edge(
-                source_id=ctx.file_id,
-                target_id=entity_id,
-                type=RelationshipType.CONTAINS,
-            )
+            entity_id = f"entity:{ctx.file_path}:{method_name}"
+            yield ctx.create_contains_edge(target_id=entity_id)
 
         # 3. Types (Structs/Interfaces)
         for match in self.TYPE_DEF.finditer(ctx.text):
             type_name = match.group(1)
             kind = match.group(2)  # struct or interface
-            line = ctx.text[: match.start()].count("\n") + 1
+            line = ctx.get_line_number(match.start())
 
-            entity_id = f"entity:{ctx.file_path}:{type_name}"
             is_exported = type_name[0].isupper()
 
-            yield Node(
-                id=entity_id,
+            yield ctx.create_code_entity_node(
                 name=type_name,
-                type=NodeType.CODE_ENTITY,
-                path=str(ctx.file_path),
+                line=line,
+                entity_type=kind,
                 language="go",
-                metadata={"entity_type": kind, "line": line, "is_exported": is_exported},
+                extra_metadata={"is_exported": is_exported},
             )
 
-            yield Edge(
-                source_id=ctx.file_id,
-                target_id=entity_id,
-                type=RelationshipType.CONTAINS,
-            )
+            entity_id = f"entity:{ctx.file_path}:{type_name}"
+            yield ctx.create_contains_edge(target_id=entity_id)

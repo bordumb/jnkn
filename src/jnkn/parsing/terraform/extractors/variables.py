@@ -1,8 +1,9 @@
+# FILE: src/jnkn/parsing/terraform/extractors/variables.py
 import re
 from dataclasses import dataclass
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node, RelationshipType
 from ...base import ExtractionContext
 
 
@@ -34,7 +35,7 @@ class VariableExtractor:
         for match in self.VAR_PATTERN.finditer(ctx.text):
             var_name = match.group(1)
             var_body = match.group(2)
-            line = ctx.text[: match.start()].count("\n") + 1
+            line = ctx.get_line_number(match.start())
 
             # Parse attributes
             default = None
@@ -51,17 +52,17 @@ class VariableExtractor:
 
             var_id = f"infra:var:{var_name}"
 
-            yield Node(
+            # FIX: Use factory method for config/variables
+            yield ctx.create_config_node(
                 id=var_id,
                 name=var_name,
-                type=NodeType.CONFIG_KEY,
-                path=str(ctx.file_path),
-                metadata={
+                line=line,
+                config_type="terraform_variable",
+                extra_metadata={
                     "terraform_type": "variable",
                     "default": default,
                     "description": description,
                     "type_hint": type_hint,
-                    "line": line,
                 },
             )
 

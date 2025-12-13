@@ -1,3 +1,4 @@
+# FILE: src/jnkn/parsing/openlineage/extractors/datasets.py
 """
 Dataset Extractor for OpenLineage.
 
@@ -17,36 +18,15 @@ from ...base import ExtractionContext
 class DatasetExtractor:
     """
     Extract Input/Output Datasets and link them to Jobs.
-
-    This extractor processes the `inputs` and `outputs` arrays in an OpenLineage event.
-    It creates DATA_ASSET nodes and connects them to the JOB node via READS/WRITES edges.
     """
 
     name = "openlineage_datasets"
     priority = 90
 
     def can_extract(self, ctx: ExtractionContext) -> bool:
-        """
-        Check if the text contains dataset definitions.
-
-        Args:
-            ctx: The extraction context.
-
-        Returns:
-            bool: True if 'inputs' or 'outputs' keys are present.
-        """
         return '"inputs"' in ctx.text or '"outputs"' in ctx.text
 
     def extract(self, ctx: ExtractionContext) -> Generator[Union[Node, Edge], None, None]:
-        """
-        Extract Dataset nodes and edges.
-
-        Args:
-            ctx: The extraction context.
-
-        Yields:
-            Union[Node, Edge]: Dataset nodes and READS/WRITES edges.
-        """
         try:
             data = json.loads(ctx.text)
         except json.JSONDecodeError:
@@ -78,15 +58,6 @@ class DatasetExtractor:
     def _process_dataset(
         self, dataset: Dict[str, Any], job_id: str, direction: str, ctx: ExtractionContext
     ) -> Generator[Union[Node, Edge], None, None]:
-        """
-        Helper to process a single dataset dictionary.
-
-        Args:
-            dataset: The dataset dictionary from the JSON.
-            job_id: The ID of the job related to this dataset.
-            direction: 'input' or 'output'.
-            ctx: The extraction context.
-        """
         namespace = dataset.get("namespace", "default")
         name = dataset.get("name")
 
@@ -99,18 +70,16 @@ class DatasetExtractor:
         if dataset_id not in ctx.seen_ids:
             ctx.seen_ids.add(dataset_id)
 
-            # Extract schema fields for metadata
             facets = dataset.get("facets", {})
             schema_fields = []
             if "schema" in facets:
                 schema_fields = [f.get("name") for f in facets["schema"].get("fields", [])]
 
-            yield Node(
+            yield ctx.create_data_asset_node(
                 id=dataset_id,
                 name=name,
-                type=NodeType.DATA_ASSET,
-                tokens=self._tokenize(name),
-                metadata={
+                asset_type="dataset",
+                extra_metadata={
                     "namespace": namespace,
                     "source": "openlineage",
                     "schema_fields": schema_fields,
@@ -118,15 +87,12 @@ class DatasetExtractor:
                 },
             )
 
-        # Create Edge
-        # Input: Job READS Dataset
-        # Output: Job WRITES Dataset
         if direction == "input":
             yield Edge(
                 source_id=job_id,
                 target_id=dataset_id,
                 type=RelationshipType.READS,
-                confidence=1.0,  # Observed runtime data is high confidence
+                confidence=1.0,
                 metadata={"source": "openlineage"},
             )
         else:
@@ -139,5 +105,4 @@ class DatasetExtractor:
             )
 
     def _tokenize(self, name: str) -> List[str]:
-        """Tokenize dataset name."""
         return [t for t in re.split(r"[_\-./]", name.lower()) if len(t) >= 2]
