@@ -22,7 +22,7 @@ It detects the invisible, cross-domain breaking changes that slip through every 
 
 ```mermaid
 graph LR
-    subgraph "The Gap"
+    subgraph "The Blind Spot"
         TF[Terraform Change] --"Breaks"--> CODE[App Configuration]
         CODE --"Breaks"--> DATA[Data Pipeline]
     end
@@ -41,29 +41,24 @@ Get running in less than 2 minutes.
 pip install jnkn
 ```
 
-### 2\. Initialize & Scan
+### 2\. Initialize
 
-Navigate to your project root (monorepo or service).
+Navigate to your project root. `jnkn` will automatically detect your stack (Python, Terraform, Kubernetes, etc.) and configure itself.
 
 ```bash
-# Detects your stack (Python, Terraform, etc.)
 jnkn init
-
-# Builds the dependency graph
-jnkn scan
 ```
 
-### 3\. Find Impact
+### 3\. Check Impact
 
-Simulate a change to see what breaks downstream.
+Run a check to see if your current changes break any downstream dependencies.
 
 ```bash
-# If I rename this env var, what code breaks?
-jnkn blast env:DATABASE_URL
-
-# If I modify this Terraform resource, what app fails?
-jnkn blast infra:payment_db_host
+# Checks your current changes against the main branch
+jnkn check
 ```
+
+**That's it**. If you renamed a Terraform output that your app relies on, `jnkn` check will fail the build and tell you exactly what broke.
 
 -----
 
@@ -75,11 +70,14 @@ Block breaking changes in Pull Requests before they merge.
 # .github/workflows/jnkn.yml
 steps:
   - uses: actions/checkout@v4
-  - name: Run Jnkan Gate
+    with:
+      fetch-depth: 0  # Required for diff analysis
+      
+  - name: Run Jnkn Gate
     run: |
       pip install jnkn
-      # Blocks if critical dependencies are broken
-      jnkn check --git-diff origin/main HEAD
+      # Fails if critical dependencies are broken
+      jnkn check --git-diff origin/main HEAD --fail-if-critical
 ```
 
 -----
@@ -98,7 +96,7 @@ steps:
 
 ## Contributing
 
-We welcome contributions\! Please see our [Contributing Guide](https://www.google.com/search?q=https://docs.jnkn.io/community/contributing/) for details on how to set up your development environment.
+We welcome contributions\! Please see our [Contributing Guide](https://bordumb.github.io/jnkn/community/contributing/) for details on how to set up your development environment.
 
 ## License
 

@@ -27,26 +27,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       
       - name: Install Jnkn
-        run: pip install jnkn[full]
+        run: pip install jnkn
       
-      - name: Scan codebase
-        run: jnkn scan
-      
-      - name: Analyze changed files
-        run: |
-          # Get changed files
-          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E '\.(py|tf)$' || true)
-          
-          if [ -n "$CHANGED" ]; then
-            echo "## 🔍 Impact Analysis" >> $GITHUB_STEP_SUMMARY
-            for file in $CHANGED; do
-              echo "### $file" >> $GITHUB_STEP_SUMMARY
-              jnkn blast "file://$file" --format markdown >> $GITHUB_STEP_SUMMARY 2>/dev/null || true
-            done
-          fi
+      # Zone A: Single command to scan, diff, and report
+      - name: Run Jnkn Gate
+        run: jnkn check --git-diff origin/${{ github.base_ref }} HEAD --fail-if-critical
 ```
 
 ## What This Does
@@ -61,20 +49,28 @@ jobs:
 When a PR modifies `terraform/rds.tf`:
 
 ```markdown
-## 🔍 Impact Analysis
+🚀 Jnkn Impact Analysis
 
-### terraform/rds.tf
+1. Building Dependency Graph...
+   Parsed 47 files.
+   Stitched 8 cross-domain links.
 
-**Blast Radius: 5 artifacts**
+2. Analyzing Impact (origin/main -> HEAD)...
 
-| Type | Artifact | Confidence |
-|------|----------|------------|
-| env_var | env:DATABASE_URL | 0.92 |
-| code_file | src/db/connection.py | 0.88 |
-| code_file | src/api/users.py | 0.85 |
+Summary
+This PR modifies 1 infrastructure output impacting 3 downstream consumer(s).
+
+Changes
+Artifact                    Type            Change       Blast Radius   Risk
+aws_db_instance.payment     infra_resource  ✏️ modified  3              🟠
+
+Analysis Complete: 1 violation found.
+  🟠 [HIGH] Change to aws_db_instance.payment impacts 3 downstream artifacts.
+
+Result: WARN
 ```
 
-## Block on High-Risk Changes
+<!-- ## Block on High-Risk Changes
 
 Add a failure condition for high-impact changes:
 
@@ -86,13 +82,13 @@ Add a failure condition for high-impact changes:
       echo "::error::High impact change: $IMPACT artifacts affected"
       exit 1
     fi
-```
+``` -->
 
 ## GitLab CI
 
 See [GitLab CI Integration](../how-to/integration/gitlab-ci.md) for GitLab-specific setup.
 
-## Next Steps
+<!-- ## Next Steps
 
 - [:octicons-arrow-right-24: Configure confidence thresholds](../how-to/configuration/configure-confidence.md)
-- [:octicons-arrow-right-24: Manage suppressions](../how-to/configuration/manage-suppressions.md)
+- [:octicons-arrow-right-24: Manage suppressions](../how-to/configuration/manage-suppressions.md) -->

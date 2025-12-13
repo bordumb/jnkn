@@ -27,6 +27,7 @@ from ...core.packs import detect_and_suggest_pack, get_available_packs, load_pac
 console = Console()
 
 # Default configuration template
+# Configured for "Discovery Mode" by default to show immediate value
 DEFAULT_CONFIG = {
     "version": "1.0",
     "project_name": "my-project",
@@ -93,7 +94,7 @@ Jnkan is built for security-conscious environments. We want to be hyper-transpar
 * ❌ **WE DO NOT** upload your dependency graph.
 
 **What We Do Collect (Telemetry):**
-* ✅ **Anonymous Metrics:** Command run counts (e.g., `scan`, `blast`), execution duration, and success/failure status.
+* ✅ **Anonymous Metrics:** Command run counts (e.g., `scan`, `check`), execution duration, and success/failure status.
 * ✅ **System Info:** Python version, OS platform, and CLI version.
 
 *This helps us improve performance and prioritize feature development.*
@@ -277,8 +278,9 @@ def init(
 
         console.print("\n[bold green]Ready to go! Try these commands:[/bold green]")
         console.print(f"1. cd {demo_dir.name}")
-        console.print("2. [bold cyan]jnkn scan[/bold cyan]")
-        console.print("3. [bold cyan]jnkn blast env:PAYMENT_DB_HOST[/bold cyan]")
+        console.print(
+            "2. [bold cyan]jnkn check[/bold cyan]"
+        )  # Updated to recommend check instead of scan
         return
 
     # Standard initialization

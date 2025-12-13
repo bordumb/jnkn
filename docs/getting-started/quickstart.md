@@ -4,6 +4,8 @@ Scan your first project in 5 minutes.
 
 ## 1. Initialize
 
+Navigate to your project root. Jnkan will automatically detect your stack (Python, Terraform, Kubernetes, etc.) and configure itself.
+
 ```bash
 cd your-project
 jnkn init
@@ -11,23 +13,40 @@ jnkn init
 
 This creates `.jnkn/config.yaml` with sensible defaults.
 
-## 2. Scan
+## 2. Check
+
+Run a check to see if your current changes break any downstream dependencies. This command automatically scans your project, builds the graph, and compares your current state against `main`.
 
 ```bash
-jnkn scan
+jnkn check
 ```
 
 Output:
 
 ```
-🔍 Scanning /path/to/your-project
-📁 Found 47 files (12 Python, 8 Terraform, 27 other)
-✅ Parsed 156 nodes, 89 edges
-🧵 Stitching cross-domain dependencies...
-✅ Created 8 cross-domain links
+🚀 Jnkn Impact Analysis
+   Scan Dir: /path/to/your-project
+
+1. Building Dependency Graph...
+   Parsed 47 files.
+   Stitched 8 cross-domain links.
+
+2. Analyzing Impact (origin/main -> HEAD)...
+
+Summary
+This PR modifies 1 infrastructure output impacting 3 downstream consumer(s).
+
+Changes
+Artifact                    Type            Change       Blast Radius   Risk
+aws_db_instance.payment     infra_resource  ✏️ modified  3              🟠
+
+Analysis Complete: 1 violation found.
+  🟠 [HIGH] Change to aws_db_instance.payment impacts 3 downstream artifacts.
+
+Result: WARN
 ```
 
-## 3. Explore
+<!-- ## 3. Explore
 
 ### View Statistics
 
@@ -79,7 +98,7 @@ Target: infra:db_host → Tokens: [db, host]
 Confidence: 0.85 (HIGH)
   [+0.90] normalized_match: 'dbhost' == 'dbhost'
   [×0.95] penalty: short token 'db'
-```
+``` -->
 
 ## What Just Happened?
 
@@ -88,7 +107,7 @@ Confidence: 0.85 (HIGH)
 3. **Stitch**: Linked `env:DATABASE_URL` to `infra:aws_db_instance.main` via token matching
 4. **Store**: Saved the graph to `.jnkn/jnkn.db`
 
-## Common Issues
+<!-- ## Common Issues
 
 ??? question "No env vars found"
     
@@ -100,10 +119,10 @@ Confidence: 0.85 (HIGH)
     
     ```bash
     jnkn suppress add "env:*_ID" "infra:*" --reason "ID fields are generic"
-    ```
+    ``` -->
 
 ## Next Steps
 
 - [:octicons-arrow-right-24: Set up CI integration](first-ci-integration.md)
-- [:octicons-arrow-right-24: Learn about blast radius](../explanation/concepts/blast-radius.md)
-- [:octicons-arrow-right-24: Configure confidence thresholds](../how-to/configuration/configure-confidence.md)
+<!-- - [:octicons-arrow-right-24: Learn about blast radius](../explanation/concepts/blast-radius.md)
+- [:octicons-arrow-right-24: Configure confidence thresholds](../how-to/configuration/configure-confidence.md) -->
