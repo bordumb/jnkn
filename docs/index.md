@@ -55,7 +55,7 @@ graph LR
 
 1. **Parse** your codebase into a dependency graph
 2. **Stitch** cross-domain links using token matching
-3. **Analyze** blast radius for any change
+3. **Analyze** the impact of your changes against the main branch
 
 ## Quick Start
 
@@ -69,13 +69,12 @@ graph LR
     pip install jnkn
     ```
 
--   **2. Scan**
+-   **2. Start**
 
     ---
 
     ```bash
     jnkn init
-    jnkn scan
     ```
 
 -   **3. Analyze**
@@ -83,7 +82,7 @@ graph LR
     ---
 
     ```bash
-    jnkn blast env:DATABASE_URL
+    jnkn check
     ```
 
 </div>
@@ -92,37 +91,33 @@ graph LR
 
 <div class="grid cards" markdown>
 
--   :material-clock-fast:{ .lg .middle } **5-Minute Setup**
+  - :material-clock-fast:{ .lg .middle } **5-Minute Setup**
 
-    ---
+    -----
 
-    Install and scan your first project in minutes. No configuration required.
+    Install and scan your first project in minutes. Auto-detection for Python, Terraform, dbt, and K8s.
 
     [:octicons-arrow-right-24: Quickstart](getting-started/quickstart.md)
 
--   :material-graph:{ .lg .middle } **Understand Impact**
+  - :material-graph:{ .lg .middle } **Understand Impact**
 
-    ---
+    -----
 
-    See what breaks when you change infrastructure or code. Traverse dependencies across domains.
+    See exactly what breaks when you change infrastructure or code. Traverse dependencies across domains.
 
-    [:octicons-arrow-right-24: Blast Radius](explanation/concepts/blast-radius.md)
+  - :material-github:{ .lg .middle } **CI/CD Ready**
 
--   :material-github:{ .lg .middle } **CI/CD Ready**
+    -----
 
-    ---
-
-    Block risky PRs automatically with GitHub Actions. Get impact analysis on every pull request.
+    Block risky PRs automatically with GitHub Actions. Get impact analysis comments on every pull request.
 
     [:octicons-arrow-right-24: CI Integration](getting-started/first-ci-integration.md)
 
--   :material-cog:{ .lg .middle } **Highly Configurable**
+  - :material-lock:{ .lg .middle } **Secure by Design**
 
-    ---
+    -----
 
-    Tune confidence thresholds and suppress false positives. Make it work for your codebase.
-
-    [:octicons-arrow-right-24: Configuration](reference/configuration/junkan-yaml.md)
+    Your code never leaves your environment. Analysis happens locally or in your CI runner. We don't see your secrets.
 
 </div>
 
@@ -140,22 +135,16 @@ graph LR
 
 <div class="grid cards" markdown>
 
--   :material-download:{ .lg .middle } **Install**
+  - :material-download:{ .lg .middle } **Install**
 
-    ---
+    -----
 
     [:octicons-arrow-right-24: Installation Guide](getting-started/installation.md)
 
--   :material-rocket-launch:{ .lg .middle } **Quickstart**
+  - :material-rocket-launch:{ .lg .middle } **Quickstart**
 
-    ---
+    -----
 
     [:octicons-arrow-right-24: 5-Minute Tutorial](getting-started/quickstart.md)
-
--   :material-book-open:{ .lg .middle } **Learn**
-
-    ---
-
-    [:octicons-arrow-right-24: Full Tutorials](tutorials/index.md)
 
 </div>

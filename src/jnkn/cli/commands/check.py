@@ -16,13 +16,18 @@ from typing import Any, List, Tuple
 
 import click
 from pydantic import BaseModel, Field
+from rich.console import Console
 
 from ...analysis.blast_radius import BlastRadiusAnalyzer
+from ...core.stitching import Stitcher
+from ...core.storage.sqlite import SQLiteStorage
 from ...core.types import NodeType
+from ...parsing.engine import ScanConfig, create_default_engine
 from ..renderers import JsonRenderer
 from ..utils import load_graph
 
 logger = logging.getLogger(__name__)
+console = Console(stderr=True)  # Use stderr for logs to not pollute JSON output pipes
 
 
 # --- API Models (External Contract) ---
@@ -88,12 +93,53 @@ class CheckEngine:
     """
 
     def __init__(self, graph_path: str = ".jnkn/jnkn.db"):
+        self.graph_path = graph_path
         self.graph = load_graph(graph_path)
 
+    def ensure_graph_exists(self):
+        """
+        Auto-scan capability: If graph is missing, build it on the fly.
+        This enables the 'init -> check' workflow without an explicit 'scan' step.
+        """
+        if self.graph is not None and self.graph.node_count > 0:
+            return
+
+        console.print("[dim]Graph not found or empty. Running auto-scan...[/dim]")
+        
+        # Setup paths
+        db_path = Path(self.graph_path)
+        root_dir = Path.cwd()
+        
+        # Run scan
+        engine = create_default_engine()
+        storage = SQLiteStorage(db_path)
+        storage.clear()
+        
+        config = ScanConfig(root_dir=root_dir, incremental=False)
+        result = engine.scan_and_store(storage, config)
+        
+        if result.is_err():
+            console.print(f"[red]Auto-scan failed:[/red] {result.unwrap_err().message}")
+            return
+
+        # Run stitcher
+        graph = storage.load_graph()
+        stitcher = Stitcher()
+        new_edges = stitcher.stitch(graph)
+        storage.save_edges_batch(new_edges)
+        
+        # Reload graph
+        self.graph = storage.load_graph()
+        storage.close()
+        console.print(f"[dim]Auto-scan complete. Found {self.graph.node_count} nodes.[/dim]")
+
     def analyze(self, changes: List[ChangedFile]) -> CheckReport:
+        # Ensure we have data to analyze
+        self.ensure_graph_exists()
+        
         report = CheckReport(changed_files=changes)
 
-        # If no graph, we can only do static file analysis
+        # If no graph (even after auto-scan attempt), fallback to static
         if not self.graph:
             self._analyze_static(changes, report)
             return report
@@ -186,10 +232,6 @@ def get_changed_files_from_git(base_ref: str, head_ref: str) -> List[ChangedFile
     """
     try:
         # Run git diff --name-status
-        # Output format:
-        # M       src/main.py
-        # A       README.md
-        # R100    old.py    new.py
         result = subprocess.run(
             ["git", "diff", "--name-status", base_ref, head_ref],
             capture_output=True,
@@ -229,14 +271,9 @@ def get_changed_files_from_diff_file(diff_path: str) -> List[ChangedFile]:
         raise FileNotFoundError(f"Diff file not found: {diff_path}")
 
     content = path.read_text()
-
-    # Regex for diff header: "diff --git a/path/to/file b/path/to/file"
-    # This is a simplified parser; robust diff parsing is complex.
-    # For CI, git --name-status is preferred.
     diff_pattern = re.compile(r"^diff --git a/(.*?) b/(.*?)$", re.MULTILINE)
 
     for match in diff_pattern.finditer(content):
-        # We assume the 'b' path is the new path
         file_path = match.group(2)
         changes.append(ChangedFile(path=file_path, change_type="MODIFIED"))
 
@@ -281,6 +318,7 @@ def check(
     Run pre-merge impact analysis.
 
     Compares changes against the dependency graph to detect breaking changes.
+    Will automatically scan the codebase if no graph exists.
     """
     renderer = JsonRenderer("check")
 
@@ -302,11 +340,9 @@ def check(
                 changed_files = get_changed_files_from_git(base, head)
             else:
                 # Fallback: Try to compare HEAD against previous commit if nothing specified
-                # This is useful for local "jnkn check" usage
                 try:
                     changed_files = get_changed_files_from_git("HEAD~1", "HEAD")
                 except Exception:
-                    # If that fails (e.g. no history), empty list
                     changed_files = []
 
             # 2. Run Analysis Engine
@@ -316,7 +352,7 @@ def check(
             # 3. Apply Failure Policy
             if fail_if_critical and report.critical_count > 0:
                 report.result = CheckResult.BLOCKED
-            elif report.high_count > 5:  # Configurable threshold in future
+            elif report.high_count > 5:
                 report.result = CheckResult.WARN
 
             # 4. Map to API Model
@@ -344,13 +380,12 @@ def check(
             sys.exit(1)
         elif api_response:
             renderer.render_success(api_response)
-            # Exit code mirrors the policy decision (0=Pass, 1=Blocked)
             sys.exit(api_response.exit_code)
     else:
         # Legacy Text Output
         if error_to_report:
             if not quiet:
-                click.echo(f"❌ Error: {error_to_report}", err=True)
+                console.print(f"❌ [red]Error:[/red] {error_to_report}")
             sys.exit(1)
 
         if api_response:
@@ -361,12 +396,15 @@ def check(
                 color = "yellow"
 
             if not quiet:
-                click.echo(f"Analysis Complete: {len(api_response.violations)} violations found.")
+                console.print(
+                    f"\n[bold]Analysis Complete:[/bold] {len(api_response.violations)} violations found."
+                )
                 for v in api_response.violations:
-                    click.echo(f"  [{v.severity.upper()}] {v.message}")
+                    icon = "🔴" if v.severity == "critical" else "🟠" if v.severity == "high" else "⚪"
+                    console.print(f"  {icon} [{v.severity.upper()}] {v.message}")
 
-                click.echo(
-                    f"\nResult: {click.style(api_response.result.value, fg=color, bold=True)}"
+                console.print(
+                    f"\nResult: [bold {color}]{api_response.result.value}[/bold {color}]"
                 )
 
             sys.exit(api_response.exit_code)
