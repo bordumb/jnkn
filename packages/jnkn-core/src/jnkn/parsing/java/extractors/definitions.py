@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/java/extractors/definitions.py
 import re
 from typing import Generator, Union
 

@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/javascript/extractors/imports.py
 """
 Import Extractor for JavaScript/TypeScript.
 """

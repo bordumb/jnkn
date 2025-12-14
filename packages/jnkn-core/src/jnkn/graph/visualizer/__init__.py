@@ -3,6 +3,7 @@ Jnkn Visualization Engine.
 
 Public API for generating the interactive dependency graph.
 """
+
 import json
 import webbrowser
 from datetime import date, datetime

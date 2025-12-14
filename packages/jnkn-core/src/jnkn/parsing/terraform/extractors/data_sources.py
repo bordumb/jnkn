@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/terraform/extractors/data_sources.py
 import re
 from typing import Generator, Union
 

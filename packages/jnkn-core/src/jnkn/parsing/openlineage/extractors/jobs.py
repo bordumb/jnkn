@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/openlineage/extractors/jobs.py
 """
 Job Extractor for OpenLineage.
 

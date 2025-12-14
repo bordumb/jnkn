@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/javascript/extractors/package_json.py
 import json
 from typing import Generator, Union
 

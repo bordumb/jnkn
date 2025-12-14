@@ -1,13 +1,13 @@
 """
 Jnkn Impact Cockpit - Visualization Builder
 
-A sophisticated dependency visualization system that transforms passive 
+A sophisticated dependency visualization system that transforms passive
 file exploration into an actionable "Impact Cockpit" for understanding
 cross-domain breaking changes.
 
 Features:
 1. Semantic Edge Visualization (The "Why")
-2. Confidence & Risk Indicators  
+2. Confidence & Risk Indicators
 3. Rich Inspector Panel (The "So What")
 4. Trace Highlighting for lineage clarity
 """
@@ -1779,8 +1779,4 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 def build_html(graph_json: str) -> str:
     """Assemble the final HTML using embedded assets."""
-    return HTML_TEMPLATE.format(
-        styles=CSS_CONTENT,
-        data=graph_json,
-        scripts=JS_CONTENT
-    )
+    return HTML_TEMPLATE.format(styles=CSS_CONTENT, data=graph_json, scripts=JS_CONTENT)

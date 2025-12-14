@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/terraform/extractors/variables.py
 import re
 from dataclasses import dataclass
 from typing import Generator, Union

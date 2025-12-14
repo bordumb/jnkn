@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/javascript/extractors/nextjs.py
 import re
 from pathlib import Path
 from typing import Generator, Union

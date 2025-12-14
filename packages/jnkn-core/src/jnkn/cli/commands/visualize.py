@@ -2,8 +2,9 @@
 Visualize Command - Open interactive graph in browser.
 """
 
-from jnkn.graph.visualizer import open_visualization
 import click
+
+from jnkn.graph.visualizer import open_visualization
 
 from ..utils import echo_error, load_graph
 

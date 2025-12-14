@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/javascript/extractors/definitions.py
 """
 Definition Extractor for JavaScript/TypeScript.
 """

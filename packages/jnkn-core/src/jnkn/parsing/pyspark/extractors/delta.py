@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/pyspark/extractors/delta.py
 import re
 from typing import Generator, Union
 

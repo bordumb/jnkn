@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/openlineage/extractors/columns.py
 """
 Column Extractor for OpenLineage.
 

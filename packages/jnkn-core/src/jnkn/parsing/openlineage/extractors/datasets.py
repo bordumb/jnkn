@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/openlineage/extractors/datasets.py
 """
 Dataset Extractor for OpenLineage.
 

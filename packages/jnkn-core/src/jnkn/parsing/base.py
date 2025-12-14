@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/base.py
 """
 Base Parser Infrastructure.
 

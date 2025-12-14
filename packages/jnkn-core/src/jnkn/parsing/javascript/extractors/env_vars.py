@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/javascript/extractors/env_vars.py
 """
 Environment Variable Extractor for JavaScript/TypeScript.
 """

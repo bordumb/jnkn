@@ -1,4 +1,3 @@
-# FILE: src/jnkn/parsing/go/extractors/imports.py
 import re
 from typing import Generator, Union
 

@@ -36,11 +36,9 @@ DEFAULT_IGNORE_FILES = {
     "uv.lock",
     "Gemfile.lock",
     "go.sum",
-
     # System / IDE
     ".DS_Store",
     "Thumbs.db",
-
     # Binary / Data artifacts
     ".coverage",  # <--- Likely binary culprit
     "db.sqlite3",
@@ -53,9 +51,8 @@ DEFAULT_IGNORE_DIRS = {
     ".venv",
     "venv",
     "env",
-    "target",   # Rust
-    "vendor",   # Go / PHP
-
+    "target",  # Rust
+    "vendor",  # Go / PHP
     # Build Artifacts
     "dist",
     "build",
@@ -68,13 +65,11 @@ DEFAULT_IGNORE_DIRS = {
     "__pycache__",
     "htmlcov",
     ".cache",
-
     # VCS / IDE
     ".git",
     ".github",  # Optional: keep if you want CI workflows
     ".idea",
     ".vscode",
-
     # Project-specific exclusions
     ".jnkn",
     "scripts",
@@ -85,23 +80,56 @@ DEFAULT_IGNORE_DIRS = {
 
 DEFAULT_IGNORE_EXTENSIONS = {
     # Images / Media
-    ".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".webp",
-    ".mp4", ".mov", ".avi", ".webm", ".mp3", ".wav",
-    ".pdf", ".zip", ".tar", ".gz", ".7z", ".rar",
-
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".ico",
+    ".svg",
+    ".webp",
+    ".mp4",
+    ".mov",
+    ".avi",
+    ".webm",
+    ".mp3",
+    ".wav",
+    ".pdf",
+    ".zip",
+    ".tar",
+    ".gz",
+    ".7z",
+    ".rar",
     # Fonts
-    ".ttf", ".otf", ".woff", ".woff2", ".eot",
-
+    ".ttf",
+    ".otf",
+    ".woff",
+    ".woff2",
+    ".eot",
     # Compiled / Binary
-    ".pyc", ".pyo", ".pyd",
-    ".exe", ".bin", ".dll", ".so", ".dylib", ".class", ".jar",
-    ".pkl", ".parquet", ".onnx", ".pt", ".pth",  # ML Models
-    ".db", ".sqlite", ".sqlite3",
+    ".pyc",
+    ".pyo",
+    ".pyd",
+    ".exe",
+    ".bin",
+    ".dll",
+    ".so",
+    ".dylib",
+    ".class",
+    ".jar",
+    ".pkl",
+    ".parquet",
+    ".onnx",
+    ".pt",
+    ".pth",  # ML Models
+    ".db",
+    ".sqlite",
+    ".sqlite3",
 }
 
 # ------------------------------------------------------------
 # HELPERS
 # ------------------------------------------------------------
+
 
 def is_binary(file_path: Path) -> bool:
     """
@@ -135,9 +163,11 @@ def is_under_master_paths(file_path: Path, root: Path) -> bool:
 
     return False
 
+
 # ------------------------------------------------------------
 # MAIN LOGIC
 # ------------------------------------------------------------
+
 
 def concat_all(output_file: str = "all_repos.txt") -> None:
     """Recursively scans and concatenates text files."""
@@ -155,14 +185,14 @@ def concat_all(output_file: str = "all_repos.txt") -> None:
     else:
         print("🌍 No master include filter (scanning full repo)")
 
-    print(f"🚫 Ignoring binaries, lockfiles, and files > {MAX_FILE_SIZE_BYTES / 1024:.0f} KB")
+    print(
+        f"🚫 Ignoring binaries, lockfiles, and files > {MAX_FILE_SIZE_BYTES / 1024:.0f} KB"
+    )
 
     for dirpath, dirnames, filenames in os.walk(root):
-
         # 1. Prune ignored directories in-place
         dirnames[:] = [
-            d for d in dirnames
-            if d not in ignore_dirs and not d.startswith(".")
+            d for d in dirnames if d not in ignore_dirs and not d.startswith(".")
         ]
 
         for filename in filenames:
@@ -221,6 +251,7 @@ def concat_all(output_file: str = "all_repos.txt") -> None:
 
     print(f"\n✅ Done! Included {len(output_lines) // 5} files.")
     print(f"📄 Output written to: {out_path}")
+
 
 # ------------------------------------------------------------
 # ENTRYPOINT
