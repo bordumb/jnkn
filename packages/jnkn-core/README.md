@@ -1,4 +1,3 @@
-
 # jnkn
 
 **The Pre-Flight Impact Analysis Engine for Engineering Teams.**
@@ -32,25 +31,9 @@ graph LR
     style DATA fill:#ff6b6b,color:#fff
 ````
 
------
+## 🚀 Quick Start
 
-## 🧠 Two-Tier Architecture
-
-Jnkn is built on a split architecture to provide **stability for CI/CD** while enabling **intelligence for AI Agents**.
-
-| Component | **Jnkn Core** (`jnkn`) | **Jnkn AI** (`jnkn-ai`) |
-| :--- | :--- | :--- |
-| **Role** | **The Ground Truth** | **The Navigator** |
-| **Philosophy** | Deterministic, 100% Local, Strict | Probabilistic, Context-Aware, Flexible |
-| **Use Case** | CI/CD Gating, Breaking Change Detection | AI Context, Architecture Q\&A, Refactoring |
-| **Output** | Pass/Fail, Static Risk Reports | LLM Context (MCP), Semantic Explanations |
-| **Connectivity** | Offline / Air-gapped | Connects to LLMs / Vector Stores |
-
------
-
-## 🚀 Quick Start (Core)
-
-Get protection in less than 2 minutes.
+Get running in less than 2 minutes.
 
 ### 1\. Installation
 
@@ -79,25 +62,7 @@ jnkn check
 
 -----
 
-## 🤖 AI Integration (MCP)
-
-Jnkn exposes your repository's dependency graph via the **Model Context Protocol (MCP)**. This allows AI agents (Claude Desktop, Cursor, Windsurf) to "chat with your architecture."
-
-### Setup
-
-```bash
-pip install jnkn-ai
-```
-
-### Capabilities
-
-  * **Smart Refactoring:** Ask your AI, *"If I rename `DB_HOST` in Terraform, what code breaks?"* The AI queries `jnkn` for the exact blast radius.
-  * **Architecture Q\&A:** Ask, *"Show me every service that consumes the payment database."*
-  * **Impact-Aware Agents:** Give your AI agents the `check_impact` tool so they self-correct before writing broken code.
-
------
-
-## ⚡ CI/CD Integration
+## 🤖 CI/CD Integration
 
 Block breaking changes in Pull Requests before they merge.
 
