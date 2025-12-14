@@ -1,0 +1,43 @@
+# --- Python Core ---
+__pycache__/
+*.py[cod]
+*.so
+*.dylib
+
+# --- Distribution & Build (Hatch/UV) ---
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Virtual Environments ---
+.venv/
+env/
+venv/
+ENV/
+
+# --- Testing & Code Quality ---
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.cache/
+
+# --- Documentation (MkDocs) ---
+# The default build output directory for mkdocs
+site/
+
+# --- IDE & OS Settings ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Project Specific (Jnkn) ---
+.jnkn/
+jnkn.db
+all_repos.txt
+jnkn-demo
+# Temporary scripts
+create
