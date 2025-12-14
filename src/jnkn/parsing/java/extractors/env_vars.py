@@ -1,3 +1,18 @@
+"""
+Java Environment Variable Extractor.
+
+This module extracts environment variable reads and property injections
+from Java source code:
+
+- `System.getenv("VAR")`
+- `System.getProperty("prop")`
+- Spring `@Value("${VAR}")` annotation
+- Spring `Environment.getProperty("VAR")`
+
+All nodes are created with proper `path` fields to enable "Open in Editor"
+functionality in the visualization.
+"""
+
 import re
 from typing import Generator, Union
 
@@ -9,11 +24,34 @@ class JavaEnvVarExtractor:
     """
     Extract environment variable reads and property injections from Java code.
 
-    Supports:
-    - System.getenv("VAR")
-    - System.getProperty("prop")
-    - Spring @Value("${VAR}") annotation
-    - Spring Environment.getProperty("VAR")
+    This extractor handles Java stdlib patterns and Spring Framework
+    configuration patterns.
+
+    Detected Patterns:
+        - `System.getenv("VAR")`
+        - `System.getProperty("prop")`
+        - `@Value("${VAR}")` / `@Value("${VAR:default}")`
+        - `environment.getProperty("VAR")`
+
+    Example:
+        ```java
+        public class MyConfig {
+            // System patterns
+            String dbHost = System.getenv("DATABASE_HOST");
+            String javaHome = System.getProperty("java.home");
+
+            // Spring patterns
+            @Value("${API_KEY}")
+            private String apiKey;
+
+            @Value("${DEBUG:false}")
+            private boolean debug;
+
+            public void init(Environment env) {
+                String port = env.getProperty("SERVER_PORT");
+            }
+        }
+        ```
     """
 
     name = "java_env_vars"
@@ -26,16 +64,34 @@ class JavaEnvVarExtractor:
     GETPROP = re.compile(r'System\.getProperty\s*\(\s*"([^"]+)"\s*\)')
 
     # @Value("${VAR}") or @Value("${VAR:default}")
-    # Captures the content inside ${...}
-    SPRING_VALUE = re.compile(r'@Value\s*\(\s*"\$\{\s*([^}]+)\s*\}\"\s*\)')
+    SPRING_VALUE = re.compile(r'@Value\s*\(\s*"\$\{\s*([^}]+)\s*\}"\s*\)')
 
-    # environment.getProperty("prop") - common variable name for Environment interface
+    # environment.getProperty("prop") - common variable name for Environment
     SPRING_ENV = re.compile(r'(?:env|environment)\.getProperty\s*\(\s*"([^"]+)"\s*\)')
 
     def can_extract(self, ctx: ExtractionContext) -> bool:
+        """
+        Check if this extractor should run on the given context.
+
+        Args:
+            ctx: The extraction context.
+
+        Returns:
+            bool: True if the text contains Java env patterns.
+        """
         return "System.get" in ctx.text or "@Value" in ctx.text or "getProperty" in ctx.text
 
     def extract(self, ctx: ExtractionContext) -> Generator[Union[Node, Edge], None, None]:
+        """
+        Extract environment variable nodes and edges.
+
+        Args:
+            ctx: The extraction context containing file info and text.
+
+        Yields:
+            Node: ENV_VAR nodes for each detected environment variable.
+            Edge: READS edges from the file to each env var.
+        """
         seen = set()
 
         for pattern, source in [
@@ -45,7 +101,7 @@ class JavaEnvVarExtractor:
             (self.SPRING_ENV, "spring_environment"),
         ]:
             for match in pattern.finditer(ctx.text):
-                raw_var = match.group(1).strip()  # FIX: Strip whitespace
+                raw_var = match.group(1).strip()
 
                 # Handle Spring placeholders with defaults: ${VAR:default}
                 if ":" in raw_var:
@@ -55,8 +111,7 @@ class JavaEnvVarExtractor:
                     var_name = raw_var
                     default_value = None
 
-                # Validate variable name (simple heuristic)
-                # After stripping, if it still has spaces, it's likely not a valid env var
+                # Validate variable name
                 if not var_name or " " in var_name:
                     continue
 
@@ -64,15 +119,20 @@ class JavaEnvVarExtractor:
                     continue
                 seen.add(var_name)
 
-                line = ctx.text[: match.start()].count("\n") + 1
+                line = ctx.get_line_number(match.start())
                 env_id = f"env:{var_name}"
 
+                # CRITICAL: Always set path for "Open in Editor" functionality
                 yield Node(
                     id=env_id,
                     name=var_name,
                     type=NodeType.ENV_VAR,
                     path=str(ctx.file_path),
-                    metadata={"source": source, "line": line, "default_value": default_value},
+                    metadata={
+                        "source": source,
+                        "line": line,
+                        "default_value": default_value,
+                    },
                 )
 
                 yield Edge(

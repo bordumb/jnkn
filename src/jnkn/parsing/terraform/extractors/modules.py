@@ -1,3 +1,4 @@
+# FILE: src/jnkn/parsing/terraform/extractors/modules.py
 import re
 from typing import Generator, Union
 
@@ -11,9 +12,6 @@ class ModuleExtractor:
     name = "terraform_modules"
     priority = 70
 
-    # Matches module "name" { body }
-    # Handles nested braces simply by greedy matching until last brace (simplified for regex)
-    # A robust solution needs a brace counter, but regex suffices for well-formatted HCL
     MODULE_PATTERN = re.compile(r'module\s+"([^"]+)"\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}', re.DOTALL)
     SOURCE_PATTERN = re.compile(r'source\s*=\s*"([^"]+)"')
 
@@ -24,7 +22,7 @@ class ModuleExtractor:
         for match in self.MODULE_PATTERN.finditer(ctx.text):
             module_name = match.group(1)
             module_body = match.group(2)
-            line = ctx.text[: match.start()].count("\n") + 1
+            line = ctx.get_line_number(match.start())
 
             # Extract source
             source = ""
@@ -33,15 +31,15 @@ class ModuleExtractor:
 
             module_id = f"infra:module:{module_name}"
 
-            yield Node(
+            # FIX: Use factory logic. Since INFRA_MODULE isn't a factory helper, use create_node.
+            yield ctx.create_node(
                 id=module_id,
                 name=module_name,
                 type=NodeType.INFRA_MODULE,
-                path=str(ctx.file_path),
+                line=line,
                 metadata={
                     "terraform_type": "module",
                     "source": source,
-                    "line": line,
                 },
             )
 
@@ -53,17 +51,14 @@ class ModuleExtractor:
             )
 
             # Extract variable references in module inputs
-            # e.g., db_host = aws_db.main.endpoint
             for input_match in re.finditer(r"(\w+)\s*=\s*(\w+\.\w+(?:\.\w+)?)", module_body):
                 input_name = input_match.group(1)
                 ref_path = input_match.group(2)
 
-                # Create reference edge
                 parts = ref_path.split(".")
                 if len(parts) >= 2:
                     ref_type, ref_name = parts[0], parts[1]
 
-                    # Normalize ref_type prefixes
                     if ref_type == "var":
                         ref_id = f"infra:var:{ref_name}"
                     elif ref_type == "local":

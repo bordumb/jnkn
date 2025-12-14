@@ -219,6 +219,7 @@ class KubernetesParser(LanguageParser):
         elif kind == "ConfigMap":
             node_type = NodeType.CONFIG_KEY
 
+        # FIX: Ensure path is set for the main resource node
         yield Node(
             id=k8s_id,
             name=name,
@@ -243,7 +244,7 @@ class KubernetesParser(LanguageParser):
 
         # Handle Workloads
         if kind in self.WORKLOAD_KINDS:
-            yield from self._process_workload(doc, k8s_id, namespace)
+            yield from self._process_workload(doc, k8s_id, namespace, str(file_path))
 
     def _process_ingress(self, doc: Dict[str, Any], ingress_id: str, namespace: str):
         """Extract backend services from Ingress."""
@@ -254,13 +255,12 @@ class KubernetesParser(LanguageParser):
             if not svc_name:
                 return
             svc_id = f"k8s:{namespace}/service/{svc_name}"
-            # We don't yield the service node itself (it might be defined elsewhere)
-            # but we create the edge. The graph builder handles missing nodes gracefully usually,
-            # or we assume the service definition exists in the scan.
+            # We don't yield the service node itself here (it should be defined in its own file)
+            # but we create the edge. The graph builder handles missing nodes gracefully.
             yield Edge(
                 source_id=ingress_id,
                 target_id=svc_id,
-                type=RelationshipType.ROUTES_TO,  # Custom type or mapped to DEPENDS_ON
+                type=RelationshipType.ROUTES_TO,
                 metadata={"type": "routes_to"},
             )
 
@@ -282,7 +282,9 @@ class KubernetesParser(LanguageParser):
                 elif "serviceName" in backend:
                     yield from link_service(backend.get("serviceName"))
 
-    def _process_workload(self, doc: Dict[str, Any], workload_id: str, namespace: str):
+    def _process_workload(
+        self, doc: Dict[str, Any], workload_id: str, namespace: str, file_path_str: str
+    ):
         """Extract env vars and volumes from workloads."""
         pod_spec = self._get_pod_spec(doc)
         if not pod_spec:
@@ -295,10 +297,12 @@ class KubernetesParser(LanguageParser):
             for env_var in self._extract_env_vars(env_list):
                 env_id = f"env:{env_var.name}"
 
+                # FIX: Ensure path is set for env vars defined in K8s
                 yield Node(
                     id=env_id,
                     name=env_var.name,
                     type=NodeType.ENV_VAR,
+                    path=file_path_str,
                     metadata={"k8s_resource": workload_id},
                 )
                 yield Edge(
@@ -309,21 +313,26 @@ class KubernetesParser(LanguageParser):
 
                 if env_var.is_config_map_ref and env_var.config_map_name:
                     cm_id = f"k8s:{namespace}/configmap/{env_var.config_map_name}"
+                    # FIX: Virtual node for referenced ConfigMap - set path to current file
+                    # This indicates "This file references this ConfigMap"
                     yield Node(
                         id=cm_id,
                         name=env_var.config_map_name,
                         type=NodeType.CONFIG_KEY,
-                        metadata={"virtual": True},
+                        path=file_path_str,
+                        metadata={"virtual": True, "referenced_in": workload_id},
                     )
                     yield Edge(source_id=env_id, target_id=cm_id, type=RelationshipType.READS)
 
                 if env_var.is_secret_ref and env_var.secret_name:
                     secret_id = f"k8s:{namespace}/secret/{env_var.secret_name}"
+                    # FIX: Virtual node for referenced Secret - set path to current file
                     yield Node(
                         id=secret_id,
                         name=env_var.secret_name,
                         type=NodeType.SECRET,
-                        metadata={"virtual": True},
+                        path=file_path_str,
+                        metadata={"virtual": True, "referenced_in": workload_id},
                     )
                     yield Edge(source_id=env_id, target_id=secret_id, type=RelationshipType.READS)
 
@@ -333,11 +342,13 @@ class KubernetesParser(LanguageParser):
                     cm_name = env_from["configMapRef"].get("name")
                     if cm_name:
                         cm_id = f"k8s:{namespace}/configmap/{cm_name}"
+                        # FIX: Virtual node with path
                         yield Node(
                             id=cm_id,
                             name=cm_name,
                             type=NodeType.CONFIG_KEY,
-                            metadata={"virtual": True},
+                            path=file_path_str,
+                            metadata={"virtual": True, "referenced_in": workload_id},
                         )
                         yield Edge(
                             source_id=workload_id, target_id=cm_id, type=RelationshipType.READS
@@ -346,11 +357,13 @@ class KubernetesParser(LanguageParser):
                     secret_name = env_from["secretRef"].get("name")
                     if secret_name:
                         secret_id = f"k8s:{namespace}/secret/{secret_name}"
+                        # FIX: Virtual node with path
                         yield Node(
                             id=secret_id,
                             name=secret_name,
                             type=NodeType.SECRET,
-                            metadata={"virtual": True},
+                            path=file_path_str,
+                            metadata={"virtual": True, "referenced_in": workload_id},
                         )
                         yield Edge(
                             source_id=workload_id, target_id=secret_id, type=RelationshipType.READS

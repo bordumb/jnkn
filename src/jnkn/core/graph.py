@@ -220,10 +220,7 @@ class DependencyGraph(IGraph):
         queue = list(source_ids)
         visited = set(source_ids)
 
-        # Track depth if needed (simple BFS level tracking omitted for brevity, using unlimited or basic check)
-        # For simplicity in this implementation, we ignore exact max_depth logic beyond a safety break
-        # or implement simple level tracking.
-
+        # Track depth if needed
         current_level = queue
         depth = 0
 
@@ -259,6 +256,34 @@ class DependencyGraph(IGraph):
             depth += 1
 
         return impacted
+
+    def stats(self) -> Dict[str, Any]:
+        """
+        Generate statistical summary of the graph.
+        """
+        nodes_by_type: Dict[str, int] = defaultdict(int)
+        for node in self.iter_nodes():
+            nodes_by_type[node.type.value] += 1
+
+        edges_by_type: Dict[str, int] = defaultdict(int)
+        for edge in self.iter_edges():
+            # Handle edge type being Enum or string
+            val = edge.type.value if hasattr(edge.type, "value") else str(edge.type)
+            edges_by_type[val] += 1
+
+        orphans = 0
+        for idx in self._graph.node_indices():
+            if self._graph.in_degree(idx) == 0 and self._graph.out_degree(idx) == 0:
+                orphans += 1
+
+        return {
+            "total_nodes": self.node_count,
+            "total_edges": self.edge_count,
+            "nodes_by_type": dict(nodes_by_type),
+            "edges_by_type": dict(edges_by_type),
+            "orphans": orphans,
+            "backend": "rustworkx",
+        }
 
     def to_dict(self) -> Dict[str, Any]:
         return {

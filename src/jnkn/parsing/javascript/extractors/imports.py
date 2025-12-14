@@ -1,3 +1,4 @@
+# FILE: src/jnkn/parsing/javascript/extractors/imports.py
 """
 Import Extractor for JavaScript/TypeScript.
 """
@@ -49,11 +50,11 @@ class ImportExtractor:
                     continue
                 seen_imports.add(module_name)
 
-                line = ctx.text[: match.start()].count("\n") + 1
+                line = ctx.get_line_number(match.start())
 
                 # Resolve path
                 if module_name.startswith("."):
-                    # Relative import - we keep it as is, or resolve if we had full context
+                    # Relative import
                     target_path = module_name
                 else:
                     # Package import
@@ -61,16 +62,25 @@ class ImportExtractor:
 
                 target_id = f"file://{target_path}"
 
+                # NOTE: We do NOT use ctx.create_node here because the target node
+                # represents an external file/package, so its 'path' should NOT be the current file.
                 yield Node(
                     id=target_id,
                     name=module_name,
                     type=NodeType.CODE_FILE,  # Virtual file or package
+                    path=target_path,  # Path points to the target
                     metadata={"virtual": True, "import_type": kind, "line": line},
                 )
 
+                yield ctx.create_reads_edge(
+                    target_id=target_id,
+                    line=line,
+                    pattern=kind,
+                )
+                # Also yield classic imports edge
                 yield Edge(
                     source_id=ctx.file_id,
                     target_id=target_id,
                     type=RelationshipType.IMPORTS,
-                    metadata={"kind": kind},
+                    metadata={"kind": kind, "line": line},
                 )

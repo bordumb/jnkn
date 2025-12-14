@@ -1,7 +1,8 @@
+# FILE: src/jnkn/parsing/java/extractors/imports.py
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node, RelationshipType
 from ...base import ExtractionContext
 
 
@@ -11,8 +12,6 @@ class JavaImportExtractor:
     name = "java_imports"
     priority = 90
 
-    # import com.example.package.Class;
-    # import static com.example.package.Class.method;
     IMPORT_PATTERN = re.compile(r"import\s+(?:static\s+)?([\w\.]+);")
 
     def can_extract(self, ctx: ExtractionContext) -> bool:
@@ -28,23 +27,17 @@ class JavaImportExtractor:
                 continue
             seen_imports.add(full_import)
 
-            # Determine if it's likely an external library or internal code
-            # Standard Java libraries
             is_stdlib = full_import.startswith(("java.", "javax."))
-
-            # Construct a virtual node for the imported package/class
-            # We use 'java:' prefix for Java entities
             pkg_id = f"java:{full_import}"
-
-            # Try to determine simple name (Class name)
             simple_name = full_import.split(".")[-1]
+            line = ctx.get_line_number(match.start())
 
-            yield Node(
-                id=pkg_id,
+            # FIX: Use factory method
+            yield ctx.create_code_entity_node(
                 name=simple_name,
-                type=NodeType.CODE_ENTITY,
-                metadata={
-                    "package_type": "java",
+                line=line,
+                entity_type="java_package",
+                extra_metadata={
                     "full_path": full_import,
                     "is_stdlib": is_stdlib,
                     "virtual": True,

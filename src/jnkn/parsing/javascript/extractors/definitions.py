@@ -1,3 +1,4 @@
+# FILE: src/jnkn/parsing/javascript/extractors/definitions.py
 """
 Definition Extractor for JavaScript/TypeScript.
 """
@@ -5,7 +6,7 @@ Definition Extractor for JavaScript/TypeScript.
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node
 from ...base import ExtractionContext
 
 
@@ -55,16 +56,14 @@ class DefinitionExtractor:
             yield from self._create_entity(ctx, def_name, match.start(), "component")
 
     def _create_entity(self, ctx: ExtractionContext, name: str, pos: int, kind: str):
-        line = ctx.text[:pos].count("\n") + 1
-        entity_id = f"entity:{ctx.file_path}:{name}"
+        line = ctx.get_line_number(pos)
 
-        yield Node(
-            id=entity_id,
+        yield ctx.create_code_entity_node(
             name=name,
-            type=NodeType.CODE_ENTITY,
-            path=str(ctx.file_path),
+            line=line,
+            entity_type=kind,
             language="javascript",
-            metadata={"entity_type": kind, "line": line},
         )
 
-        yield Edge(source_id=ctx.file_id, target_id=entity_id, type=RelationshipType.CONTAINS)
+        entity_id = f"entity:{ctx.file_path}:{name}"
+        yield ctx.create_contains_edge(target_id=entity_id)

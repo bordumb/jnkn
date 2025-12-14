@@ -3,6 +3,7 @@ JavaScript/TypeScript Language Parser.
 
 Handles parsing of JS, TS, JSX, TSX files and package.json.
 Supports multiple frameworks (Next.js, Vite, React) via specialized extractors.
+Includes protections against minified files which can hang the regex engine.
 """
 
 import logging
@@ -50,7 +51,7 @@ class JavaScriptParser(LanguageParser):
 
     @property
     def extensions(self) -> List[str]:
-        return [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"]
+        return [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".json"]
 
     def get_capabilities(self) -> List[ParserCapability]:
         return [
@@ -60,8 +61,11 @@ class JavaScriptParser(LanguageParser):
         ]
 
     def can_parse(self, file_path: Path, content: bytes | None = None) -> bool:
-        if file_path.name == "package.json":
-            return True
+        # STRICT check for JSON: only parse package.json
+        # This avoids parsing massive schema.json or fixture.json files
+        if file_path.suffix == ".json":
+            return file_path.name == "package.json"
+
         return file_path.suffix.lower() in self.extensions
 
     def _init_tree_sitter(self, file_path: Path) -> bool:
@@ -80,6 +84,30 @@ class JavaScriptParser(LanguageParser):
             self._logger.warning(f"Failed to initialize tree-sitter for {lang_name}: {e}")
             return False
 
+    def _is_minified(self, text: str) -> bool:
+        """
+        Check if text appears to be minified code.
+        Heuristic: High characters per line average or extremely long single line.
+        """
+        if not text:
+            return False
+
+        # Check for extremely long lines (characteristic of bundlers/minifiers)
+        # 10000 chars on a single line is suspicious for source code
+        MAX_LINE_LENGTH = 10000
+
+        # Check the first few lines to fail fast
+        first_chunk = text[:20000]
+        if "\n" not in first_chunk and len(first_chunk) > 1000:
+            # If we have > 1000 chars and no newline, assume minified
+            return True
+
+        for line in text.splitlines(keepends=True)[:10]:  # Check first 10 lines
+            if len(line) > MAX_LINE_LENGTH:
+                return True
+
+        return False
+
     def parse(
         self,
         file_path: Path,
@@ -90,6 +118,11 @@ class JavaScriptParser(LanguageParser):
         try:
             text = content.decode(self.context.encoding)
         except UnicodeDecodeError:
+            return
+
+        # Protection against minified/bundled files that hang regexes
+        if self._is_minified(text):
+            self._logger.debug(f"Skipping minified file: {file_path}")
             return
 
         try:
@@ -113,7 +146,8 @@ class JavaScriptParser(LanguageParser):
         )
 
         tree = None
-        if self._init_tree_sitter(file_path):
+        # Don't try tree-sitter on package.json
+        if lang != "json" and self._init_tree_sitter(file_path):
             try:
                 tree = self._ts_parser.parse(content)
             except Exception:

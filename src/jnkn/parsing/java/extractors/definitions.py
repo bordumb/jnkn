@@ -1,7 +1,8 @@
+# FILE: src/jnkn/parsing/java/extractors/definitions.py
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node
 from ...base import ExtractionContext
 
 
@@ -33,24 +34,15 @@ class JavaDefinitionExtractor:
             def_type = match.group(1)  # class, interface, etc.
             def_name = match.group(2)
 
-            line = ctx.text[: match.start()].count("\n") + 1
-            entity_id = f"entity:{ctx.file_path}:{def_name}"
+            line = ctx.get_line_number(match.start())
 
-            yield Node(
-                id=entity_id,
+            yield ctx.create_code_entity_node(
                 name=def_name,
-                type=NodeType.CODE_ENTITY,
-                path=str(ctx.file_path),
+                line=line,
+                entity_type=def_type,
                 language="java",
-                metadata={
-                    "entity_type": def_type,
-                    "line": line,
-                    "is_public": def_name == filename_no_ext,
-                },
+                extra_metadata={"is_public": def_name == filename_no_ext},
             )
 
-            yield Edge(
-                source_id=ctx.file_id,
-                target_id=entity_id,
-                type=RelationshipType.CONTAINS,
-            )
+            entity_id = f"entity:{ctx.file_path}:{def_name}"
+            yield ctx.create_contains_edge(target_id=entity_id)

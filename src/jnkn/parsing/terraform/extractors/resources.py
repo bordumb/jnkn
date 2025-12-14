@@ -1,7 +1,8 @@
+# FILE: src/jnkn/parsing/terraform/extractors/resources.py
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node, RelationshipType
 from ...base import ExtractionContext
 
 
@@ -20,19 +21,16 @@ class ResourceExtractor:
     def extract(self, ctx: ExtractionContext) -> Generator[Union[Node, Edge], None, None]:
         for match in self.RESOURCE_PATTERN.finditer(ctx.text):
             res_type, res_name = match.groups()
-            line = ctx.text[: match.start()].count("\n") + 1
+            line = ctx.get_line_number(match.start())
 
             node_id = f"infra:{res_type}.{res_name}"
 
-            yield Node(
+            yield ctx.create_infra_node(
                 id=node_id,
                 name=res_name,
-                type=NodeType.INFRA_RESOURCE,
-                path=str(ctx.file_path),
-                metadata={
-                    "terraform_type": res_type,
-                    "line": line,
-                },
+                line=line,
+                infra_type=res_type,
+                extra_metadata={"terraform_type": res_type},
             )
 
             yield Edge(

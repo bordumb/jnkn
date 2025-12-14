@@ -1,7 +1,8 @@
+# FILE: src/jnkn/parsing/terraform/extractors/data_sources.py
 import re
 from typing import Generator, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node, RelationshipType
 from ...base import ExtractionContext
 
 
@@ -20,20 +21,17 @@ class DataSourceExtractor:
     def extract(self, ctx: ExtractionContext) -> Generator[Union[Node, Edge], None, None]:
         for match in self.DATA_PATTERN.finditer(ctx.text):
             data_type, data_name = match.groups()
-            line = ctx.text[: match.start()].count("\n") + 1
+            line = ctx.get_line_number(match.start())
 
             node_id = f"infra:data.{data_type}.{data_name}"
 
-            yield Node(
+            # FIX: Use factory method to ensure path population
+            yield ctx.create_infra_node(
                 id=node_id,
                 name=data_name,
-                type=NodeType.INFRA_RESOURCE,
-                path=str(ctx.file_path),
-                metadata={
-                    "terraform_type": data_type,
-                    "is_data": True,
-                    "line": line,
-                },
+                line=line,
+                infra_type=f"data.{data_type}",
+                extra_metadata={"terraform_type": data_type, "is_data": True},
             )
 
             yield Edge(

@@ -1,3 +1,4 @@
+# FILE: src/jnkn/parsing/javascript/extractors/env_vars.py
 """
 Environment Variable Extractor for JavaScript/TypeScript.
 """
@@ -5,7 +6,7 @@ Environment Variable Extractor for JavaScript/TypeScript.
 import re
 from typing import Generator, Set, Union
 
-from ....core.types import Edge, Node, NodeType, RelationshipType
+from ....core.types import Edge, Node
 from ...base import ExtractionContext
 
 
@@ -55,32 +56,26 @@ class EnvVarExtractor:
                         continue
                     seen_vars.add(var_name)
 
-                    line = ctx.text[: match.start()].count("\n") + 1
+                    line = ctx.get_line_number(match.start())
 
                     # Detect framework/public status
                     framework = self._detect_framework(var_name)
                     is_public = var_name.startswith(("NEXT_PUBLIC_", "VITE_", "REACT_APP_"))
 
-                    env_id = f"env:{var_name}"
-
-                    yield Node(
-                        id=env_id,
+                    yield ctx.create_env_var_node(
                         name=var_name,
-                        type=NodeType.ENV_VAR,
-                        path=str(ctx.file_path),
-                        metadata={
-                            "source": source,
-                            "line": line,
+                        line=line,
+                        source=source,
+                        extra_metadata={
                             "framework": framework,
                             "is_public": is_public,
                         },
                     )
 
-                    yield Edge(
-                        source_id=ctx.file_id,
-                        target_id=env_id,
-                        type=RelationshipType.READS,
-                        metadata={"pattern": source},
+                    yield ctx.create_reads_edge(
+                        target_id=f"env:{var_name}",
+                        line=line,
+                        pattern=source,
                     )
 
     def _detect_framework(self, var_name: str) -> str | None:
