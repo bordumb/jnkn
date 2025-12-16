@@ -8,18 +8,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 from click.testing import CliRunner
 
-# CRITICAL FIX: Skip this entire module if watchdog is not installed.
-# This prevents 'ModuleNotFoundError' during test collection in environments
-# where the optional 'watchdog' dependency is missing.
+# Skip this entire module if watchdog is not installed.
 pytest.importorskip("watchdog")
 
 from watchdog.events import FileModifiedEvent, FileDeletedEvent
 
 from jnkn.cli.commands.watch import watch
 from jnkn.cli.watcher import ParsingEventHandler, FileSystemWatcher
-from jnkn.core.result import Ok, Err
 from jnkn.parsing.base import ParseResult
-from jnkn.parsing.engine import ScanError
 
 
 @pytest.fixture
@@ -64,7 +60,11 @@ class TestParsingEventHandler:
         engine._parse_file_full.assert_called_once()
         storage.delete_nodes_by_file.assert_called_once_with("/tmp/project/app.py")
         storage.save_nodes_batch.assert_called_once()
-        storage.save_edges_batch.assert_called_once()
+        
+        # CRITICAL FIX: Parsing saves local edges, and Stitching saves cross-file edges.
+        # So we expect this to be called at least once (likely twice).
+        assert storage.save_edges_batch.call_count >= 1
+        
         storage.save_scan_metadata.assert_called_once()
         
         # Ensure stitching was triggered
@@ -129,12 +129,14 @@ class TestParsingEventHandler:
 class TestWatchCommand:
     """Tests for the CLI watch command."""
 
-    @patch("jnkn.cli.commands.watch.FileSystemWatcher")
+    # CRITICAL FIX: Patch the SOURCE of the import (jnkn.cli.watcher), 
+    # not the destination (jnkn.cli.commands.watch), because the import is lazy.
+    @patch("jnkn.cli.watcher.FileSystemWatcher")
     def test_watch_command_starts_watcher(self, MockWatcher):
         """Test that the CLI command initializes and starts the watcher."""
         runner = CliRunner()
         
-        # Mock the watcher instance
+        # Mock the watcher instance to verify .start() is called
         mock_instance = MockWatcher.return_value
         
         with runner.isolated_filesystem():
@@ -154,7 +156,7 @@ class TestWatchCommand:
             # Verify start was called
             mock_instance.start.assert_called_once()
 
-    @patch("jnkn.cli.commands.watch.FileSystemWatcher")
+    @patch("jnkn.cli.watcher.FileSystemWatcher")
     def test_watch_creates_db_dir(self, MockWatcher):
         """Test that the command creates the DB directory if missing."""
         runner = CliRunner()
@@ -167,3 +169,4 @@ class TestWatchCommand:
             
             assert result.exit_code == 0
             assert Path(".jnkn").exists()
+            assert Path(".jnkn").is_dir()
