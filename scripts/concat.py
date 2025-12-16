@@ -17,7 +17,7 @@ from pathlib import Path
 # Examples:
 # MASTER_INCLUDE_PATHS = ["src/jnkn/parsing"]
 #
-MASTER_INCLUDE_PATHS = ["packages"]
+MASTER_INCLUDE_PATHS = ["packages/jnkn-core/src"]
 
 # ------------------------------------------------------------
 # CONFIGURATION
@@ -76,6 +76,7 @@ DEFAULT_IGNORE_DIRS = {
     "tests",
     "site",
     "docs",
+    "out"
 }
 
 DEFAULT_IGNORE_EXTENSIONS = {

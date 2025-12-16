@@ -11,34 +11,16 @@ from pathlib import Path
 def uri_to_path(uri: str) -> Path:
     """
     Convert an LSP URI to a local file system path.
+    
+    Handles decoding (e.g., %20 -> space) and file:// stripping.
 
     Args:
-        uri: The URI string (e.g., 'file:///Users/marcus/code/app.py').
+        uri: The URI string (e.g., 'file:///Users/marcus/code/my%20app.py').
 
     Returns:
-        Path: The corresponding Path object.
+        Path: The corresponding absolute Path object.
     """
     parsed = urllib.parse.urlparse(uri)
+    # unquote handles %20 and other encoded characters
     path_str = urllib.parse.unquote(parsed.path)
     return Path(path_str).resolve()
-
-
-def format_hover_markdown(node_name: str, resource_address: str, node_type: str) -> str:
-    """
-    Format the hover text content using Markdown.
-
-    Args:
-        node_name: The name of the node (e.g., 'DB_HOST').
-        resource_address: The connected infrastructure address.
-        node_type: The type of the node.
-
-    Returns:
-        str: Formatted Markdown string.
-    """
-    return f"""### Jnkn Linkage
-**Artifact:** `{node_name}`
-**Type:** `{node_type}`
-**Connected Infra:** `{resource_address}`
-
-[View in Graph](command:jnkn.visualize)
-"""

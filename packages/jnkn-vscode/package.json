@@ -7,7 +7,7 @@
   "engines": {
     "vscode": "^1.75.0"
   },
-  "activationEvents": [],
+  "activationEvents": ["onLanguage:python"],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [

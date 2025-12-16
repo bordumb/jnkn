@@ -12,7 +12,6 @@ members = [
     "packages/jnkn-core",
     "packages/jnkn-mcp",
     "packages/jnkn-lsp",
-
 ]
 
 [build-system]
