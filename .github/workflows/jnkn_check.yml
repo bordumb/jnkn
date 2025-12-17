@@ -18,3 +18,4 @@ jobs:
       - uses: ./packages/jnkn-core 
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          ignore: 'node_modules,dist,build,tests,__pycache__,.git'
