@@ -1,20 +1,31 @@
 """
 Scan Command - Parse codebase and build dependency graph.
-Enhanced with Discovery/Enforcement modes and manager-readable output.
+
+This command is the primary entry point for analyzing a codebase. It:
+1. Resolves dependencies from jnkn.toml (local paths and git remotes)
+2. Parses all source files across all repositories
+3. Stitches cross-domain connections using fuzzy matching and explicit mappings
+4. Stores the resulting graph in SQLite for LSP queries
+
+Supports Discovery and Enforcement modes for different stages of adoption.
 """
 
 import json
 import logging
 import sys
 from pathlib import Path
+from typing import List, Optional, Tuple
 
 import click
 from pydantic import BaseModel
 from rich.console import Console
 
 from ...analysis.top_findings import TopFindingsExtractor
+from ...core.enhanced_stitching import EnhancedStitcher
+from ...core.manifest import ProjectManifest
 from ...core.mode import ScanMode, get_mode_manager
 from ...core.packs import detect_and_suggest_pack, load_pack
+from ...core.resolver import DependencyResolver
 from ...core.stitching import Stitcher
 from ...core.storage.sqlite import SQLiteStorage
 from ...parsing.engine import ScanConfig, create_default_engine
@@ -38,17 +49,149 @@ class ScanSummaryResponse(BaseModel):
     output_path: str
     duration_sec: float
     mode: str
-    pack: str | None = None
+    pack: Optional[str] = None
+    explicit_mappings_applied: int = 0
+    repos_scanned: int = 1
 
 
 class _null_context:
-    """Helper for non-capture mode."""
+    """Context manager that does nothing (for non-capture mode)."""
 
     def __enter__(self):
         pass
 
     def __exit__(self, *args):
         pass
+
+
+def _resolve_scan_targets(
+    scan_path: Path,
+    no_deps: bool,
+    as_json: bool,
+    summary_only: bool,
+) -> Tuple[List[Tuple[Path, str]], Optional[ProjectManifest]]:
+    """
+    Resolve all scan targets including dependencies.
+
+    Args:
+        scan_path: Primary directory to scan.
+        no_deps: If True, skip dependency resolution.
+        as_json: If True, suppress console output.
+        summary_only: If True, suppress verbose output.
+
+    Returns:
+        Tuple of (scan_targets, manifest) where scan_targets is a list of
+        (path, repo_name) tuples and manifest is the loaded ProjectManifest.
+    """
+    manifest = ProjectManifest.load(scan_path / "jnkn.toml")
+    scan_targets = [(scan_path, manifest.name)]
+
+    if no_deps:
+        return scan_targets, manifest
+
+    try:
+        resolver = DependencyResolver(scan_path)
+        resolution = resolver.resolve()
+
+        for dep in resolution.dependencies:
+            if not as_json and not summary_only:
+                # Show dependency source icon
+                icon = "📁" if dep.source.value in ("local", "override") else "🌐"
+                console.print(f"   {icon} Dependency: [blue]{dep.name}[/blue] ({dep.path})")
+
+            scan_targets.append((dep.path, dep.name))
+
+        # Warn about stale lockfile
+        if resolution.lockfile_stale and not as_json:
+            console.print("[yellow]⚠️  Lockfile is stale. Run 'jnkn lock' to update.[/yellow]")
+
+    except Exception as e:
+        # Don't fail scan if dependency resolution fails, just warn
+        logger.warning(f"Dependency resolution failed: {e}")
+        if not as_json:
+            console.print(f"[yellow]⚠️  Dependency resolution failed: {e}[/yellow]")
+
+    return scan_targets, manifest
+
+
+def _run_stitching(
+    graph,
+    manifest: ProjectManifest,
+    min_confidence: float,
+    active_pack,
+    as_json: bool,
+    summary_only: bool,
+) -> Tuple[int, int, int]:
+    """
+    Run the stitching process with explicit mapping support.
+
+    Uses EnhancedStitcher if explicit mappings are defined in the manifest,
+    otherwise falls back to the basic Stitcher.
+
+    Args:
+        graph: The dependency graph to stitch.
+        manifest: Project manifest with mappings.
+        min_confidence: Minimum confidence threshold.
+        active_pack: Framework pack to apply (if any).
+        as_json: If True, suppress console output.
+        summary_only: If True, suppress verbose output.
+
+    Returns:
+        Tuple of (stitched_count, explicit_count, ignored_count).
+    """
+    stitched_count = 0
+    explicit_count = 0
+    ignored_count = 0
+
+    if graph.node_count == 0:
+        return stitched_count, explicit_count, ignored_count
+
+    if not as_json and not summary_only:
+        console.print("🧵 Stitching cross-domain dependencies...")
+
+    # Use EnhancedStitcher if we have explicit mappings
+    if manifest.mappings:
+        if not as_json and not summary_only:
+            console.print(f"   [dim]Applying {len(manifest.mappings)} explicit mapping(s)[/dim]")
+
+        stitcher = EnhancedStitcher(
+            mappings=manifest.mappings,
+            min_confidence=min_confidence,
+        )
+
+        stitch_result = stitcher.stitch(graph)
+
+        stitched_count = stitch_result.total
+        explicit_count = stitch_result.explicit_count
+        ignored_count = stitch_result.ignored_count
+
+        if not as_json and not summary_only:
+            if stitch_result.ignored_count > 0:
+                console.print(
+                    f"   [dim]Ignored {stitch_result.ignored_count} source(s) (user-defined)[/dim]"
+                )
+            if stitch_result.filtered_count > 0:
+                console.print(
+                    f"   [dim]Filtered {stitch_result.filtered_count} low-confidence edge(s)[/dim]"
+                )
+
+        return stitched_count, explicit_count, ignored_count, stitch_result.edges
+
+    else:
+        # No explicit mappings - use basic Stitcher
+        stitcher = Stitcher()
+
+        if active_pack:
+            stitcher.apply_pack(active_pack)
+
+        stitched_edges = stitcher.stitch(graph)
+
+        # Filter by confidence threshold
+        filtered_edges = [e for e in stitched_edges if (e.confidence or 0.5) >= min_confidence]
+
+        stitched_count = len(filtered_edges)
+
+        return stitched_count, 0, 0, filtered_edges
 
 
 @click.command()
@@ -65,6 +208,8 @@ class _null_context:
 )
 @click.option("--pack", "pack_name", help="Use a specific framework pack")
 @click.option("--summary-only", is_flag=True, help="Show only summary, not full details")
+@click.option("--no-deps", is_flag=True, help="Ignore jnkn.toml dependencies")
+@click.option("--frozen", is_flag=True, help="Enforce lockfile versions (fail if stale)")
 def scan(
     directory: str,
     output: str,
@@ -72,14 +217,17 @@ def scan(
     no_recursive: bool,
     force: bool,
     as_json: bool,
-    mode: str | None,
-    pack_name: str | None,
+    mode: Optional[str],
+    pack_name: Optional[str],
     summary_only: bool,
+    no_deps: bool,
+    frozen: bool,
 ):
     """
     Scan directory and build dependency graph.
 
     Uses incremental scanning by default: only changed files are re-parsed.
+    Automatically resolves and scans dependencies defined in jnkn.toml.
 
     \b
     Modes:
@@ -91,22 +239,26 @@ def scan(
         jnkn scan                           # Scan current directory
         jnkn scan ./src --mode discovery    # Force discovery mode
         jnkn scan --pack django-aws         # Use Django+AWS framework pack
-        jnkn scan --summary-only            # Brief output
+        jnkn scan --no-deps                 # Ignore external dependencies
+        jnkn scan --frozen                  # Enforce lockfile versions
     """
     scan_path = Path(directory).absolute()
     renderer = JsonRenderer("scan")
 
+    # =========================================================================
     # 1. Initialize Mode Manager
+    # =========================================================================
     mode_manager = get_mode_manager()
 
-    # Override mode if specified
     if mode:
         mode_manager.set_mode(ScanMode(mode))
 
     current_mode = mode_manager.current_mode
     min_confidence = mode_manager.min_confidence
 
+    # =========================================================================
     # 2. Handle Framework Pack
+    # =========================================================================
     active_pack = None
     active_pack_name = None
 
@@ -126,18 +278,17 @@ def scan(
                 if not as_json:
                     console.print(f"[dim]Auto-detected framework pack: {active_pack_name}[/dim]")
 
+    # =========================================================================
     # 3. Determine Output Path and Format
+    # =========================================================================
     if output:
         output_path = Path(output)
     else:
         output_path = Path(".jnkn/jnkn.db")
 
-    # If explicit JSON output requested via -o file.json, we'll need to export at the end
     export_to_json = output_path.suffix.lower() == ".json"
 
-    # We always use a DB for the scanning process
     if export_to_json:
-        # Use a temporary DB or default DB location for the scan
         db_path = output_path.with_suffix(".db")
     else:
         db_path = output_path
@@ -162,112 +313,143 @@ def scan(
                 if db_path.exists() and not force:
                     console.print("   [dim]Using incremental cache[/dim]")
 
+            # =================================================================
             # 4. Initialize Engine & Storage
+            # =================================================================
             engine = create_default_engine()
             storage = SQLiteStorage(db_path)
 
             if force:
                 storage.clear()
 
-            # 5. Configure Scan
-            skip_dirs = SKIP_DIRS.copy()
-            config = ScanConfig(
-                root_dir=scan_path,
-                skip_dirs=skip_dirs,
-                incremental=not force,
+            # =================================================================
+            # 5. Resolve Dependencies (Multi-Repo Support)
+            # =================================================================
+            scan_targets, manifest = _resolve_scan_targets(
+                scan_path=scan_path,
+                no_deps=no_deps,
+                as_json=as_json,
+                summary_only=summary_only,
             )
 
-            # 6. Run Scan
+            # =================================================================
+            # 6. Run Scan Loop
+            # =================================================================
+            total_stats_scanned = 0
+            total_stats_failed = 0
+            total_stats_skipped = 0
+            total_stats_unchanged = 0
+            total_stats_time = 0.0
+
+            skip_dirs = SKIP_DIRS.copy()
+
             def progress(path: Path, current: int, total: int):
                 if not as_json and verbose and not summary_only:
                     console.print(f"   [{current}/{total}] {path.name}")
 
-            result = engine.scan_and_store(storage, config, progress_callback=progress)
+            for target_path, repo_name in scan_targets:
+                if not target_path.exists():
+                    logger.warning(f"Scan target not found: {target_path}")
+                    continue
 
-            if result.is_err():
-                raise result.unwrap_err().cause or Exception(result.unwrap_err().message)
+                config = ScanConfig(
+                    root_dir=target_path,
+                    skip_dirs=skip_dirs,
+                    incremental=not force,
+                    source_repo_name=repo_name,
+                )
 
-            stats = result.unwrap()
+                result = engine.scan_and_store(storage, config, progress_callback=progress)
 
-            if not as_json and verbose and not summary_only:
-                if stats.files_scanned > 0:
-                    console.print(
-                        f"   Parsed {stats.files_scanned} files ({stats.files_unchanged} unchanged)"
-                    )
-                if stats.files_failed > 0:
-                    console.print(f"   [red]❌ Failed: {stats.files_failed} files[/red]")
+                if result.is_err():
+                    raise result.unwrap_err().cause or Exception(result.unwrap_err().message)
 
+                stats = result.unwrap()
+
+                # Accumulate stats
+                total_stats_scanned += stats.files_scanned
+                total_stats_failed += stats.files_failed
+                total_stats_skipped += stats.files_skipped
+                total_stats_unchanged += stats.files_unchanged
+                total_stats_time += stats.scan_time_ms
+
+                if not as_json and verbose and not summary_only:
+                    if stats.files_scanned > 0:
+                        console.print(f"   Parsed {stats.files_scanned} files in {repo_name}")
+
+            # =================================================================
             # 7. Hydrate Graph for Stitching
+            # =================================================================
             graph = storage.load_graph()
 
-            # 8. Run Stitching (with pack integration)
-            stitched_count = 0
-            if graph.node_count > 0:
-                # Show stitching message by default (removed 'verbose' constraint)
-                # This ensures the user knows cross-domain analysis is happening
-                if not as_json and not summary_only:
-                    console.print("🧵 Stitching cross-domain dependencies...")
+            # =================================================================
+            # 8. Run Stitching (with Explicit Mapping Support)
+            # =================================================================
+            stitched_count, explicit_count, ignored_count, edges_to_save = _run_stitching(
+                graph=graph,
+                manifest=manifest,
+                min_confidence=min_confidence,
+                active_pack=active_pack,
+                as_json=as_json,
+                summary_only=summary_only,
+            )
 
-                # Create stitcher with mode-aware confidence
-                stitcher = Stitcher()
+            # Save stitched edges
+            if edges_to_save:
+                storage.save_edges_batch(edges_to_save)
 
-                if active_pack:
-                    stitcher.apply_pack(active_pack)
-
-                # Run the newly implemented stitch method
-                stitched_edges = stitcher.stitch(graph)
-
-                # Filter by mode confidence
-                filtered_edges = [
-                    e for e in stitched_edges if (e.confidence or 0.5) >= min_confidence
-                ]
-
-                if filtered_edges:
-                    storage.save_edges_batch(filtered_edges)
-                    stitched_count = len(filtered_edges)
-
+            # =================================================================
             # 9. Extract Top Findings
+            # =================================================================
             graph = storage.load_graph()  # Reload with new edges
 
             if graph.node_count > 0:
                 extractor = TopFindingsExtractor(graph)
                 findings_summary = extractor.extract()
 
+            # =================================================================
             # 10. Format Output
+            # =================================================================
             if not as_json:
                 formatter = ScanSummaryFormatter(console)
                 formatter.format_summary(
                     nodes_found=graph.node_count,
                     edges_found=graph.edge_count,
                     stitched_count=stitched_count,
-                    files_parsed=stats.files_scanned + stats.files_unchanged,
-                    duration_sec=stats.scan_time_ms / 1000,
+                    files_parsed=total_stats_scanned + total_stats_unchanged,
+                    duration_sec=total_stats_time / 1000,
                     mode=current_mode,
                     findings_summary=findings_summary,
                     pack_name=active_pack_name,
                 )
 
-                # Check for low node count warning
+                # Show explicit mapping stats if any
+                if explicit_count > 0 and not summary_only:
+                    console.print(
+                        f"   [dim]({explicit_count} from explicit mappings, "
+                        f"{stitched_count - explicit_count} from fuzzy matching)[/dim]"
+                    )
+
                 if graph.node_count < 5:
                     echo_low_node_warning(graph.node_count)
 
-            # Handle JSON export if requested via -o file.json
             if export_to_json:
                 with open(output_path, "w") as f:
                     json.dump(graph.to_dict(), f, indent=2)
 
-            # Prepare API Response
             response_data = ScanSummaryResponse(
-                total_files=stats.files_scanned + stats.files_unchanged,
-                files_parsed=stats.files_scanned,
-                files_skipped=stats.files_skipped,
+                total_files=total_stats_scanned + total_stats_unchanged,
+                files_parsed=total_stats_scanned,
+                files_skipped=total_stats_skipped,
                 nodes_found=graph.node_count,
                 edges_found=graph.edge_count,
                 new_links_stitched=stitched_count,
                 output_path=str(output_path),
-                duration_sec=round(stats.scan_time_ms / 1000, 2),
+                duration_sec=round(total_stats_time / 1000, 2),
                 mode=current_mode.value,
                 pack=active_pack_name,
+                explicit_mappings_applied=explicit_count,
+                repos_scanned=len(scan_targets),
             )
 
             storage.close()
@@ -275,7 +457,6 @@ def scan(
         except Exception as e:
             error_to_report = e
 
-    # Render output
     if as_json:
         if error_to_report:
             renderer.render_error(error_to_report)

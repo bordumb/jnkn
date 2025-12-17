@@ -18,3 +18,4 @@ jobs:
       - uses: ./packages/jnkn-core 
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          ignore: 'tests,fixtures,examples,jnkn-demo,e2e_live,jnkn-mcp,docs,corpus'
